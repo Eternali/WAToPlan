@@ -8,3 +8,4 @@ local.properties
 .gradle/
 .idea
 app/build/
+app/app.iml
