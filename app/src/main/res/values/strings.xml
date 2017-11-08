@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">syde161proto01</string>
+    <string name="settings_name">SETTINGS</string>
+    <string name="about_name">ABOUT</string>
+    <string name="help_name">HELP</string>
+    <string name="themeText">Join the Dark Side?</string>
+    <string name="displayAsText">Display As</string>
+    <string name="listToggleText">List</string>
+    <string name="calendarToggleText">Calendar</string>
+    <string name="monthToggleText">MONTH</string>
+    <string name="weekToggleText">WEEK</string>
+    <string name="dayToggleText">DAY</string>
+    <string name="eventTimePlacehold">TIME</string>
+    <string name="eventTitlePlacehold">TITLE</string>
+    <string name="eventDescPlacehold">DESCRIPTION</string>
+    <string name="eventType_desc">Choose Type</string>
+    <string name="eventTypeChooser_text">EVENT</string>
+    <string name="duedateTypeChooser_text">DUE DATE</string>
+    <string name="projectTypeChooser_text">PROJECT</string>
+    <string name="reminderTypeChooser_text">REMINDER</string>
+    <string name="eventTypePlacehold">TYPE</string>
+</resources>

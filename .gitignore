@@ -1,0 +1,10 @@
+build/
+gradle/
+syde161proto01.iml
+gradle.properties
+gradlew
+gradlew.bat
+local.properties
+.gradle/
+.idea
+app/build/
