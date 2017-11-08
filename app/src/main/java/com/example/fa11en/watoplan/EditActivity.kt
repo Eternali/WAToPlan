@@ -1,4 +1,4 @@
-package com.example.fa11en.syde161proto01
+package com.example.fa11en.watoplan
 
 import android.app.Activity
 import android.os.Bundle
@@ -23,7 +23,7 @@ class EditActivity : Activity() {
 
         //  set layout dynamically according to event type  //
 
-        val root = findViewById<ScrollView>(R.id.edit_activity_root)
+        val root = findViewById<LinearLayout>(R.id.edit_activity_root)
 
         val typeSpinner = findViewById<Spinner>(R.id.eventTypeSpinner)
         val typeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,

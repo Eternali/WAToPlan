@@ -1,4 +1,4 @@
-package com.example.fa11en.syde161proto01
+package com.example.fa11en.watoplan
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("com.example.fa11en.syde161proto01", appContext.packageName)
+        assertEquals("com.example.fa11en.watoplan", appContext.packageName)
     }
 }

@@ -1,6 +1,6 @@
 build/
 gradle/
-syde161proto01.iml
+watoplan.iml
 gradle.properties
 gradlew
 gradlew.bat

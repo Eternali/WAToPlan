@@ -1,4 +1,4 @@
-package com.example.fa11en.syde161proto01
+package com.example.fa11en.watoplan
 
 import android.content.Context
 import android.view.LayoutInflater

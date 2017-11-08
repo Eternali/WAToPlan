@@ -1,4 +1,4 @@
-package com.example.fa11en.syde161proto01
+package com.example.fa11en.watoplan
 
 import android.app.Activity
 import android.content.Context
