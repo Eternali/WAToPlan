@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         events.add(UserEvent(eventTypes["EVENT"]!!))
         events[events.size-1].setParam(ParameterTypes.TITLE, "TEST TITLE")
         events[events.size-1].setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
-        events[events.size-1].setParam(ParameterTypes.DATETIME, Date())
+        events[events.size-1].setParam(ParameterTypes.DATETIME, Calendar.getInstance())
         events[events.size-1].setParam(ParameterTypes.LOCATION, Location("gps"))
     }
 

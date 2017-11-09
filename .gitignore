@@ -9,3 +9,4 @@ local.properties
 .idea
 app/build/
 app/app.iml
+app/src/main/AndroidManifest.xml

@@ -1,7 +1,7 @@
 package com.example.fa11en.watoplan
 
 import android.location.Location
-import java.util.Date
+import java.util.Calendar
 import kotlin.collections.HashMap
 
 
@@ -19,7 +19,7 @@ class UserEvent (val type: EventType) {
             when (key) {
                 ParameterTypes.TITLE -> return value is String
                 ParameterTypes.DESCRIPTION -> return value is String
-                ParameterTypes.DATETIME -> return value is Date
+                ParameterTypes.DATETIME -> return value is Calendar
                 ParameterTypes.LOCATION -> return value is Location
                 ParameterTypes.ENTITIES -> return value is MutableList<*>
                 ParameterTypes.REPEAT -> return value is MutableList<*>

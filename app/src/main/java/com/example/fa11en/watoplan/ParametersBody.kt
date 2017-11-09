@@ -1,10 +1,20 @@
 package com.example.fa11en.watoplan
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.Dialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.text.InputType
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.*
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import java.util.Calendar
 
 
 class ParametersBody (val parentContext: Context,
@@ -103,12 +113,33 @@ class ParametersBody (val parentContext: Context,
                         0.5f
                 )
                 timeButton.text = parentContext.getString(R.string.editTimeButton)
+                timeButton.setOnClickListener {
+                    val curTime = Calendar.getInstance()
+                    val cHour = curTime.get(Calendar.HOUR_OF_DAY)
+                    val cMinute = curTime.get(Calendar.MINUTE)
+                    val timeDialog = TimePickerDialog(parentContext,
+                            TimePickerDialog.OnTimeSetListener { view, hour, minute
+                                -> labelText.text = "" }, cHour, cMinute, true)
+                    timeDialog.setTitle("Select Time")
+                    timeDialog.show()
+                }
                 dateButton.layoutParams = LinearLayout.LayoutParams(
                         0,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         0.5f
                 )
                 dateButton.text = parentContext.getString(R.string.editDateButton)
+                dateButton.setOnClickListener {
+                    val curDate = Calendar.getInstance()
+                    val cYear = curDate.get(Calendar.YEAR)
+                    val cMonth = curDate.get(Calendar.MONTH)
+                    val cDay = curDate.get(Calendar.DAY_OF_MONTH)
+                    val dateDialog = DatePickerDialog(parentContext,
+                            DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth
+                                -> labelText.text = "" }, cYear, cMonth, cDay)
+                    dateDialog.setTitle("Select Date")
+                    dateDialog.show()
+                }
 
                 labelContainer.addView(labelText)
                 buttonContainer.addView(timeButton)
@@ -118,7 +149,42 @@ class ParametersBody (val parentContext: Context,
             }
             ParameterTypes.LOCATION -> {
                 container = (parentContext as Activity).findViewById(R.id.eventLocationContainer)
+                val labelText = TextView(parentContext)
+                val mapButton = Button(parentContext)
 
+                labelText.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.4f
+                )
+                labelText.text = parentContext.getString(R.string.locationLabelText)
+                labelText.textAlignment = LinearLayout.TEXT_ALIGNMENT_CENTER
+                val buttonLayoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.6f
+                )
+                buttonLayoutParams.setMargins(6, 0, 0, 6)
+                mapButton.layoutParams = buttonLayoutParams
+                mapButton.text = parentContext.getString(R.string.mapButtonText)
+                mapButton.setOnClickListener {
+                    val mapDialog = Dialog(parentContext)
+                    mapDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                    mapDialog.setContentView(R.layout.dialog_map)
+                    mapDialog.show()
+
+                    val mapView = mapDialog.findViewById<MapView>(R.id.mapViewOnEdit)
+                    MapsInitializer.initialize(parentContext)
+
+                    mapView.onCreate(mapDialog.onSaveInstanceState())
+                    mapView.onResume()
+                    val googleMap = mapView.getMapAsync( {
+
+                    } )
+                }
+
+                container.addView(labelText)
+                container.addView(mapButton)
             }
             ParameterTypes.ENTITIES -> {
                 // TODO: move entities list to where it makes sense and actually mean something

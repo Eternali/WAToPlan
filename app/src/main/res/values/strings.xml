@@ -25,4 +25,6 @@
     <string name="entityLabelText">RELATED CONTACTS</string>
     <string name="personNamePlacehold">FIRSTNAME LASTNAME</string>
     <string name="addEntityButtonText">ADD PERSON</string>
+    <string name="locationLabelText">CHOOSE LOCATION</string>
+    <string name="mapButtonText">OPEN MAP</string>
 </resources>
