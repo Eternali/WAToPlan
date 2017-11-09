@@ -28,7 +28,8 @@ class EditActivity : Activity() {
     fun cancelEvent (view: View) = this.finish()
 
     fun saveEvent (view: View) {
-
+        events.addEvent(event)
+        this.finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

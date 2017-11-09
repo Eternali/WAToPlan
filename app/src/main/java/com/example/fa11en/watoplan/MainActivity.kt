@@ -13,6 +13,22 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import java.util.*
 
 
+fun MutableList<UserEvent>.saveToDB () {
+
+}
+
+
+fun MutableList<UserEvent>.addEvent (event: UserEvent) : Boolean {
+    try {
+        this.add(event)
+        this.saveToDB()
+        return true
+    } catch (e: Exception) {
+        return false
+    }
+}
+
+
 enum class ParameterTypes (val param: String){
     TITLE ("TITLE"),
     DESCRIPTION ("DESCRIPTION"),
@@ -48,7 +64,7 @@ internal var events: MutableList<UserEvent> = ArrayList()
 class MainActivity : AppCompatActivity() {
 
     fun getEvents (events: MutableList<UserEvent>) {
-        events.add(UserEvent(eventTypes["EVENT"]!!))
+        events.addEvent(UserEvent(eventTypes["EVENT"]!!))
         events[events.size-1].setParam(ParameterTypes.TITLE, "TEST TITLE")
         events[events.size-1].setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
         events[events.size-1].setParam(ParameterTypes.DATETIME, Calendar.getInstance())

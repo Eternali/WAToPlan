@@ -5,7 +5,9 @@ import android.app.DatePickerDialog
 import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
@@ -58,6 +60,7 @@ class ParametersBody (val parentContext: Context,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         0.6f)
                 titleEdit.hint = param.param.toLowerCase()
+                titleEdit.addTextChangedListener(TextParamWatcher(param, ))
 
                 container.addView(labelText)
                 container.addView(titleEdit)
