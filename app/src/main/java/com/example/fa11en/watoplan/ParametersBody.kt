@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.text.InputType
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -71,7 +72,46 @@ class ParametersBody (val parentContext: Context,
             }
             ParameterTypes.DATETIME -> {
                 container = (parentContext as Activity).findViewById(R.id.eventDateTimeContainer)
+                val labelContainer = LinearLayout(parentContext)
+                val buttonContainer = LinearLayout(parentContext)
+                val labelText = TextView(parentContext)
+                val timeButton = Button(parentContext)
+                val dateButton = Button(parentContext)
 
+                labelContainer.layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                buttonContainer.layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                val labelTextParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                labelTextParams.setMargins(0, 0, 0, 12)
+                labelText.layoutParams = labelTextParams
+                labelText.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                labelText.text = parentContext.getString(R.string.datetimeLabelText)
+                timeButton.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.5f
+                )
+                timeButton.text = parentContext.getString(R.string.editTimeButton)
+                dateButton.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.5f
+                )
+                dateButton.text = parentContext.getString(R.string.editDateButton)
+
+                labelContainer.addView(labelText)
+                buttonContainer.addView(timeButton)
+                buttonContainer.addView(dateButton)
+                container.addView(labelContainer)
+                container.addView(buttonContainer)
             }
             ParameterTypes.LOCATION -> {
                 container = (parentContext as Activity).findViewById(R.id.eventLocationContainer)
@@ -79,7 +119,16 @@ class ParametersBody (val parentContext: Context,
             }
             ParameterTypes.ENTITIES -> {
                 container = (parentContext as Activity).findViewById(R.id.eventEntitiesContainer)
+                val labelText = TextView(parentContext)
 
+                labelText.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.4f)
+                labelText.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                labelText.text = parentContext.getString(R.string.entityLabelText)
+
+                container.addView(labelText)
             }
             ParameterTypes.REPEAT -> {
                 container = (parentContext as Activity).findViewById(R.id.eventRepeatContainer)

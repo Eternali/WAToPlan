@@ -19,4 +19,8 @@
     <string name="projectTypeChooser_text">PROJECT</string>
     <string name="reminderTypeChooser_text">REMINDER</string>
     <string name="eventTypePlacehold">TYPE</string>
+    <string name="editDateButton">DATE</string>
+    <string name="editTimeButton">TIME</string>
+    <string name="datetimeLabelText">CHOOSE TIME AND DATE</string>
+    <string name="entityLabelText">RELATED CONTACTS</string>
 </resources>
