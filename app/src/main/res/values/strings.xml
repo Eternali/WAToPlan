@@ -23,4 +23,6 @@
     <string name="editTimeButton">TIME</string>
     <string name="datetimeLabelText">CHOOSE TIME AND DATE</string>
     <string name="entityLabelText">RELATED CONTACTS</string>
+    <string name="personNamePlacehold">FIRSTNAME LASTNAME</string>
+    <string name="addEntityButtonText">ADD PERSON</string>
 </resources>

@@ -6,11 +6,11 @@ import android.view.MotionEvent
 import android.widget.RelativeLayout
 
 
-class EventListView (val ctx: Context) : RelativeLayout (ctx) {
+class PersonListView (val ctx: Context) : RelativeLayout (ctx) {
 
     init {
-        val layoutInflator = ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        layoutInflator.inflate(R.layout.event_list_layout, this, true)
+        val layoutInflater = ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        layoutInflater.inflate(R.layout.person_list_layout, this, true)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {

@@ -4,10 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.text.InputType
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 
 
 class ParametersBody (val parentContext: Context,
@@ -21,8 +18,14 @@ class ParametersBody (val parentContext: Context,
 
     fun set (parameters: MutableList<ParameterTypes>) {
         ParameterTypes.values().forEach {
-            if (it !in params && it in parameters) renderParam(it)
-            else if (it in params && it !in parameters) removeParam(it)
+            if (it !in params && it in parameters) {
+                renderParam(it)
+                params.add(it)
+            }
+            else if (it in params && it !in parameters) {
+                removeParam(it)
+                params.remove(it)
+            }
         }
     }
 
@@ -118,8 +121,13 @@ class ParametersBody (val parentContext: Context,
 
             }
             ParameterTypes.ENTITIES -> {
+                // TODO: move entities list to where it makes sense and actually mean something
+                val entities: MutableList<Person> = mutableListOf()
                 container = (parentContext as Activity).findViewById(R.id.eventEntitiesContainer)
                 val labelText = TextView(parentContext)
+                val contactsContainer = LinearLayout(parentContext)
+                val contactListView = ListView(parentContext)
+                val addPersonButton = Button(parentContext)
 
                 labelText.layoutParams = LinearLayout.LayoutParams(
                         0,
@@ -127,8 +135,25 @@ class ParametersBody (val parentContext: Context,
                         0.4f)
                 labelText.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
                 labelText.text = parentContext.getString(R.string.entityLabelText)
+                contactsContainer.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.6f
+                )
+                contactsContainer.orientation = LinearLayout.VERTICAL
+                contactListView.adapter = ContactAdapter(parentContext, 0, entities)
+                val addButtonParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                addButtonParams.setMargins(4, 2, 2, 4)
+                addPersonButton.layoutParams = addButtonParams
+                addPersonButton.text = parentContext.getString(R.string.addEntityButtonText)
 
+                contactsContainer.addView(contactListView)
+                contactsContainer.addView(addPersonButton)
                 container.addView(labelText)
+                container.addView(contactsContainer)
             }
             ParameterTypes.REPEAT -> {
                 container = (parentContext as Activity).findViewById(R.id.eventRepeatContainer)
@@ -147,7 +172,7 @@ class ParametersBody (val parentContext: Context,
             ParameterTypes.ENTITIES   -> container = (parentContext as Activity).findViewById(R.id.eventEntitiesContainer)
             ParameterTypes.REPEAT     -> container = (parentContext as Activity).findViewById(R.id.eventRepeatContainer)
         }
-        container.removeAllViewsInLayout()
+        container.removeAllViews()
     }
 
 }
