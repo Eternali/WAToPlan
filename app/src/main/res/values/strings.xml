@@ -27,4 +27,6 @@
     <string name="addEntityButtonText">ADD PERSON</string>
     <string name="locationLabelText">CHOOSE LOCATION</string>
     <string name="mapButtonText">OPEN MAP</string>
+    <string name="cancelButtonText">CANCEL</string>
+    <string name="saveButtonText">SAVE</string>
 </resources>

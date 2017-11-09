@@ -25,6 +25,12 @@ class EditActivity : Activity() {
         }
     }
 
+    fun cancelEvent (view: View) = this.finish()
+
+    fun saveEvent (view: View) {
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
