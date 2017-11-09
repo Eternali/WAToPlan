@@ -22,7 +22,7 @@ enum class ParameterTypes (val param: String){
     REPEAT ("REPEAT")
 }
 
-internal var eventTypes = hashMapOf(
+internal val eventTypes = hashMapOf(
         "EVENT" to EventType("EVENT",
                                     arrayListOf(ParameterTypes.TITLE,
                                             ParameterTypes.DESCRIPTION,
@@ -121,7 +121,6 @@ class MainActivity : AppCompatActivity() {
                 addMenu.collapse()
                 val editIntent = Intent(this, EditActivity::class.java)
                 editIntent.putExtra("typeName", it.key)
-                editIntent.putExtra("parameters", it.value.parameters)
                 startActivity(editIntent)
             }
 

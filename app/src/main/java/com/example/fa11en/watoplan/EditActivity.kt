@@ -2,13 +2,28 @@ package com.example.fa11en.watoplan
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.ViewGroup
+import android.view.View
 import android.widget.*
 
 
 class EditActivity : Activity() {
 
     lateinit var bundle: Bundle
+    lateinit var event: UserEvent
+    lateinit var body: ParametersBody
+
+    inner class TypeSelectedListener : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            if (parent == null || parent.getItemAtPosition(position) !in eventTypes.keys) return
+
+            event = UserEvent(eventTypes[parent.getItemAtPosition(position)]!!)
+            body.set(event.type.parameters)
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -16,14 +31,10 @@ class EditActivity : Activity() {
         bundle = intent.extras
 
         val typeName = bundle.getString("typeName")
-        val parameters = bundle.getStringArrayList("parameters")
 
         if (typeName == null || typeName !in eventTypes.keys) return
-        val event = UserEvent(eventTypes[typeName] as EventType)
-
-        //  set layout dynamically according to event type  //
-
-        val root = findViewById<LinearLayout>(R.id.edit_activity_root)
+        event = UserEvent(eventTypes[typeName] as EventType)
+        body = ParametersBody(this, event.type.parameters)
 
         val typeSpinner = findViewById<Spinner>(R.id.eventTypeSpinner)
         val typeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
@@ -31,40 +42,7 @@ class EditActivity : Activity() {
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         typeSpinner.adapter = typeAdapter
         typeSpinner.setSelection(typeAdapter.getPosition(typeName))
-
-        // load the proper fragment for each type (and on type change)
-        event.params.forEach {
-            val linearParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT)
-            linearParams.setMargins(10, 10, 10, 10)
-            when (it.key) {
-                ParameterTypes.TITLE -> {
-                    val curLayout = LinearLayout(this)
-                    val labelText = TextView(this)
-                    val titleEdit = EditText(this)
-
-                    curLayout.orientation = LinearLayout.HORIZONTAL
-                    curLayout.layoutParams = linearParams
-                    labelText.layoutParams = LinearLayout.LayoutParams(
-                            0,
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            0.5f)
-                    labelText.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-                    labelText.text = it.key.param
-                    titleEdit.layoutParams = LinearLayout.LayoutParams(
-                            0,
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            0.5f)
-                    titleEdit.hint = it.key.param
-
-                    curLayout.addView(labelText)
-                    curLayout.addView(titleEdit)
-                    root.addView(curLayout)
-                }
-            }
-//            root.invalidate()
-        }
+        typeSpinner.onItemSelectedListener = TypeSelectedListener()
 
     }
 
