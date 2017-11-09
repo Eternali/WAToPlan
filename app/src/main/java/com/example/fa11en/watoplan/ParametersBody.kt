@@ -148,6 +148,7 @@ class ParametersBody (val parentContext: Context,
                 container.addView(buttonContainer)
             }
             ParameterTypes.LOCATION -> {
+                // TODO: figure out best way for user to add location
                 container = (parentContext as Activity).findViewById(R.id.eventLocationContainer)
                 val labelText = TextView(parentContext)
                 val mapButton = Button(parentContext)
