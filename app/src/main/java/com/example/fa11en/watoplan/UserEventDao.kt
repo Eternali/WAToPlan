@@ -1,18 +1,21 @@
 package com.example.fa11en.watoplan
 
 import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Delete
+import android.arch.persistence.room.Insert
 import android.arch.persistence.room.Query
 
 
 @Dao
 interface UserEventDao {
 
-    /* eid,  */
+    @Query("SELECT * FROM userevent")
+    fun getAll(): List<UserEvent>
 
-    @Query('SELECT * FROM event')
-    val getAll(): List<UserEvent>
+    @Insert
+    fun insert (event: UserEvent)
 
-    @Query('SELECT * FROM event WHERE eid IN (:eventIds)')
-    val loadAllByIds(userIds: Array<Int>) : List<UserEvent>
+    @Delete
+    fun delete (event: UserEvent)
 
 }

@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan
 
 import android.app.FragmentTransaction
+import android.arch.persistence.room.Room
 import android.content.Intent
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
@@ -13,18 +14,29 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import java.util.*
 
 
-fun MutableList<UserEvent>.saveToDB () {
-
+fun MutableList<UserEvent>.loadAll (eventDao: UserEventDao) {
+    this.clear()
+    this.addAll(eventDao.getAll())
 }
 
+fun MutableList<UserEvent>.saveAll (eventDao: UserEventDao) {
+    this.forEach {
+        eventDao.insert(it)
+    }
+}
 
-fun MutableList<UserEvent>.addEvent (event: UserEvent) : Boolean {
-    try {
+fun MutableList<UserEvent>.deleteEvent (pos: Int, eventDao: UserEventDao) {
+    eventDao.delete(this[pos])
+    this.removeAt(pos)
+}
+
+fun MutableList<UserEvent>.addEvent (event: UserEvent, eventDao: UserEventDao) : Boolean {
+    return try {
+        eventDao.insert(event)
         this.add(event)
-        this.saveToDB()
-        return true
+        true
     } catch (e: Exception) {
-        return false
+        false
     }
 }
 
@@ -59,12 +71,14 @@ internal val eventTypes = hashMapOf(
                                             ParameterTypes.DATETIME))
         )
 
+internal var appdb: AppDatabase? = null
 internal var events: MutableList<UserEvent> = ArrayList()
 
 class MainActivity : AppCompatActivity() {
 
-    fun getEvents (events: MutableList<UserEvent>) {
-        events.addEvent(UserEvent(eventTypes["EVENT"]!!))
+    fun getEvents (events: MutableList<UserEvent>, db: AppDatabase) {
+        events.loadAll(db.eventDao())
+        events.addEvent(UserEvent(events.size, eventTypes["EVENT"]!!), db.eventDao())
         events[events.size-1].setParam(ParameterTypes.TITLE, "TEST TITLE")
         events[events.size-1].setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
         events[events.size-1].setParam(ParameterTypes.DATETIME, Calendar.getInstance())
@@ -111,7 +125,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        getEvents(events)
+        appdb = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "events-database")
+                .allowMainThreadQueries().build()
+        getEvents(events, appdb!!)
 
         displayGroup = findViewById(R.id.overviewLayoutSwitcher)
         dayToggle = findViewById(R.id.dayToggle)

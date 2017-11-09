@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan
 
 import android.app.Activity
+import android.arch.persistence.room.Room
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -16,7 +17,7 @@ class EditActivity : Activity() {
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             if (parent == null || parent.getItemAtPosition(position) !in eventTypes.keys) return
 
-            event = UserEvent(eventTypes[parent.getItemAtPosition(position)]!!)
+            event = UserEvent(events.size, eventTypes[parent.getItemAtPosition(position)]!!)
             body.set(event.type.parameters)
         }
 
@@ -28,7 +29,11 @@ class EditActivity : Activity() {
     fun cancelEvent (view: View) = this.finish()
 
     fun saveEvent (view: View) {
-        events.addEvent(event)
+        if (appdb == null) appdb = Room.databaseBuilder(applicationContext,
+                                                        AppDatabase::class.java,
+                                                        "events-database")
+                                        .allowMainThreadQueries().build()
+        events.addEvent(event, appdb!!.eventDao())
         this.finish()
     }
 
@@ -40,7 +45,7 @@ class EditActivity : Activity() {
         val typeName = bundle.getString("typeName")
 
         if (typeName == null || typeName !in eventTypes.keys) return
-        event = UserEvent(eventTypes[typeName] as EventType)
+        event = UserEvent(events.size, eventTypes[typeName] as EventType)
         body = ParametersBody(this, event.type.parameters)
 
         val typeSpinner = findViewById<Spinner>(R.id.eventTypeSpinner)

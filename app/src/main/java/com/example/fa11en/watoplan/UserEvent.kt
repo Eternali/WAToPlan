@@ -1,12 +1,17 @@
 package com.example.fa11en.watoplan
 
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 import android.location.Location
 import java.util.Calendar
 import kotlin.collections.HashMap
 
 
-class UserEvent (val type: EventType) {
+@Entity
+class UserEvent (@PrimaryKey val eid: Int, val type: EventType) {
 
+    @ColumnInfo(name = "params")
     var params: HashMap<ParameterTypes, Any> = hashMapOf()
 
     fun setParam (key: ParameterTypes, value: Any) {

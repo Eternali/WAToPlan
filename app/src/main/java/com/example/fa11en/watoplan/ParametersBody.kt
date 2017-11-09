@@ -60,7 +60,7 @@ class ParametersBody (val parentContext: Context,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         0.6f)
                 titleEdit.hint = param.param.toLowerCase()
-                titleEdit.addTextChangedListener(TextParamWatcher(param, ))
+//                titleEdit.addTextChangedListener(TextParamWatcher(param, ))
 
                 container.addView(labelText)
                 container.addView(titleEdit)

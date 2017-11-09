@@ -4,9 +4,9 @@ import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
 
 
-@Database(entities = {UserEvent.class}, version = 1)
+@Database(entities = arrayOf(UserEvent::class), version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase () {
 
-    public abstract userEventDao() :
+    abstract fun eventDao () : UserEventDao
 
 }
