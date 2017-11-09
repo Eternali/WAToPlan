@@ -2,6 +2,7 @@ package com.example.fa11en.watoplan
 
 import android.app.Activity
 import android.content.Context
+import android.text.InputType
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -35,13 +36,13 @@ class ParametersBody (val parentContext: Context,
                 labelText.layoutParams = LinearLayout.LayoutParams(
                         0,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
-                        0.5f)
+                        0.4f)
                 labelText.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
                 labelText.text = param.param
                 titleEdit.layoutParams = LinearLayout.LayoutParams(
                         0,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
-                        0.5f)
+                        0.6f)
                 titleEdit.hint = param.param.toLowerCase()
 
                 container.addView(labelText)
@@ -49,7 +50,24 @@ class ParametersBody (val parentContext: Context,
             }
             ParameterTypes.DESCRIPTION -> {
                 container = (parentContext as Activity).findViewById(R.id.eventDescContainer)
+                val labelText = TextView(parentContext)
+                val descEdit = EditText(parentContext)
 
+                labelText.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.4f)
+                labelText.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                labelText.text = param.param
+                descEdit.layoutParams = LinearLayout.LayoutParams(
+                        0,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0.6f)
+                descEdit.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                descEdit.hint = param.param.toLowerCase()
+
+                container.addView(labelText)
+                container.addView(descEdit)
             }
             ParameterTypes.DATETIME -> {
                 container = (parentContext as Activity).findViewById(R.id.eventDateTimeContainer)

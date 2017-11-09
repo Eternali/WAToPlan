@@ -37,36 +37,54 @@
         android:id="@+id/eventTitleContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="14dp" />
 
     <LinearLayout
         android:id="@+id/eventDescContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="14dp" />
 
     <LinearLayout
         android:id="@+id/eventDateTimeContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="14dp" />
 
     <LinearLayout
         android:id="@+id/eventLocationContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="14dp" />
 
     <LinearLayout
         android:id="@+id/eventEntitiesContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="14dp" />
 
     <LinearLayout
         android:id="@+id/eventRepeatContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" />
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="14dp" />
 
 </LinearLayout>
