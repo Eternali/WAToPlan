@@ -125,8 +125,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        appdb = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "events-database")
-                .allowMainThreadQueries().build()
+        appdb = EventsDB.getInstance(this)
         getEvents(events, appdb!!)
 
         displayGroup = findViewById(R.id.overviewLayoutSwitcher)

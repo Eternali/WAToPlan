@@ -1,9 +1,6 @@
 package com.example.fa11en.watoplan
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Delete
-import android.arch.persistence.room.Insert
-import android.arch.persistence.room.Query
+import android.arch.persistence.room.*
 
 
 @Dao
@@ -13,9 +10,12 @@ interface UserEventDao {
     fun getAll(): List<UserEvent>
 
     @Insert
-    fun insert (event: UserEvent)
+    fun insert (vararg events: UserEvent)
 
     @Delete
-    fun delete (event: UserEvent)
+    fun delete (vararg events: UserEvent)
+
+    @Update
+    fun update (vararg events: UserEvent)
 
 }

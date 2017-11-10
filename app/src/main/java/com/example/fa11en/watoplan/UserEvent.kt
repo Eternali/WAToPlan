@@ -8,7 +8,7 @@ import java.util.Calendar
 import kotlin.collections.HashMap
 
 
-@Entity
+@Entity(tableName = "userevent")
 class UserEvent (@PrimaryKey val eid: Int, val type: EventType) {
 
     @ColumnInfo(name = "params")
