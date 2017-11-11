@@ -8,7 +8,7 @@ import kotlin.collections.HashMap
 
 // This is a list of converters to convert complex datatypes (objects) into basic datatypes for
 // storage in a SQLite database.
-object Converters {
+class Converters {
 
     /* First is converting between Calendar and a long timestamp */
     @TypeConverter
@@ -110,6 +110,18 @@ object Converters {
 
     /* Convert EventType to String */
     @TypeConverter
-    fun eventFromString (event: EventType)
+    fun stringToEvent (eventStr: String?) : EventType? {
+        if (eventStr != null) {
+            eventTypes.forEach {
+                if (it.value.name == eventStr) return it.value
+            }
+        }
+        return null
+    }
+
+    @TypeConverter
+    fun eventToString (event: EventType?) : String? {
+        return event?.name
+    }
 
 }

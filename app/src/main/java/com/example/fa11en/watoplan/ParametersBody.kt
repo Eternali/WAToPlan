@@ -121,8 +121,11 @@ class ParametersBody (val parentContext: Context,
                     val cHour = curTime.get(Calendar.HOUR_OF_DAY)
                     val cMinute = curTime.get(Calendar.MINUTE)
                     val timeDialog = TimePickerDialog(parentContext,
-                            TimePickerDialog.OnTimeSetListener { view, hour, minute
-                                -> labelText.text = "" }, cHour, cMinute, true)
+                            TimePickerDialog.OnTimeSetListener { view, hour, minute -> run {
+                                val text = labelText.text.split(",") as MutableList<String>
+                                text[0] = hour.toString() + ": " + minute.toString()
+                                labelText.text = text.joinToString(", ")
+                            } }, cHour, cMinute, true)
                     timeDialog.setTitle("Select Time")
                     timeDialog.show()
                 }
@@ -138,8 +141,11 @@ class ParametersBody (val parentContext: Context,
                     val cMonth = curDate.get(Calendar.MONTH)
                     val cDay = curDate.get(Calendar.DAY_OF_MONTH)
                     val dateDialog = DatePickerDialog(parentContext,
-                            DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth
-                                -> labelText.text = "" }, cYear, cMonth, cDay)
+                            DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth -> run {
+                                val text = labelText.text.split(",") as MutableList<String>
+                                text[1] = dayOfMonth.toString() + " " + month.toString() + " " + year.toString()
+                                labelText.text = text.joinToString(", ")
+                            } }, cYear, cMonth, cDay)
                     dateDialog.setTitle("Select Date")
                     dateDialog.show()
                 }
