@@ -11,7 +11,6 @@ import kotlin.collections.HashMap
 class Converters {
 
     /* First is converting between Calendar and a long timestamp */
-    @TypeConverter
     fun fromTimestamp (stamp: Long?) : Calendar? {
         return if (stamp != null) {
             val cal = Calendar.getInstance()
@@ -20,13 +19,11 @@ class Converters {
         } else null
     }
 
-    @TypeConverter
     fun calToTimestamp (cal: Calendar?) : Long? {
         return cal?.timeInMillis
     }
 
     /* Next is converting between a Location and a String containing Latitude and Longitude */
-    @TypeConverter
     fun fromLocstring (locstr: String?) : Location? {
         return if (locstr != null) {
             val loc = Location("gps")
@@ -38,26 +35,22 @@ class Converters {
         } else null
     }
 
-    @TypeConverter
     fun locToStr (loc: Location?) : String? {
         return if (loc != null) loc.latitude.toString() + ',' + loc.longitude.toString()
         else null
     }
 
     /* Next is converting between a list of timestamps and a String */
-    @TypeConverter
     fun fromListString (listStr: String?) : List<Long>? {
         return listStr?.split(",")?.map { it.toLong() }
     }
 
-    @TypeConverter
     fun toRepeatStr (repeats: MutableList<Long>?) : String? {
         return repeats?.joinToString { it.toString() + ','}
     }
 
     /* Convert parameter Hashmap to String */
     @TypeConverter
-
     fun fromStringtoParams (paramStr: String?) : HashMap<ParameterTypes, Any>? {
         return if (paramStr != null) {
             val params: HashMap<ParameterTypes, Any> = hashMapOf()

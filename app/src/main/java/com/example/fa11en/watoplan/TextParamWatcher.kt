@@ -11,7 +11,7 @@ class TextParamWatcher (val paramType: ParameterTypes, val curEvent: UserEvent) 
     override fun afterTextChanged(s: Editable?) {  }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        curEvent.setParam(paramType, s as Any)
+        if (s != null) curEvent.setParam(paramType, s as String)
     }
 
 }

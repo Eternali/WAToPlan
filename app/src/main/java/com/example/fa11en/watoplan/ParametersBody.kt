@@ -20,23 +20,24 @@ import java.util.Calendar
 
 
 class ParametersBody (val parentContext: Context,
-                      private var params: MutableList<ParameterTypes>) {
+                      var event: UserEvent) {
+
+    private var params = event.type.parameters
 
     init {
-        params.forEach {
-            renderParam(it)
-        }
+        params.forEach { renderParam(it) }
     }
 
-    fun set (parameters: MutableList<ParameterTypes>) {
-        ParameterTypes.values().forEach {
-            if (it !in params && it in parameters) {
+    fun set (newEvent: UserEvent) {
+        event = newEvent
+        ParameterTypes.values().toMutableList().forEach {
+            if (it !in this.params && it in event.type.parameters) {
                 renderParam(it)
-                params.add(it)
+                this.params.add(it)
             }
-            else if (it in params && it !in parameters) {
+            else if (it in this.params && it !in event.type.parameters) {
                 removeParam(it)
-                params.remove(it)
+                this.params.remove(it)
             }
         }
     }
@@ -60,7 +61,7 @@ class ParametersBody (val parentContext: Context,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         0.6f)
                 titleEdit.hint = param.param.toLowerCase()
-//                titleEdit.addTextChangedListener(TextParamWatcher(param, ))
+                titleEdit.addTextChangedListener(TextParamWatcher(param, event))
 
                 container.addView(labelText)
                 container.addView(titleEdit)

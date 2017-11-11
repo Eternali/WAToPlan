@@ -3,6 +3,7 @@ package com.example.fa11en.watoplan
 import android.app.Activity
 import android.arch.persistence.room.Room
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 
@@ -18,7 +19,7 @@ class EditActivity : Activity() {
             if (parent == null || parent.getItemAtPosition(position) !in eventTypes.keys) return
 
             event = UserEvent(events.size, eventTypes[parent.getItemAtPosition(position)]!!)
-            body.set(event.type.parameters)
+            body.set(event)
         }
 
         override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -29,11 +30,8 @@ class EditActivity : Activity() {
     fun cancelEvent (view: View) = this.finish()
 
     fun saveEvent (view: View) {
-        if (appdb == null) appdb = Room.databaseBuilder(applicationContext,
-                                                        AppDatabase::class.java,
-                                                        "events-database")
-                                        .allowMainThreadQueries().build()
-        events.addEvent(event, appdb!!.eventDao())
+        if (appdb == null) appdb = EventsDB.getInstance(this)
+        events.addEvent(event, appdb!!)
         this.finish()
     }
 
@@ -44,9 +42,9 @@ class EditActivity : Activity() {
 
         val typeName = bundle.getString("typeName")
 
-        if (typeName == null || typeName !in eventTypes.keys) return
-        event = UserEvent(events.size, eventTypes[typeName] as EventType)
-        body = ParametersBody(this, event.type.parameters)
+        if (typeName == null || typeName !in eventTypes.keys) finish()
+        event = UserEvent(events.size, eventTypes[typeName]!!)
+        body = ParametersBody(this, event)
 
         val typeSpinner = findViewById<Spinner>(R.id.eventTypeSpinner)
         val typeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,

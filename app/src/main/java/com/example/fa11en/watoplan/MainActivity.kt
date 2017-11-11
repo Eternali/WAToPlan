@@ -14,9 +14,17 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import java.util.*
 
 
-fun MutableList<UserEvent>.loadAll (eventDao: UserEventDao) {
+fun MutableList<UserEvent>.loadAll (db: AppDatabase) {
     this.clear()
-    this.addAll(eventDao.getAll())
+    db.beginTransaction()
+    try {
+        this.addAll(db.eventDao().getAll())
+        db.setTransactionSuccessful()
+    } catch (e: Exception) {
+        return
+    } finally {
+        db.endTransaction()
+    }
 }
 
 fun MutableList<UserEvent>.saveAll (eventDao: UserEventDao) {
@@ -30,13 +38,17 @@ fun MutableList<UserEvent>.deleteEvent (pos: Int, eventDao: UserEventDao) {
     this.removeAt(pos)
 }
 
-fun MutableList<UserEvent>.addEvent (event: UserEvent, eventDao: UserEventDao) : Boolean {
+fun MutableList<UserEvent>.addEvent (event: UserEvent, db: AppDatabase) : Boolean {
+    db.beginTransaction()
     return try {
-        eventDao.insert(event)
+        db.eventDao().insert(event)
         this.add(event)
+        db.setTransactionSuccessful()
         true
     } catch (e: Exception) {
         false
+    } finally {
+        db.endTransaction()
     }
 }
 
@@ -77,12 +89,12 @@ internal var events: MutableList<UserEvent> = ArrayList()
 class MainActivity : AppCompatActivity() {
 
     fun getEvents (events: MutableList<UserEvent>, db: AppDatabase) {
-        events.loadAll(db.eventDao())
-        events.addEvent(UserEvent(events.size, eventTypes["EVENT"]!!), db.eventDao())
+        events.addEvent(UserEvent(events.size, eventTypes["EVENT"]!!), db)
         events[events.size-1].setParam(ParameterTypes.TITLE, "TEST TITLE")
         events[events.size-1].setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
         events[events.size-1].setParam(ParameterTypes.DATETIME, Calendar.getInstance())
         events[events.size-1].setParam(ParameterTypes.LOCATION, Location("gps"))
+        events.loadAll(db)
     }
 
     val displayToggleListener: RadioGroup.OnCheckedChangeListener = RadioGroup.OnCheckedChangeListener { group, checkedId ->
