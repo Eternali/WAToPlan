@@ -5,8 +5,11 @@ import android.location.Location
 import java.util.*
 
 
+// This is a list of converters to convert complex datatypes (objects) into basic datatypes for
+// storage in a SQLite database.
 object Converters {
 
+    /* First is converting between Calendar and a long timestamp */
     @TypeConverter
     fun fromTimestamp (stamp: Long?) : Calendar? {
         return if (stamp != null) {
@@ -21,6 +24,7 @@ object Converters {
         return cal?.timeInMillis
     }
 
+    /* Next is converting between a Location and a String containing Latitude and Longitude */
     @TypeConverter
     fun fromLocstring (locstr: String?) : Location? {
         return if (locstr != null) {
@@ -37,6 +41,21 @@ object Converters {
     fun locToStr (loc: Location?) : String? {
         return if (loc != null) loc.latitude.toString() + ',' + loc.longitude.toString()
         else null
+    }
+
+    /* Next is converting between a list of timestamps and a String */
+    @TypeConverter
+    fun fromListString (listStr: String?) : MutableList<Long>? {
+        return if (listStr != null) {
+
+        } else null
+    }
+
+    @TypeConverter
+    fun toRepeatStr (repeats: MutableList<Long>?) : String? {
+        return if (repeats != null) {
+            
+        } else null
     }
 
 }
