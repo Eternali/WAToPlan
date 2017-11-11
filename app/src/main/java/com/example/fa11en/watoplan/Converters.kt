@@ -3,6 +3,7 @@ package com.example.fa11en.watoplan
 import android.arch.persistence.room.TypeConverter
 import android.location.Location
 import java.util.*
+import kotlin.collections.HashMap
 
 
 // This is a list of converters to convert complex datatypes (objects) into basic datatypes for
@@ -45,17 +46,70 @@ object Converters {
 
     /* Next is converting between a list of timestamps and a String */
     @TypeConverter
-    fun fromListString (listStr: String?) : MutableList<Long>? {
-        return if (listStr != null) {
-
-        } else null
+    fun fromListString (listStr: String?) : List<Long>? {
+        return listStr?.split(",")?.map { it.toLong() }
     }
 
     @TypeConverter
     fun toRepeatStr (repeats: MutableList<Long>?) : String? {
-        return if (repeats != null) {
-            
+        return repeats?.joinToString { it.toString() + ','}
+    }
+
+    /* Convert parameter Hashmap to String */
+    @TypeConverter
+
+    fun fromStringtoParams (paramStr: String?) : HashMap<ParameterTypes, Any>? {
+        return if (paramStr != null) {
+            val params: HashMap<ParameterTypes, Any> = hashMapOf()
+
+            paramStr.split("&").forEach {
+                if (it.split("=").size != 2) return@forEach
+                when (it.split("=")[0]) {
+                    ParameterTypes.TITLE.param ->
+                        params[ParameterTypes.TITLE] = it.split("=")[1]
+                    ParameterTypes.DESCRIPTION.param ->
+                        params[ParameterTypes.DESCRIPTION] = it.split("=")[1]
+                    ParameterTypes.DATETIME.param ->
+                        params[ParameterTypes.DATETIME] = fromTimestamp(it.split("=")[1].toLong())!!
+                    ParameterTypes.LOCATION.param ->
+                        params[ParameterTypes.LOCATION] = fromLocstring(it.split("=")[1])!!
+                    ParameterTypes.ENTITIES.param ->
+                        params[ParameterTypes.ENTITIES] = it.split("=")[1]
+                    ParameterTypes.REPEAT.param ->
+                        params[ParameterTypes.REPEAT] = fromListString(it.split("=")[1])!!
+                }
+            }
+
+            params
+        } else null
+
+    }
+
+    @TypeConverter
+    fun hashParamstoString (params: HashMap<ParameterTypes, Any>?) : String? {
+        return if (params != null) {
+            var encodedStr = ""
+
+            // TODO: figure out a better way to typecheck ParameterTypes enum vals
+            params.keys.forEach{
+                if (encodedStr.isNotEmpty()) encodedStr += "&"
+                encodedStr += it.toString() + "="
+                encodedStr += when (it) {
+                    ParameterTypes.TITLE -> params[it]
+                    ParameterTypes.DESCRIPTION -> params[it]
+                    ParameterTypes.DATETIME -> calToTimestamp(params[it] as Calendar).toString()
+                    ParameterTypes.LOCATION -> locToStr(params[it] as Location)
+                    ParameterTypes.ENTITIES -> params[it]
+                    ParameterTypes.REPEAT -> toRepeatStr(params[it] as MutableList<Long>)
+                }
+            }
+
+            encodedStr
         } else null
     }
+
+    /* Convert EventType to String */
+    @TypeConverter
+    fun eventFromString (event: EventType)
 
 }

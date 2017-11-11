@@ -1,8 +1,6 @@
 package com.example.fa11en.watoplan
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
 import android.location.Location
 import java.util.Calendar
 import kotlin.collections.HashMap
@@ -11,9 +9,13 @@ import kotlin.collections.HashMap
 @Entity(tableName = "userevent")
 class UserEvent (@PrimaryKey val eid: Int, val type: EventType) {
 
+    init {
+    }
+
     @ColumnInfo(name = "params")
     var params: HashMap<ParameterTypes, Any> = hashMapOf()
 
+    @Ignore
     fun setParam (key: ParameterTypes, value: Any) {
         if (key in type.parameters && checkParamType(key, value))
             this.params.set(key, value)
