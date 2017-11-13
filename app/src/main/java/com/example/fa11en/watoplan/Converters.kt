@@ -2,6 +2,7 @@ package com.example.fa11en.watoplan
 
 import android.arch.persistence.room.TypeConverter
 import android.location.Location
+import android.util.Log
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -96,6 +97,8 @@ class Converters {
                     ParameterTypes.REPEAT -> toRepeatStr(params[it] as MutableList<Long>)
                 }
             }
+
+            Log.i("HASHEDSTR", encodedStr)
 
             encodedStr
         } else null
