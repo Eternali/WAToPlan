@@ -14,40 +14,59 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu
 import java.util.*
 
 
-fun MutableList<UserEvent>.loadAll (db: AppDatabase) {
+fun MutableList<UserEvent>.loadAll (db: AppDatabase) : Boolean {
     this.clear()
     db.beginTransaction()
-    try {
+    return try {
         this.addAll(db.eventDao().getAll())
         db.setTransactionSuccessful()
+        true
     } catch (e: Exception) {
-        return
+        false
     } finally {
         db.endTransaction()
     }
 }
 
-fun MutableList<UserEvent>.saveAll (eventDao: UserEventDao) {
-    this.forEach {
-        eventDao.insert(it)
+fun MutableList<UserEvent>.saveAll (db: AppDatabase) : Boolean {
+    db.beginTransaction()
+    return try {
+        this.forEach {
+            db.eventDao().insert(it)
+        }
+        db.setTransactionSuccessful()
+        true
+    } catch (e: Exception) {
+        false
+    } finally {
+        db.endTransaction()
     }
 }
 
-fun MutableList<UserEvent>.deleteEvent (pos: Int, eventDao: UserEventDao) {
-    eventDao.delete(this[pos])
-    this.removeAt(pos)
+fun MutableList<UserEvent>.deleteEvent (pos: Int, db: AppDatabase) : Boolean {
+    db.beginTransaction()
+    return try {
+        db.eventDao().delete(this[pos])
+        db.setTransactionSuccessful()
+        true
+    } catch (e: Exception) {
+        false
+    } finally {
+        this.removeAt(pos)
+        db.endTransaction()
+    }
 }
 
 fun MutableList<UserEvent>.addEvent (event: UserEvent, db: AppDatabase) : Boolean {
     db.beginTransaction()
     return try {
         db.eventDao().insert(event)
-        this.add(event)
         db.setTransactionSuccessful()
         true
     } catch (e: Exception) {
         false
     } finally {
+        this.add(event)
         db.endTransaction()
     }
 }
