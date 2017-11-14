@@ -38,4 +38,9 @@ class EventAdapter (val ctx: Context, var resource: Int, var events: MutableList
         return convertView
     }
 
+    fun onClick (view: View) {
+        
+    }
+
+
 }

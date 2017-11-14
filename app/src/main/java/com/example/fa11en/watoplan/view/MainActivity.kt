@@ -1,6 +1,8 @@
 package com.example.fa11en.watoplan
 
 import android.app.FragmentTransaction
+import android.arch.lifecycle.ViewModelProvider
+import android.arch.lifecycle.ViewModelProviders
 import android.arch.persistence.room.Room
 import android.content.Intent
 import android.location.Location
@@ -9,6 +11,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.RadioGroup
 import android.widget.ToggleButton
+import com.example.fa11en.watoplan.viewmodel.UserEventViewModel
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import java.util.*
@@ -103,14 +106,9 @@ internal val eventTypes = hashMapOf(
         )
 
 internal var appdb: AppDatabase? = null
-internal var events: MutableList<UserEvent> = ArrayList()
+//internal var events: MutableList<UserEvent> = ArrayList()
 
 class MainActivity : AppCompatActivity() {
-
-    fun getEvents (events: MutableList<UserEvent>, db: AppDatabase) {
-        events.loadAll(db)
-//        events.sort()
-    }
 
     val displayToggleListener: RadioGroup.OnCheckedChangeListener = RadioGroup.OnCheckedChangeListener { group, checkedId ->
         for (r in 0..group.childCount) {
@@ -120,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    lateinit private var eventsModel: UserEventViewModel
     lateinit private var dotMenu: Menu
     lateinit var displayGroup: RadioGroup
     lateinit var dayToggle: ToggleButton
@@ -153,7 +152,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         appdb = EventsDB.getInstance(this)
-        getEvents(events, appdb!!)
+        eventsModel = ViewModelProviders.of(this).get(UserEventViewModel::class.java)
 
         displayGroup = findViewById(R.id.overviewLayoutSwitcher)
         dayToggle = findViewById(R.id.dayToggle)
