@@ -109,12 +109,7 @@ class MainActivity : AppCompatActivity() {
 
     fun getEvents (events: MutableList<UserEvent>, db: AppDatabase) {
         events.loadAll(db)
-        val event = UserEvent(eventTypes["EVENT"]!!)
-        event.setParam(ParameterTypes.TITLE, "TEST TITLE")
-        event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
-        event.setParam(ParameterTypes.DATETIME, Calendar.getInstance())
-        event.setParam(ParameterTypes.LOCATION, Location("gps"))
-        events.addEvent(event, db)
+//        events.sort()
     }
 
     val displayToggleListener: RadioGroup.OnCheckedChangeListener = RadioGroup.OnCheckedChangeListener { group, checkedId ->

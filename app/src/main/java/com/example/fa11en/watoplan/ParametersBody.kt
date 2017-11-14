@@ -83,6 +83,7 @@ class ParametersBody (val parentContext: Context,
                         0.6f)
                 descEdit.inputType = InputType.TYPE_TEXT_FLAG_MULTI_LINE
                 descEdit.hint = param.param.toLowerCase()
+                descEdit.addTextChangedListener(TextParamWatcher(param, event))
 
                 container.addView(labelText)
                 container.addView(descEdit)
