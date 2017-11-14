@@ -18,7 +18,7 @@ class EditActivity : Activity() {
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             if (parent == null || parent.getItemAtPosition(position) !in eventTypes.keys) return
 
-            event = UserEvent(events.size, eventTypes[parent.getItemAtPosition(position)]!!)
+            event = UserEvent(eventTypes[parent.getItemAtPosition(position)]!!)
             body.set(event)
         }
 
@@ -43,7 +43,7 @@ class EditActivity : Activity() {
         val typeName = bundle.getString("typeName")
 
         if (typeName == null || typeName !in eventTypes.keys) finish()
-        event = UserEvent(events.size, eventTypes[typeName]!!)
+        event = UserEvent(eventTypes[typeName]!!)
         body = ParametersBody(this, event)
 
         val typeSpinner = findViewById<Spinner>(R.id.eventTypeSpinner)

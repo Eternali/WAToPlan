@@ -7,10 +7,10 @@ import kotlin.collections.HashMap
 
 
 @Entity(tableName = "userevent")
-class UserEvent (@PrimaryKey val eid: Int, val type: EventType) {
+class UserEvent (val type: EventType) {
 
-    init {
-    }
+    @PrimaryKey(autoGenerate = true)
+    var eid: Int = 0
 
     @ColumnInfo(name = "params")
     var params: HashMap<ParameterTypes, Any> = hashMapOf()
