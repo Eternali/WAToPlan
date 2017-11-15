@@ -8,7 +8,10 @@ import com.example.fa11en.watoplan.UserEvent
 
 class UserEventViewModel (private val db: AppDatabase) : ViewModel () {
 
-    private val events: MutableLiveData<MutableList<UserEvent>> = MutableLiveData()
+    private var events: MutableLiveData<MutableList<UserEvent>>
+        get() = this
+        set(value) { events.postValue(events.value) }
+    private var curEvent: MutableLiveData<UserEvent> = MutableLiveData()
 
     init {
         // get all stored data on object creation
@@ -26,5 +29,7 @@ class UserEventViewModel (private val db: AppDatabase) : ViewModel () {
     fun getEvents () : MutableLiveData<MutableList<UserEvent>> {
         return events
     }
+
+
 
 }
