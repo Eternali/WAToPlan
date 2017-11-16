@@ -8,9 +8,12 @@ import com.example.fa11en.watoplan.UserEvent
 
 class UserEventViewModel (private val db: AppDatabase) : ViewModel () {
 
-    private var events: MutableLiveData<MutableList<UserEvent>>
-        get() = this
-        set(value) { events.postValue(events.value) }
+    var i: Int
+        get() = i
+        set(value) { field = value }
+
+    var events: MutableLiveData<MutableList<UserEvent>> = MutableLiveData()
+
     private var curEvent: MutableLiveData<UserEvent> = MutableLiveData()
 
     init {
