@@ -16,6 +16,13 @@ import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import java.util.*
 
+/*
+    Models:
+        - mainViewState: eventTypes, userEvents, pos, displayType
+        - editViewState: parameterTypes, userEvent
+        -
+ */
+
 
 fun MutableList<UserEvent>.loadAll (db: AppDatabase) : Boolean {
     this.clear()
