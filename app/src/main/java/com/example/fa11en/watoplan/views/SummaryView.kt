@@ -8,7 +8,7 @@ import com.example.fa11en.watoplan.UserEvent
 interface SummaryView {
 
     // click on an event intent
-    fun editIntent (): UserEvent
+    fun settingsIntent (ctx: Context, type: EventType)
 
     // click on a FAB
     fun addIntent (ctx: Context, type: EventType): EventType
