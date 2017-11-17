@@ -38,6 +38,8 @@ dependencies {
     compile 'android.arch.persistence.room:runtime:1.0.0'
     kapt 'android.arch.persistence.room:compiler:1.0.0'
 
+    compile 'com.jakewharton:kotterknife:0.1.0-SNAPSHOT'
+
     testImplementation 'junit:junit:4.12'
     testImplementation 'android.arch.persistence.room:testing:1.0.0'
 
