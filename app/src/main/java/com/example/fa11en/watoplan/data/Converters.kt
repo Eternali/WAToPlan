@@ -109,7 +109,7 @@ class Converters {
     fun stringToEvent (eventStr: String?) : EventType? {
         if (eventStr != null) {
             eventTypes.forEach {
-                if (it.value.name == eventStr) return it.value
+                if (it.name == eventStr) return@forEach it
             }
         }
         return null

@@ -13,4 +13,6 @@ abstract class AppDatabase : RoomDatabase () {
 
     abstract fun eventDao () : UserEventDao
 
+    abstract fun typeDao () : EventTypeDao
+
 }
