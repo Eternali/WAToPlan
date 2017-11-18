@@ -12,7 +12,7 @@ class UserEvent (val type: EventType) {
     @PrimaryKey(autoGenerate = true)
     var eid: Int = 0
 
-    @ColumnInfo(name = "params")
+    @Embedded //@ColumnInfo(name = "params")
     var params: HashMap<ParameterTypes, Any> = hashMapOf()
 
     @Ignore

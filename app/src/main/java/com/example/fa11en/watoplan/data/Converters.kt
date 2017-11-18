@@ -12,7 +12,7 @@ import kotlin.collections.HashMap
 class Converters {
 
     /* First is converting between Calendar and a long timestamp */
-    fun fromTimestamp (stamp: Long?) : Calendar? {
+    fun fromTimestamp (stamp: Long?): Calendar? {
         return if (stamp != null) {
             val cal = Calendar.getInstance()
             cal.time = Date(stamp)
@@ -20,12 +20,12 @@ class Converters {
         } else null
     }
 
-    fun calToTimestamp (cal: Calendar?) : Long? {
+    fun calToTimestamp (cal: Calendar?): Long? {
         return cal?.timeInMillis
     }
 
     /* Next is converting between a Location and a String containing Latitude and Longitude */
-    fun fromLocstring (locstr: String?) : Location? {
+    fun fromLocstring (locstr: String?): Location? {
         return if (locstr != null) {
             val loc = Location("gps")
             val locArr = locstr.split(',')
@@ -36,23 +36,26 @@ class Converters {
         } else null
     }
 
-    fun locToStr (loc: Location?) : String? {
+    fun locToStr (loc: Location?): String? {
         return if (loc != null) loc.latitude.toString() + ',' + loc.longitude.toString()
         else null
     }
 
     /* Next is converting between a list of timestamps and a String */
-    fun fromListString (listStr: String?) : List<Long>? {
+    fun fromListString (listStr: String?): List<Long>? {
         return listStr?.split(",")?.map { it.toLong() }
     }
 
-    fun toRepeatStr (repeats: MutableList<Long>?) : String? {
-        return repeats?.joinToString { it.toString() + ','}
+    fun toRepeatStr (repeats: MutableList<Long>?): String? {
+        return repeats?.joinToString {
+            if (repeats.indexOf(it) == repeats.size - 1) it.toString() + ','
+            else it.toString()
+        }
     }
 
     /* Convert parameter Hashmap to String */
     @TypeConverter
-    fun fromStringtoParams (paramStr: String?) : HashMap<ParameterTypes, Any>? {
+    fun fromStringtoParams (paramStr: String?): HashMap<ParameterTypes, Any>? {
         return if (paramStr != null) {
             val params: HashMap<ParameterTypes, Any> = hashMapOf()
 
@@ -80,7 +83,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun hashParamstoString (params: HashMap<ParameterTypes, Any>?) : String? {
+    fun hashParamstoString (params: HashMap<ParameterTypes, Any>?): String? {
         return if (params != null) {
             var encodedStr = ""
 
@@ -106,7 +109,7 @@ class Converters {
 
     /* Convert EventType to String */
     @TypeConverter
-    fun stringToEvent (eventStr: String?) : EventType? {
+    fun stringToEvent (eventStr: String?): EventType? {
         if (eventStr != null) {
             eventTypes.forEach {
                 if (it.name == eventStr) return@forEach it
@@ -116,8 +119,23 @@ class Converters {
     }
 
     @TypeConverter
-    fun eventToString (event: EventType?) : String? {
+    fun eventToString (event: EventType?): String? {
         return event?.name
+    }
+
+    /* EventType parameters to encoded string */
+    @TypeConverter
+    fun paramsToString (parameters: MutableList<ParameterTypes>?): String? {
+        return parameters?.joinToString {
+            if(parameters.indexOf(it) == parameters.size - 1) it.param + '&'
+            else it.param
+        }
+    }
+
+    /* Encoded string to event parameters */
+    @TypeConverter
+    fun stringToParams (encodedStr: String?): List<ParameterTypes>? {
+        return encodedStr?.split('&')?.map { ParameterTypes.valueOf(it) }
     }
 
 }
