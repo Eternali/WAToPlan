@@ -12,13 +12,21 @@ class UserEvent (val type: EventType) {
     @PrimaryKey(autoGenerate = true)
     var eid: Int = 0
 
-    @Embedded //@ColumnInfo(name = "params")
+    @ColumnInfo(name = "params")  // @Embedded
     var params: HashMap<ParameterTypes, Any> = hashMapOf()
 
     @Ignore
     fun setParam (key: ParameterTypes, value: Any) {
         if (key in type.parameters && checkParamType(key, value))
             this.params.set(key, value)
+    }
+
+    @Ignore
+    fun convertToDb () {
+        for (param in params) {
+            @ColumnInfo(name = param.key)
+            val data = param.value
+        }
     }
 
     companion object {
