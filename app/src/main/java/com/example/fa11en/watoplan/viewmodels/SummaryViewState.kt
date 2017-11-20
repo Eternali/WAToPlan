@@ -15,7 +15,6 @@ sealed class SummaryViewState: ViewModel () {
     val types: MutableLiveData<MutableList<EventType>> = MutableLiveData()
     val typesLoaded: MutableLiveData<Boolean> = MutableLiveData()
 
-
     class DayViewModel (p: Int = 0, dbIsLoaded: Boolean = false, typesAreLoaded: Boolean = false, eventsAreLoaded: Boolean = false)
         : SummaryViewState() {
         // LiveData objects for day view state

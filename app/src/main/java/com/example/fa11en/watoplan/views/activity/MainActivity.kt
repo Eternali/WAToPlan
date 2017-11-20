@@ -54,6 +54,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     lateinit private var dotMenu: Menu
 
+    lateinit override var state: SummaryViewState
     lateinit override var appdb: AppDatabase
 
     override fun onCreate (savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
@@ -62,10 +63,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
         super.onCreate(savedInstanceState, persistentState)
         setContentView(R.layout.activity_main)
 
-        render(SummaryViewState.DayViewModel(p = 0,
-                                            dbIsLoaded = false,
-                                            typesAreLoaded = false,
-                                            eventsAreLoaded = false),this)
+        state = SummaryViewState.DayViewModel(0, false, false, false)
+        render(state,this)
     }
 
     override fun onCreateOptionsMenu (menu: Menu?): Boolean {
@@ -79,7 +78,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         if (item == null) return false
         when (item.itemId) {
             R.id.action_settings -> {
-
+                startActivity(Intent(this, SettingsActivity::class.java))
             }
         }
 
@@ -142,17 +141,19 @@ class MainActivity: AppCompatActivity (), SummaryView {
         val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         when (view.id) {
             R.id.dayToggle -> {
-                render(SummaryViewState.DayViewModel(p = 0,
-                        dbIsLoaded = true,
-                        typesAreLoaded = true,
-                        eventsAreLoaded = true), this)
-                fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "Day")
+                state = SummaryViewState.DayViewModel(0, true, true,true)
+                fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "day")
+                render(state, this)
             }
             R.id.weekToggle -> {
-
+                state = SummaryViewState.WeekViewModel()
+                fragTransaction.replace(R.id.displayFragContainer, WeekFragment(), "day")
+                render(state, this)
             }
             R.id.monthToggle -> {
-
+                state = SummaryViewState.MonthViewModel()
+                fragTransaction.replace(R.id.displayFragContainer, MonthFragment(), "day")
+                render(state, this)
             }
         }
         fragTransaction.commit()
@@ -171,6 +172,13 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun render (summaryState: SummaryViewState, ctx: Context) {
+
+        // fragment handling
+        when (state) {
+            is SummaryViewState.DayViewModel -> {}
+            is SummaryViewState.WeekViewModel -> {}
+            is SummaryViewState.MonthViewModel -> {}
+        }
 
         // load database if not already done so
         if (summaryState.dbLoaded.value == null || !(summaryState.dbLoaded.value as Boolean))

@@ -4,6 +4,8 @@ import android.arch.persistence.room.Room
 import android.location.Location
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
+import com.example.fa11en.watoplan.viewmodels.SummaryViewState
+import com.example.fa11en.watoplan.views.SummaryView
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +34,8 @@ class UserEventReadWriteTest {
     @Test
     @Throws(Exception::class)
     fun writeEventAndReadInList () {
-        val event = UserEvent(0, eventTypes["EVENT"]!!)
+        val event = UserEvent(EventType("TestType", listOf(ParameterTypes.TITLE),
+                R.color.colorAccent, R.color.colorAccent_pressed))
         event.setParam(ParameterTypes.TITLE, "TEST TITLE")
         event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
         event.setParam(ParameterTypes.DATETIME, Calendar.getInstance())
