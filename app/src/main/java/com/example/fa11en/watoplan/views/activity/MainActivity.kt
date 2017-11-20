@@ -28,6 +28,12 @@ import kotterknife.bindView
  */
 
 
+// global enum of themes
+enum class Themes {
+    DARK,
+    LIGHT
+}
+
 // This can be put here because it will never change and is required globally
 enum class ParameterTypes (val param: String) {
     TITLE ("TITLE"),
