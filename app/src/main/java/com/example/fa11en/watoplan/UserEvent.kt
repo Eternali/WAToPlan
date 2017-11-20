@@ -7,13 +7,20 @@ import kotlin.collections.HashMap
 
 
 @Entity(tableName = "userevent")
-class UserEvent (val type: EventType) {
+class UserEvent (@Ignore val type: EventType) {
+
+    init {  }
 
     @PrimaryKey(autoGenerate = true)
     var eid: Int = 0
 
-    @ColumnInfo(name = "params")  // @Embedded
+    @ColumnInfo(name = "typename")
+    var typeName: String = type.name
+
+    @ColumnInfo(name = "params")
     var params: HashMap<ParameterTypes, Any> = hashMapOf()
+
+    // TODO: add ability to change event type on the fly
 
     @Ignore
     fun setParam (key: ParameterTypes, value: Any) {
@@ -21,23 +28,15 @@ class UserEvent (val type: EventType) {
             this.params.set(key, value)
     }
 
-    @Ignore
-    fun convertToDb () {
-        for (param in params) {
-            @ColumnInfo(name = param.key)
-            val data = param.value
-        }
-    }
-
     companion object {
         fun checkParamType (key: ParameterTypes, value: Any): Boolean {
-            when (key) {
-                ParameterTypes.TITLE -> return value is String
-                ParameterTypes.DESCRIPTION -> return value is String
-                ParameterTypes.DATETIME -> return value is Calendar
-                ParameterTypes.LOCATION -> return value is Location
-                ParameterTypes.ENTITIES -> return value is MutableList<*>
-                ParameterTypes.REPEAT -> return value is MutableList<*>
+            return when (key) {
+                ParameterTypes.TITLE -> value is String
+                ParameterTypes.DESCRIPTION -> value is String
+                ParameterTypes.DATETIME -> value is Calendar
+                ParameterTypes.LOCATION -> value is Location
+                ParameterTypes.ENTITIES -> value is MutableList<*>
+                ParameterTypes.REPEAT -> value is MutableList<*>
             }
         }
     }

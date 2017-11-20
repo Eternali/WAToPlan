@@ -33,11 +33,11 @@ class ParametersBody (val parentContext: Context,
         ParameterTypes.values().toMutableList().forEach {
             if (it !in this.params && it in event.type.parameters) {
                 renderParam(it)
-                this.params.add(it)
+//                this.params.add(it)
             }
             else if (it in this.params && it !in event.type.parameters) {
                 removeParam(it)
-                this.params.remove(it)
+//                this.params.remove(it)
             }
         }
     }

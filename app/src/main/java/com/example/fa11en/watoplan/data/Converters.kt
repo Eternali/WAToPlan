@@ -101,26 +101,8 @@ class Converters {
                 }
             }
 
-            Log.i("HASHEDSTR", encodedStr)
-
             encodedStr
         } else null
-    }
-
-    /* Convert EventType to String */
-    @TypeConverter
-    fun stringToEvent (eventStr: String?): EventType? {
-        if (eventStr != null) {
-            eventTypes.forEach {
-                if (it.name == eventStr) return@forEach it
-            }
-        }
-        return null
-    }
-
-    @TypeConverter
-    fun eventToString (event: EventType?): String? {
-        return event?.name
     }
 
     /* EventType parameters to encoded string */

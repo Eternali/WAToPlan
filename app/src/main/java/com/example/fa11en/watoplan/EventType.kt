@@ -6,7 +6,9 @@ import android.arch.persistence.room.PrimaryKey
 
 
 @Entity(tableName = "eventtype")
-data class EventType (@PrimaryKey val name: String,
-                      @ColumnInfo val parameters: ArrayList<ParameterTypes>,
-                      @ColumnInfo val colorNormal: Int,
-                      @ColumnInfo val colorPressed: Int)
+data class EventType (@PrimaryKey val name: String = "",
+                      @ColumnInfo val parameters: List<ParameterTypes> = listOf(),
+                      @ColumnInfo val colorNormal: Int = 0,
+                      @ColumnInfo val colorPressed: Int = 0) {
+    init {  }
+}

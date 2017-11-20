@@ -16,7 +16,7 @@ class DayFragment : Fragment () {
             val view: View = inflater.inflate(R.layout.day_fragment_layout, null)
 
             val dayListView: ListView = view.findViewById(R.id.dayView)
-            dayListView.adapter = EventAdapter(activity, 0, events)
+            dayListView.adapter = EventAdapter(activity, 0, )
 
             return view
         }

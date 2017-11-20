@@ -1,5 +1,6 @@
 package com.example.fa11en.watoplan
 
+import android.app.FragmentTransaction
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,12 +9,14 @@ import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.RadioGroup
 import android.widget.ToggleButton
 import com.example.fa11en.watoplan.viewmodels.SummaryViewState
 import com.example.fa11en.watoplan.views.SummaryView
 import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotterknife.bindView
 
 
@@ -50,6 +53,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
     private val monthToggle: ToggleButton by bindView(R.id.monthToggle)
 
     lateinit private var dotMenu: Menu
+
+    lateinit override var appdb: AppDatabase
 
     override fun onCreate (savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
 
@@ -95,7 +100,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     override fun loadDatabase (ctx: Context, state: SummaryViewState): Boolean {
         return try {
-            this.appdb = EventsDB.getInstance(ctx)
+            appdb = EventsDB.getInstance(ctx)
             state.dbLoaded.postValue(true)
             true
         } catch (e: Exception) {
@@ -128,6 +133,29 @@ class MainActivity: AppCompatActivity (), SummaryView {
         } finally {
             db.endTransaction()
         }
+    }
+
+    override fun toggleDisplay (view: View) {
+        displayGroup.clearCheck()
+        displayGroup.check(view.id)
+
+        val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+        when (view.id) {
+            R.id.dayToggle -> {
+                render(SummaryViewState.DayViewModel(p = 0,
+                        dbIsLoaded = true,
+                        typesAreLoaded = true,
+                        eventsAreLoaded = true), this)
+                fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "Day")
+            }
+            R.id.weekToggle -> {
+
+            }
+            R.id.monthToggle -> {
+
+            }
+        }
+        fragTransaction.commit()
     }
 
     override fun editIntent (ctx: Context, event: UserEvent) {
@@ -176,6 +204,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
             }
             addMenu.addButton(button)
         }
+
     }
 
 }
