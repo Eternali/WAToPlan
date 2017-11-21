@@ -34,6 +34,18 @@ enum class Themes {
     LIGHT
 }
 
+// global enum for request codes
+enum class RequestCodes (val code: Int) {
+    NEWEVENTTYPE(0)
+}
+
+// global enum for result codes
+enum class ResultCodes (val code: Int) {
+    TYPECANCELED(0),
+    TYPESAVED(1),
+    TYPEFAILED(2)
+}
+
 // This can be put here because it will never change and is required globally
 enum class ParameterTypes (val param: String) {
     TITLE ("TITLE"),

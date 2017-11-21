@@ -40,6 +40,17 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         render(SettingsViewState.Loading(Themes.LIGHT, false, false), this)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            RequestCodes.NEWEVENTTYPE.code -> {
+                if (resultCode == ResultCodes.TYPESAVED.code)
+                    // notify adapter of type changed
+                    {}
+            }
+        }
+    }
+
 
     ////**** INTENTS ****////
 
@@ -70,7 +81,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     }
 
     override fun editDialog(ctx: Context, state: SettingsViewState) {
-        startActivity(Intent(ctx, EditTypeActivity::class.java))
+        startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
     }
 
     override fun render(state: SettingsViewState, ctx: Context) {
@@ -96,9 +107,6 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             is SettingsViewState.Passive -> {
                 // now that everything is loaded, set listview adapter
                 eventList.adapter = TypeAdapter(this, 0, state.types.value!!)
-            }
-            is SettingsViewState.Editing -> {
-                editDialog(ctx, state)
             }
         }
 

@@ -49,34 +49,4 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
 
     }
 
-    class Editing (t: Themes, etype: EventType? = null): SettingsViewState (t) {
-
-        val type: MutableLiveData<EventType> = MutableLiveData()
-        val typeName: MutableLiveData<String> = MutableLiveData()
-        val typeParams: HashMap<ParameterTypes, MutableLiveData<Boolean>> = hashMapOf()
-        val typeColorNormal: MutableLiveData<Int> = MutableLiveData()
-        val typeColorPressed: MutableLiveData<Int> = MutableLiveData()
-
-        init {
-            // set type
-            // other classes (i.e. edit dialog) should observe this and adjust editables accordingly
-            if (etype != null) type.postValue(etype)
-
-            // initialize all parameters to false
-            ParameterTypes.values().forEach {
-                typeParams[it] = MutableLiveData()
-                typeParams[it]!!.postValue(false)  // WATCH NULL-SAFE ASSERTION
-            }
-            // set defaults
-            typeParams[ParameterTypes.TITLE]!!.postValue(true)
-            typeParams[ParameterTypes.DESCRIPTION]!!.postValue(true)
-
-            // initialize other event type parameters
-            typeName.postValue("")
-            typeColorNormal.postValue(R.color.colorAccent)
-            typeColorPressed.postValue(R.color.colorAccent_pressed)
-        }
-
-    }
-
 }

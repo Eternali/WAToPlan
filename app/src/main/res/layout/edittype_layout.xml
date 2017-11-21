@@ -75,39 +75,39 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content">
             <RadioButton
-                android:id="@+id/titleRadio"
+                android:id="@+id/TITLE"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="@string/titleRadioText"
                 android:checked="true"/>
             <RadioButton
-                android:id="@+id/descRadio"
+                android:id="@+id/DESCRIPTION"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="@string/descRadioText"
                 android:checked="true"/>
             <RadioButton
-                android:id="@+id/datetimeRadio"
+                android:id="@+id/DATETIME"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="@string/datetimeRadioText"/>
             <RadioButton
-                android:id="@+id/locationRadio"
+                android:id="@+id/LOCATION"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="@string/locationRadioText"/>
             <RadioButton
-                android:id="@+id/entitiesRadio"
+                android:id="@+id/ENTITIES"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="@string/entitiesRadioText"/>
             <RadioButton
-                android:id="@+id/repeatRadio"
+                android:id="@+id/REPEAT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
