@@ -1,43 +1,104 @@
 package com.example.fa11en.watoplan
 
 import android.app.Activity
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
-import android.widget.RadioGroup
-import android.widget.ToggleButton
+import android.widget.*
+import com.example.fa11en.watoplan.viewmodels.SettingsViewState
+import com.example.fa11en.watoplan.views.SettingsView
+import kotterknife.bindView
 
-class SettingsActivity : Activity () {
+class SettingsActivity : AppCompatActivity (), SettingsView {
 
-    val displayToggleListener: RadioGroup.OnCheckedChangeListener = RadioGroup.OnCheckedChangeListener { group, checkedId ->
-        for (r in 0..group.childCount) {
-            if (group.getChildAt(r) == null) continue
-            val view: ToggleButton = group.getChildAt(r) as ToggleButton
-            view.isChecked = view.id == checkedId
-        }
-    }
+    // use kotterknife to bind views to vals
 
-    lateinit var displayGroup: RadioGroup
-    lateinit var listToggle: ToggleButton
-    lateinit var calToggle: ToggleButton
+    // theme switch
+    private val themeSwitch: Switch by bindView(R.id.themeSwitch)
 
-    fun toggleDisplay(view: View) {
-        displayGroup.clearCheck()
-        displayGroup.check(view.id)
-    }
+    // event types
+    private val eventContainer: LinearLayout by bindView(R.id.eventTypesContainer)
+    private val eventLabel: TextView by bindView(R.id.eventEditTitle)
+    private val eventList: ListView by bindView(R.id.eventsEditList)
+
+    lateinit override var appdb: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // set content view to layout
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        displayGroup = findViewById(R.id.displayToggleGroup)
-        listToggle = findViewById(R.id.listToggle)
-        calToggle = findViewById(R.id.calendarToggle)
+        // initialize state to loading (neither the database or events are loaded yet)
+        render(SettingsViewState.Loading(Themes.LIGHT, false, false), this)
+    }
 
-        displayGroup.setOnCheckedChangeListener(displayToggleListener)
+
+    ////**** INTENTS ****////
+
+    override fun loadDatabase(ctx: Context, state: SettingsViewState): Boolean {
+        return try {
+            appdb = EventsDB.getInstance(ctx)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    override fun showDbError(ctx: Context, msg: String) {
+        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+    }
+
+    // TODO: make a database intents class for application-wide data loading
+    override fun loadTypes(db: AppDatabase, state: SettingsViewState): Boolean {
+        db.beginTransaction()
+        return try {
+            state.types.postValue(db.typeDao().getAll().toMutableList())
+            true
+        } catch (e: Exception) {
+            false
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    override fun editDialog(ctx: Context, state: SettingsViewState) {
+
+    }
+
+    override fun render(state: SettingsViewState, ctx: Context) {
+        when (state) {
+            is SettingsViewState.Loading -> {
+                // watch loading status
+                val loadingObserver: Observer<Boolean> = Observer {
+                    if (state.dbLoaded.value != null && state.dbLoaded.value!!
+                            && state.typesLoaded.value != null && state.typesLoaded.value!!) {
+                        // WATCH NULL-SAFETY PROMISE
+                        render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
+                    }
+                }
+                state.dbLoaded.observe(this, loadingObserver)
+                state.typesLoaded.observe(this, loadingObserver)
+
+                // load data
+                if (loadDatabase(ctx, state)) state.dbLoaded.postValue(true)
+                else showDbError(ctx, "Failed to Load Database")
+                if (loadTypes(appdb, state)) state.typesLoaded.postValue(true)
+                else showDbError(ctx, "Failed to load Events")
+            }
+            is SettingsViewState.Passive -> {
+
+            }
+            is SettingsViewState.Editing -> {
+
+            }
+        }
+
     }
 
 }

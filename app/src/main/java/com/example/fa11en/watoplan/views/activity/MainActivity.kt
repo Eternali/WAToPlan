@@ -60,6 +60,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     lateinit private var dotMenu: Menu
 
+    // activity state variables
     lateinit override var state: SummaryViewState
     lateinit override var appdb: AppDatabase
 

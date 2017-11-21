@@ -29,4 +29,5 @@
     <string name="mapButtonText">OPEN MAP</string>
     <string name="cancelButtonText">CANCEL</string>
     <string name="saveButtonText">SAVE</string>
+    <string name="eventTypesEditTitle">ACTIVITY TYPES</string>
 </resources>
