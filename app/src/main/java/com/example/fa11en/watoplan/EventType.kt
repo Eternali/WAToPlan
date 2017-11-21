@@ -10,5 +10,5 @@ data class EventType (@PrimaryKey val name: String = "",
                       @ColumnInfo val parameters: List<ParameterTypes> = listOf(),
                       @ColumnInfo val colorNormal: Int = 0,
                       @ColumnInfo val colorPressed: Int = 0) {
-    init {  }
+    init {  }  // need empty constructor for Room DB
 }

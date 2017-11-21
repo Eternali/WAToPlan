@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.*
 import com.example.fa11en.watoplan.viewmodels.SettingsViewState
 import com.example.fa11en.watoplan.views.SettingsView
+import com.example.fa11en.watoplan.views.adapter.TypeAdapter
+import com.example.fa11en.watoplan.views.dialog.EditTypeActivity
 import kotterknife.bindView
 
 class SettingsActivity : AppCompatActivity (), SettingsView {
@@ -68,7 +70,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     }
 
     override fun editDialog(ctx: Context, state: SettingsViewState) {
-
+        startActivity(Intent(ctx, EditTypeActivity::class.java))
     }
 
     override fun render(state: SettingsViewState, ctx: Context) {
@@ -78,7 +80,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 val loadingObserver: Observer<Boolean> = Observer {
                     if (state.dbLoaded.value != null && state.dbLoaded.value!!
                             && state.typesLoaded.value != null && state.typesLoaded.value!!) {
-                        // WATCH NULL-SAFETY PROMISE
+                        // LOOK OUT FOR NULL-SAFETY PROMISE
                         render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
                     }
                 }
@@ -92,10 +94,11 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 else showDbError(ctx, "Failed to load Events")
             }
             is SettingsViewState.Passive -> {
-
+                // now that everything is loaded, set listview adapter
+                eventList.adapter = TypeAdapter(this, 0, state.types.value!!)
             }
             is SettingsViewState.Editing -> {
-
+                editDialog(ctx, state)
             }
         }
 

@@ -30,4 +30,16 @@
     <string name="cancelButtonText">CANCEL</string>
     <string name="saveButtonText">SAVE</string>
     <string name="eventTypesEditTitle">ACTIVITY TYPES</string>
+    <string name="pressedText">PRESSED</string>
+    <string name="normalText">NORMAL</string>
+    <string name="hintName">NAME</string>
+    <string name="parametersTitleText">PARAMETERS</string>
+    <string name="titleRadioText">TITLE</string>
+    <string name="descRadioText">DESCRIPTION</string>
+    <string name="datetimeRadioText">DATETIME</string>
+    <string name="locationRadioText">LOCATION</string>
+    <string name="entitiesRadioText">PEOPLE</string>
+    <string name="repeatRadioText">REPETITIONS</string>
+    <string name="cancelText">CANCEL</string>
+    <string name="saveText">SAVE</string>
 </resources>

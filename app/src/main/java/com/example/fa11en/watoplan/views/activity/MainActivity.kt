@@ -53,7 +53,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
     private val addMenu: FloatingActionsMenu by bindView(R.id.addMenu)
 
     // view selection
-    private val displayGroup: RadioGroup by bindView(R.id.displayToggleGroup)
+    private val displayGroup: RadioGroup by bindView(R.id.overviewLayoutSwitcher)
     private val dayToggle: ToggleButton by bindView(R.id.dayToggle)
     private val weekToggle: ToggleButton by bindView(R.id.weekToggle)
     private val monthToggle: ToggleButton by bindView(R.id.monthToggle)
