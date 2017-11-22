@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan
 
 import android.app.FragmentTransaction
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.RadioGroup
+import android.widget.Toast
 import android.widget.ToggleButton
 import com.example.fa11en.watoplan.viewmodels.SummaryViewState
 import com.example.fa11en.watoplan.views.SummaryView
@@ -73,7 +75,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
     lateinit private var dotMenu: Menu
 
     // activity state variables
-    lateinit override var state: SummaryViewState
     lateinit override var appdb: AppDatabase
 
     override fun onCreate (savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
@@ -82,8 +83,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         super.onCreate(savedInstanceState, persistentState)
         setContentView(R.layout.activity_main)
 
-        state = SummaryViewState.DayViewModel(0, false, false, false)
-        render(state,this)
+        render(SummaryViewState.Loading(false, false, false, dayToggle.id),this)
     }
 
     override fun onCreateOptionsMenu (menu: Menu?): Boolean {
@@ -116,21 +116,23 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     ////**** INTENTS ****////
 
-    override fun loadDatabase (ctx: Context, state: SummaryViewState): Boolean {
+    override fun loadDatabase (ctx: Context): Boolean {
         return try {
             appdb = EventsDB.getInstance(ctx)
-            state.dbLoaded.postValue(true)
             true
         } catch (e: Exception) {
             false
         }
     }
 
+    override fun showDbError(ctx: Context, msg: String) {
+        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+    }
+
     override fun loadTypes (state: SummaryViewState, db: AppDatabase): Boolean {
         db.beginTransaction()
         return try {
             state.types.postValue(db.typeDao().getAll().toMutableList())
-            state.typesLoaded.postValue(true)
             true
         } catch (e: Exception) {
             false
@@ -144,7 +146,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
         return try {
             // alter state to reflect success
             state.events.postValue(db.eventDao().getAll().toMutableList())
-            state.eventsLoaded.postValue(true)
             true
         } catch (e: Exception) {
             false
@@ -157,25 +158,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         displayGroup.clearCheck()
         displayGroup.check(view.id)
 
-        val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-        when (view.id) {
-            R.id.dayToggle -> {
-                state = SummaryViewState.DayViewModel(0, true, true,true)
-                fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "day")
-                render(state, this)
-            }
-            R.id.weekToggle -> {
-                state = SummaryViewState.WeekViewModel()
-                fragTransaction.replace(R.id.displayFragContainer, WeekFragment(), "day")
-                render(state, this)
-            }
-            R.id.monthToggle -> {
-                state = SummaryViewState.MonthViewModel()
-                fragTransaction.replace(R.id.displayFragContainer, MonthFragment(), "day")
-                render(state, this)
-            }
-        }
-        fragTransaction.commit()
+        render(SummaryViewState.Loading(true, true, true, view.id), this)
     }
 
     override fun editIntent (ctx: Context, event: UserEvent) {
@@ -190,24 +173,56 @@ class MainActivity: AppCompatActivity (), SummaryView {
         startActivity(Intent(ctx, SettingsActivity::class.java))
     }
 
-    override fun render (summaryState: SummaryViewState, ctx: Context) {
+    override fun render (state: SummaryViewState, ctx: Context) {
 
         // fragment handling
         when (state) {
+            is SummaryViewState.Loading -> {
+                // watch loading status
+                val dbLoadingObserver: Observer<Boolean> = Observer {
+                    if (it != null && it) {
+                        // LOOK OUT FOR NULL-SAFETY PROMISE
+                        if (loadTypes(state, appdb)) state.typesLoaded.postValue(true)
+                        else showDbError(ctx, "Failed to load Event Types.")
+                        if (loadEvents(state, appdb)) state.eventsLoaded.postValue(true)
+                        else showDbError(ctx, "Failed to load Events.")
+                    }
+                }
+
+                state.dbLoaded.observe(this, dbLoadingObserver)
+
+                // load database if not already done so
+                if (state.dbLoaded.value == null || !state.dbLoaded.value!!) {
+                    if (loadDatabase(ctx)) state.dbLoaded.postValue(true)
+                    else showDbError(ctx, "Failed to load Database.")
+                }
+
+                // set display fragment
+                // TODO: only replace fragment when previous is different from requested
+                val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+                when (state.displayFrag.value) {
+                    R.id.dayToggle -> {
+                        fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "day")
+                        fragTransaction.commit()
+                        render(SummaryViewState.DayViewModel(0), this)
+                    }
+                    R.id.weekToggle -> {
+                        fragTransaction.replace(R.id.displayFragContainer, WeekFragment(), "day")
+                        fragTransaction.commit()
+                        render(SummaryViewState.WeekViewModel(), this)
+                    }
+                    R.id.monthToggle -> {
+                        fragTransaction.replace(R.id.displayFragContainer, MonthFragment(), "day")
+                        fragTransaction.commit()
+                        render(SummaryViewState.MonthViewModel(), this)
+                    }
+                    else -> fragTransaction.commit()
+                }
+            }
             is SummaryViewState.DayViewModel -> {}
             is SummaryViewState.WeekViewModel -> {}
             is SummaryViewState.MonthViewModel -> {}
         }
-
-        // load database if not already done so
-        if (summaryState.dbLoaded.value == null || !(summaryState.dbLoaded.value as Boolean))
-            loadDatabase(ctx, summaryState)
-
-        // load event types and events if not already done so
-        if (summaryState.typesLoaded.value == null || !(summaryState.typesLoaded.value as Boolean))
-            loadTypes(summaryState, appdb)
-        if (summaryState.eventsLoaded.value == null || !(summaryState.eventsLoaded.value as Boolean))
-            loadEvents(summaryState, appdb)
 
         // make radio group from togglers
         displayGroup.setOnCheckedChangeListener({group, checkedId ->
@@ -219,7 +234,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         })
 
         // generate FABS
-        summaryState.types.value?.forEach {
+        state.types.value?.forEach {
             val button = FloatingActionButton(ctx)
             button.size = FloatingActionButton.SIZE_MINI
             button.setColorNormalResId(it.colorNormal)

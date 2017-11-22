@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import com.example.fa11en.watoplan.viewmodels.SummaryViewState
 
 import com.example.fa11en.watoplan.views.SummaryView
 
@@ -15,6 +16,7 @@ class DayFragment : Fragment () {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
+        // Note: the fragment is guaranteed that the data it needs is loaded (it isn't in the DayViewModel state
         if (inflater != null && container != null
                 && (activity as MainActivity).state.eventsLoaded.value != null
                 && (activity as MainActivity).state.eventsLoaded.value!!) {
@@ -27,6 +29,12 @@ class DayFragment : Fragment () {
         }
 
         return View(activity)
+    }
+
+    companion object {
+        fun newInstance (state: SummaryViewState.DayViewModel) {
+
+        }
     }
 
 }

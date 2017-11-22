@@ -12,11 +12,13 @@ import com.example.fa11en.watoplan.viewmodels.SummaryViewState
 
 interface SummaryView {
 
-    var state: SummaryViewState
     var appdb: AppDatabase
 
     // load database
-    fun loadDatabase (ctx: Context, state: SummaryViewState): Boolean
+    fun loadDatabase (ctx: Context): Boolean
+
+    // show database errors
+    fun showDbError (ctx: Context, msg: String)
 
     // load types
     fun loadTypes (state: SummaryViewState, db: AppDatabase): Boolean
@@ -38,9 +40,9 @@ interface SummaryView {
 
     /*
         Render the view
-        @param summaryState: the viewState to be displayed
+        @param state: the viewState to be displayed
         @param ctx: the context to be rendered in
     */
-    fun render (summaryState: SummaryViewState, ctx: Context)
+    fun render (state: SummaryViewState, ctx: Context)
 
 }

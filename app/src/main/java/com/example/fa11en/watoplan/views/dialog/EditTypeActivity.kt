@@ -1,10 +1,12 @@
 package com.example.fa11en.watoplan.views.dialog
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -48,6 +50,7 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
 
     val colorDialog = AmbilWarnaDialog(this, R.color.colorAccent, listener()).dialog.show()
 
+
     ////**** INTENTS ****////
 
     override fun saveType(state: EditTypeViewState): Boolean {
@@ -77,8 +80,9 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
     }
 
     override fun render(state: EditTypeViewState, ctx: Context) {
-        // initialize observables
 
+        // initialize observables/listeners
+        name.addTextChangedListener(EditParamWatcher(state.typeName))
 
         //  radio listeners  //
         for (c in 0 until paramsContainer.childCount) {

@@ -15,7 +15,7 @@ interface SettingsView {
     // load database if not done so already.
     // this should check state.dbLoaded and read from bundle
     // or instantiate a new database if necessary.
-    fun loadDatabase (ctx: Context, state: SettingsViewState): Boolean
+    fun loadDatabase (ctx: Context): Boolean
 
     // show database errors
     fun showDbError (ctx: Context, msg: String)

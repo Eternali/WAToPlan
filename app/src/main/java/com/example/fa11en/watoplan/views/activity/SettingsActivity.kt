@@ -54,7 +54,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     ////**** INTENTS ****////
 
-    override fun loadDatabase(ctx: Context, state: SettingsViewState): Boolean {
+    override fun loadDatabase(ctx: Context): Boolean {
         return try {
             appdb = EventsDB.getInstance(ctx)
             true
@@ -88,21 +88,25 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         when (state) {
             is SettingsViewState.Loading -> {
                 // watch loading status
-                val loadingObserver: Observer<Boolean> = Observer {
-                    if (state.dbLoaded.value != null && state.dbLoaded.value!!
-                            && state.typesLoaded.value != null && state.typesLoaded.value!!) {
+                val dbLoadingObserver: Observer<Boolean> = Observer {
+                    if (it != null && it) {
+                        // LOOK OUT FOR NULL-SAFETY PROMISE
+                        if (loadTypes(appdb, state)) state.typesLoaded.postValue(true)
+                        else showDbError(ctx, "Failed to load Event Types")
+                    }
+                }
+                val typesLoadingObserver: Observer<Boolean> = Observer {
+                    if (it != null && it) {
                         // LOOK OUT FOR NULL-SAFETY PROMISE
                         render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
                     }
                 }
-                state.dbLoaded.observe(this, loadingObserver)
-                state.typesLoaded.observe(this, loadingObserver)
+                state.dbLoaded.observe(this, dbLoadingObserver)
+                state.typesLoaded.observe(this, typesLoadingObserver)
 
-                // load data
-                if (loadDatabase(ctx, state)) state.dbLoaded.postValue(true)
+                // load database
+                if (loadDatabase(ctx)) state.dbLoaded.postValue(true)
                 else showDbError(ctx, "Failed to Load Database")
-                if (loadTypes(appdb, state)) state.typesLoaded.postValue(true)
-                else showDbError(ctx, "Failed to load Events")
             }
             is SettingsViewState.Passive -> {
                 // now that everything is loaded, set listview adapter
