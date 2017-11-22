@@ -27,6 +27,8 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
     val cancelButton: Button by bindView(R.id.typeCancelButton)
     val saveButton: Button by bindView(R.id.typeSaveButton)
 
+    override lateinit var appdb: AppDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edittype_layout)
