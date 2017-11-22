@@ -129,12 +129,12 @@ class MainActivity: AppCompatActivity (), SummaryView {
     ////**** INTENTS ****////
 
     override fun loadDatabase (ctx: Context): Boolean {
-        return try {
+//        return try {
             appdb = EventsDB.getInstance(ctx)
-            true
-        } catch (e: Exception) {
-            false
-        }
+            return true
+//        } catch (e: Exception) {
+//            false
+//        }
     }
 
     override fun showDbError(ctx: Context, msg: String) {

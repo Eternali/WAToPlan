@@ -55,7 +55,7 @@ class Converters {
 
     /* Convert parameter Hashmap to String */
     @TypeConverter
-    fun fromStringtoParams (paramStr: String?): HashMap<ParameterTypes, Any>? {
+    fun fromStringtoHashParams (paramStr: String?): HashMap<ParameterTypes, Any>? {
         return if (paramStr != null) {
             val params: HashMap<ParameterTypes, Any> = hashMapOf()
 

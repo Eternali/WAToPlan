@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
-//apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 26
@@ -36,8 +36,9 @@ dependencies {
     compile 'android.arch.lifecycle:runtime:1.0.3'
     compile 'android.arch.lifecycle:extensions:1.0.0'
     compile 'android.arch.persistence.room:runtime:1.0.0'
-    testCompile 'android.arch.persistence.room:compiler:1.0.0'
-//    kapt 'android.arch.persistence.room:compiler:1.0.0'
+//    testCompile 'android.arch.persistence.room:compiler:1.0.0'
+//    annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
+    kapt 'android.arch.persistence.room:compiler:1.0.0'
 
     compile 'com.jakewharton:kotterknife:0.1.0-SNAPSHOT'
 

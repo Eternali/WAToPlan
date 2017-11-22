@@ -2,20 +2,22 @@ package com.example.fa11en.watoplan
 
 import android.arch.persistence.room.*
 import android.location.Location
+import android.util.EventLog
 import java.util.Calendar
 import kotlin.collections.HashMap
 
 
 @Entity(tableName = "userevent")
-class UserEvent (@Ignore val type: EventType) {
+class UserEvent (@ColumnInfo(name = "typename") val typeName: String) {
 
-    init {  }
+    @Ignore
+    var type: EventType?
+
+    init {
+    }
 
     @PrimaryKey(autoGenerate = true)
     var eid: Int = 0
-
-    @ColumnInfo(name = "typename")
-    var typeName: String = type.name
 
     @ColumnInfo(name = "params")
     var params: HashMap<ParameterTypes, Any> = hashMapOf()
