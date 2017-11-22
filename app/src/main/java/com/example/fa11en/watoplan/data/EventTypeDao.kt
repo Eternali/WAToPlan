@@ -9,6 +9,9 @@ interface EventTypeDao {
     @Query("SELECT * FROM eventtype")
     fun getAll(): List<EventType>
 
+    @Query("SELECT * FROM eventtype where name LIKE :name")
+    fun get(name: String): EventType
+
     @Insert
     fun insert (vararg events: EventType)
 

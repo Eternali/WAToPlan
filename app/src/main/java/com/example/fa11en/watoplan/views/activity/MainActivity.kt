@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -158,6 +159,10 @@ class MainActivity: AppCompatActivity (), SummaryView {
         return try {
             // alter state to reflect success
             state.events.postValue(db.eventDao().getAll().toMutableList())
+            state.events.value!!.forEach {
+                if (!it.loadType(db))
+                    throw TypeNotPresentException(it.typeName, Throwable())
+            }
             true
         } catch (e: Exception) {
             false

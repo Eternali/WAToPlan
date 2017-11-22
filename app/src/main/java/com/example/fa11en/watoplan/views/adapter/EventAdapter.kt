@@ -30,7 +30,7 @@ class EventAdapter (val ctx: Context, var resource: Int, var events: MutableList
             // since not all events are shown at once, we can't used the passed position argument
             title.text = events[position].params[ParameterTypes.TITLE] as String
             desc.text = events[position].params[ParameterTypes.DESCRIPTION] as String
-            type.text = events[position].type.name
+            type.text = events[position].type?.name
 
             return eventView
         }

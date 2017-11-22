@@ -116,8 +116,7 @@ class Converters {
 
     /* Encoded string to event parameters */
     @TypeConverter
-    fun stringToParams (encodedStr: String?): List<ParameterTypes>? {
-        return encodedStr?.split('&')?.map { ParameterTypes.valueOf(it) }
-    }
+    fun stringToParams (encodedStr: String?): List<ParameterTypes>? =
+            encodedStr?.split('&')?.map { ParameterTypes.valueOf(it) }
 
 }

@@ -24,7 +24,7 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
         }
     }
 
-    class Loading (t: Themes, dbl: Boolean = false, tl: Boolean = false, etypes: MutableList<EventType>? = null)
+    class Loading (t: Themes, dbIsLoaded: Boolean = false, typesIsLoaded: Boolean = false, etypes: MutableList<EventType> = mutableListOf())
         : SettingsViewState (t) {
 
         val dbLoaded: MutableLiveData<Boolean> = MutableLiveData()
@@ -32,10 +32,10 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
 
         init {
             // database loading status
-            dbLoaded.postValue(dbl)
+            dbLoaded.postValue(dbIsLoaded)
             // type loading status (note we can accept etypes argument because only the database might not be loaded)
-            typesLoaded.postValue(tl)
-            if (etypes != null) types.value = etypes
+            typesLoaded.postValue(typesIsLoaded)
+            types.postValue(etypes)
         }
 
     }
@@ -43,8 +43,8 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
     class Passive (t: Themes, etypes: MutableList<EventType> = mutableListOf()): SettingsViewState (t) {
 
         init {
-            // set events
-            types.postValue(etypes)
+            // set event types
+            types.postValue(mutableListOf())
         }
 
     }

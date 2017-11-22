@@ -22,20 +22,20 @@ import java.util.Calendar
 class ParametersBody (val parentContext: Context,
                       var event: UserEvent) {
 
-    private var params = event.type.parameters
+    private var params = event.type?.parameters
 
     init {
-        params.forEach { renderParam(it) }
+        params?.forEach { renderParam(it) }
     }
 
     fun set (newEvent: UserEvent) {
         event = newEvent
         ParameterTypes.values().toMutableList().forEach {
-            if (it !in this.params && it in event.type.parameters) {
+            if (this.params?.contains(it) != true && event.type?.parameters?.contains(it) == true) {
                 renderParam(it)
 //                this.params.add(it)
             }
-            else if (it in this.params && it !in event.type.parameters) {
+            else if (this.params?.contains(it) == true && event.type?.parameters?.contains(it) == false) {
                 removeParam(it)
 //                this.params.remove(it)
             }

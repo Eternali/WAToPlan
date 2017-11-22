@@ -34,7 +34,7 @@ class UserEventReadWriteTest {
     @Test
     @Throws(Exception::class)
     fun writeEventAndReadInList () {
-        val event = UserEvent(EventType("TestType", listOf(ParameterTypes.TITLE),
+        val event = UserEvent(EventType("TestType", mutableListOf(ParameterTypes.TITLE),
                 R.color.colorAccent, R.color.colorAccent_pressed))
         event.setParam(ParameterTypes.TITLE, "TEST TITLE")
         event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")

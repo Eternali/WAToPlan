@@ -12,8 +12,9 @@ import com.example.fa11en.watoplan.UserEvent
 sealed class SummaryViewState: ViewModel () {
 
     // LiveData objects for all summary states
-    val events: MutableLiveData<MutableList<UserEvent>> = MutableLiveData()
     val types: MutableLiveData<MutableList<EventType>> = MutableLiveData()
+    // TODO: possibly make application wide livedata (in its own ViewModel) (events, maybe types?)
+    val events: MutableLiveData<MutableList<UserEvent>> = MutableLiveData()
 
     class Loading private constructor (dbIsLoaded: Boolean = false,
                                        typesAreLoaded: Boolean = false,
@@ -26,11 +27,14 @@ sealed class SummaryViewState: ViewModel () {
         val typesLoaded: MutableLiveData<Boolean> = MutableLiveData()
         val displayFrag: MutableLiveData<Int> = MutableLiveData()
 
+        // initialize variables
         init {
             dbLoaded.postValue(dbIsLoaded)
             typesLoaded.postValue(typesAreLoaded)
             eventsLoaded.postValue(eventsAreLoaded)
             displayFrag.postValue(fragToDisplay)
+            types.postValue(mutableListOf())
+            events.postValue(mutableListOf())
         }
 
         companion object {

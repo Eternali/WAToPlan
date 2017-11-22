@@ -11,9 +11,10 @@ import kotlin.collections.HashMap
 class UserEvent (@ColumnInfo(name = "typename") val typeName: String) {
 
     @Ignore
-    var type: EventType?
+    var type: EventType? = null
 
-    init {
+    constructor (eventType: EventType): this(eventType.name) {
+        type = eventType
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -24,22 +25,36 @@ class UserEvent (@ColumnInfo(name = "typename") val typeName: String) {
 
     // TODO: add ability to change event type on the fly
 
+    // will return false if type hasn't been loaded yet or an error occurs
     @Ignore
-    fun setParam (key: ParameterTypes, value: Any) {
-        if (key in type.parameters && checkParamType(key, value))
-            this.params.set(key, value)
+    fun setParam (key: ParameterTypes, value: Any): Boolean {
+        return if (type != null && key in type!!.parameters && checkParamType(key, value)) {
+            this.params[key] = value
+            true
+        } else false
+    }
+
+    @Ignore
+    fun loadType (db: AppDatabase): Boolean {
+        db.beginTransaction()
+        return try {
+            type = db.typeDao().get(typeName)
+            true
+        } catch (e: Exception) {
+            false
+        } finally {
+            db.endTransaction()
+        }
     }
 
     companion object {
-        fun checkParamType (key: ParameterTypes, value: Any): Boolean {
-            return when (key) {
-                ParameterTypes.TITLE -> value is String
-                ParameterTypes.DESCRIPTION -> value is String
-                ParameterTypes.DATETIME -> value is Calendar
-                ParameterTypes.LOCATION -> value is Location
-                ParameterTypes.ENTITIES -> value is MutableList<*>
-                ParameterTypes.REPEAT -> value is MutableList<*>
-            }
+        fun checkParamType (key: ParameterTypes, value: Any): Boolean = when (key) {
+            ParameterTypes.TITLE -> value is String
+            ParameterTypes.DESCRIPTION -> value is String
+            ParameterTypes.DATETIME -> value is Calendar
+            ParameterTypes.LOCATION -> value is Location
+            ParameterTypes.ENTITIES -> value is MutableList<*>
+            ParameterTypes.REPEAT -> value is MutableList<*>
         }
     }
 

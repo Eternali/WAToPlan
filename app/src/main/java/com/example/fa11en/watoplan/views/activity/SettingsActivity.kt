@@ -98,7 +98,10 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 val typesLoadingObserver: Observer<Boolean> = Observer {
                     if (it != null && it) {
                         // LOOK OUT FOR NULL-SAFETY PROMISE
-                        render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
+//                        if (state.types.value != null)
+//                            render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
+//                        else
+                            render(SettingsViewState.Passive(state.theme.value!!), ctx)
                     }
                 }
                 state.dbLoaded.observe(this, dbLoadingObserver)
