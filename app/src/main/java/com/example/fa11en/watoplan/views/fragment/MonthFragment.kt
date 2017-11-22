@@ -11,9 +11,7 @@ class MonthFragment : Fragment () {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
-        if (inflater != null && container != null
-                && (activity as MainActivity).state.eventsLoaded.value != null
-                && (activity as MainActivity).state.eventsLoaded.value!!) {
+        if (inflater != null && container != null) {
             val view: View = inflater.inflate(R.layout.month_fragment_layout, null)
 
             return view

@@ -16,14 +16,14 @@ class DayFragment : Fragment () {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
-        // Note: the fragment is guaranteed that the data it needs is loaded (it isn't in the DayViewModel state
-        if (inflater != null && container != null
-                && (activity as MainActivity).state.eventsLoaded.value != null
-                && (activity as MainActivity).state.eventsLoaded.value!!) {
+        // Note: the fragment is guaranteed that the data it needs is loaded
+        // (the DayViewModel state is guaranteed)
+        if (inflater != null && container != null) {
             val view: View = inflater.inflate(R.layout.day_fragment_layout, null)
 
             val dayListView: ListView = view.findViewById(R.id.dayView)
-            dayListView.adapter = EventAdapter(activity, 0, (activity as SummaryView).state.events.value!!)
+            dayListView.adapter = EventAdapter(activity, 0,
+                    SummaryViewState.DayViewModel.getInstance().events.value!!)
 
             return view
         }

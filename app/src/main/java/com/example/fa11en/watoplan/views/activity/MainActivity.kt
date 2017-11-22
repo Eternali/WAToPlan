@@ -2,6 +2,7 @@ package com.example.fa11en.watoplan
 
 import android.app.FragmentTransaction
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -77,13 +78,24 @@ class MainActivity: AppCompatActivity (), SummaryView {
     // activity state variables
     lateinit override var appdb: AppDatabase
 
-    override fun onCreate (savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+    override fun onCreate (savedInstanceState: Bundle?) {
 
         // set content view to layout
-        super.onCreate(savedInstanceState, persistentState)
+        // DEFAULT had parameter persistentState: PersistableBundle? in constructor and passed to super onCreate //
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        render(SummaryViewState.Loading(false, false, false, dayToggle.id),this)
+        /* I HAVE TWO OPTIONS TO MANAGE STATE:
+        *  1: Use ViewModelProviders to keep a lifecycle aware instance of the model alive across fragments
+        *       (but this requires vararg parameter in render method to specify how to set the state)
+        *  2: Make each SummaryViewState subclass a singleton and get the instance across fragments
+        *       (but this is not lifecycle aware)
+        *  I have gone with the 2nd option for now */
+        render(SummaryViewState.Loading.getInstance
+                (false, false, false, dayToggle.id), this)
+//        render(ViewModelProviders.of(this)
+//                .get(SummaryViewState.Loading.getInstance(false, false, false, dayToggle.id)
+//                ::class.java), this)
     }
 
     override fun onCreateOptionsMenu (menu: Menu?): Boolean {
@@ -158,7 +170,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         displayGroup.clearCheck()
         displayGroup.check(view.id)
 
-        render(SummaryViewState.Loading(true, true, true, view.id), this)
+        render(SummaryViewState.Loading.getInstance(true, true, true, view.id), this)
     }
 
     override fun editIntent (ctx: Context, event: UserEvent) {
@@ -204,7 +216,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                     R.id.dayToggle -> {
                         fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "day")
                         fragTransaction.commit()
-                        render(SummaryViewState.DayViewModel(0), this)
+                        render(SummaryViewState.DayViewModel.getInstance(0), this)
                     }
                     R.id.weekToggle -> {
                         fragTransaction.replace(R.id.displayFragContainer, WeekFragment(), "day")
@@ -219,9 +231,9 @@ class MainActivity: AppCompatActivity (), SummaryView {
                     else -> fragTransaction.commit()
                 }
             }
-            is SummaryViewState.DayViewModel -> {}
-            is SummaryViewState.WeekViewModel -> {}
-            is SummaryViewState.MonthViewModel -> {}
+            is SummaryViewState.DayViewModel -> {  }
+            is SummaryViewState.WeekViewModel -> {  }
+            is SummaryViewState.MonthViewModel -> {  }
         }
 
         // make radio group from togglers
