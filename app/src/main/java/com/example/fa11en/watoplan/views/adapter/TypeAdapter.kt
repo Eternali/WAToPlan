@@ -29,9 +29,14 @@ class TypeAdapter (val ctx: Context, var resource: Int, var events: MutableList<
             val typeName = typeView.findViewById<TextView>(R.id.typeName)
 
             // set layout to proper values
-            typeContainer.setBackgroundColor(events[position].colorNormal)
+            typeContainer.setBackgroundResource(events[position].colorNormal)
             typeName.text = events[position].name
-            typeName.setBackgroundColor(events[position].colorPressed)
+            typeName.setBackgroundResource(events[position].colorPressed)
+
+            // click listeners
+            typeContainer.setOnClickListener {
+                ctx
+            }
 
             return typeView
         }

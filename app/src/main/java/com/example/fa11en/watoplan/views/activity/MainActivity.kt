@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
@@ -139,8 +140,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
         types.forEach {
             val button = FloatingActionButton(this)
             button.size = FloatingActionButton.SIZE_MINI
-            button.setColorNormalResId(it.colorNormal)
-            button.setColorPressedResId(it.colorPressed)
+            button.colorNormal = it.colorNormal
+            button.colorPressed = it.colorPressed
             button.title = it.name
             button.setOnClickListener { _ ->
                 addMenu.collapse()
@@ -167,7 +168,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
         db.beginTransaction()
         return try {
             val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-                    R.color.colorAccent, R.color.colorAccent_pressed)
+                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
+                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null))
             db.typeDao().insert(type)
             state.types.postValue(db.typeDao().getAll())
             true

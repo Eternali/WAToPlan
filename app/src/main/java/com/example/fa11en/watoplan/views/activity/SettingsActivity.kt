@@ -29,7 +29,6 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     // event types
     private val eventContainer: LinearLayout by bindView(R.id.eventTypesContainer)
-    private val eventLabel: TextView by bindView(R.id.eventEditTitle)
     private val eventList: ListView by bindView(R.id.eventsEditList)
 
     lateinit override var appdb: AppDatabase
@@ -72,7 +71,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     }
 
     // TODO: make a database intents class for application-wide data loading
-    override fun loadTypes(db: AppDatabase, state: SettingsViewState): Boolean {
+    override fun loadTypes(db: AppDatabase, state: SettingsViewState.Loading): Boolean {
         db.beginTransaction()
         return try {
             val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
@@ -87,7 +86,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         }
     }
 
-    override fun editDialog(ctx: Context, state: SettingsViewState) {
+    override fun editDialog(ctx: Context, state: SettingsViewState.Passive) {
         startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
     }
 
@@ -110,7 +109,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 val finishedLoadingObserver: Observer<Boolean> = Observer {
                     if (state.typesLoaded.value == true) {
                         // if typesLoaded is true then types is guaranteed to be defined.
-                        render(SettingsViewState.Passive(Themes.LIGHT, state.types.value!!), ctx)
+                        render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
                     }
                 }
                 state.dbLoaded.observe(this, dbLoadingObserver)
@@ -123,7 +122,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             }
             is SettingsViewState.Passive -> {
                 // now that everything is loaded, set listview adapter
-                eventList.adapter = TypeAdapter(this, 0, state.types.value!!.toMutableList())
+                eventList.adapter = TypeAdapter(this, 0, state.types)
             }
         }
 
