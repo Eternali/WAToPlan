@@ -72,9 +72,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     override fun loadTypes(db: AppDatabase, state: SettingsViewState): Boolean {
         db.beginTransaction()
         return try {
-            Log.i("TYPES", state.types.value.toString())
             state.types.postValue(db.typeDao().getAll())
-            Log.i("TYPES", state.types.value.toString())
             true
         } catch (e: Exception) {
             false

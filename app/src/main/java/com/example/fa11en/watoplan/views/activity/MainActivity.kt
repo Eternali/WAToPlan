@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan
 
 import android.app.FragmentTransaction
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
@@ -101,7 +102,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         *       (but this is not lifecycle aware)
         *  I have gone with the 2nd option for now */
         render(SummaryViewState.Loading.getInstance
-                (false, false, false, dayToggle.id), this)
+                (false, false, false), this)
     }
 
     override fun onCreateOptionsMenu (menu: Menu?): Boolean {
@@ -134,6 +135,21 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     ////**** INTENTS ****////
 
+    fun generateFABS (types: List<EventType>) {
+        types.forEach {
+            val button = FloatingActionButton(this)
+            button.size = FloatingActionButton.SIZE_MINI
+            button.setColorNormalResId(it.colorNormal)
+            button.setColorPressedResId(it.colorPressed)
+            button.title = it.name
+            button.setOnClickListener { _ ->
+                addMenu.collapse()
+                addIntent(this, it)
+            }
+            addMenu.addButton(button)
+        }
+    }
+
     override fun loadDatabase (ctx: Context): Boolean {
         return try {
             appdb = EventsDB.getInstance(ctx)
@@ -150,11 +166,9 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadTypes (state: SummaryViewState, db: AppDatabase): Boolean {
         db.beginTransaction()
         return try {
-//            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-//                    R.color.colorAccent, R.color.colorAccent_pressed)
-//            db.typeDao().insert(type)
-//            val gets: List<EventType> = db.typeDao().getAll()
-//            if (!gets.contains(type)) throw TypeNotPresentException(type.name, Throwable())
+            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
+                    R.color.colorAccent, R.color.colorAccent_pressed)
+            db.typeDao().insert(type)
             state.types.postValue(db.typeDao().getAll())
             true
         } catch (e: Exception) {
@@ -167,19 +181,14 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadEvents (state: SummaryViewState, db: AppDatabase): Boolean {
         db.beginTransaction()
         return try {
-//            val event = UserEvent(EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-//                    R.color.colorAccent, R.color.colorAccent_pressed))
-//            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
-//            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
-//            db.eventDao().insert(event)
+            val event = UserEvent("TestType")
+            event.loadType(db)
+            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
+            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
+            db.eventDao().insert(event)
 //            val gets: List<UserEvent> = db.eventDao().getAll()
 //            if (gets[0] != event) throw TypeNotPresentException(event.typeName, Throwable())
-
             state.events.postValue(db.eventDao().getAll())
-            state.events.value?.forEach {
-                if (!it.loadType(db))
-                    throw TypeNotPresentException(it.typeName, Throwable())
-            }
             true
         } catch (e: Exception) {
             false
@@ -192,7 +201,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         displayGroup.clearCheck()
         displayGroup.check(view.id)
 
-        render(SummaryViewState.Loading.getInstance(true, true, true, view.id), this)
+        render(SummaryViewState.Passive(view.id), this)
     }
 
     override fun editIntent (ctx: Context, event: UserEvent) {
@@ -212,17 +221,47 @@ class MainActivity: AppCompatActivity (), SummaryView {
         // fragment handling
         when (state) {
             is SummaryViewState.Loading -> {
+
                 // watch loading status
                 val dbLoadingObserver: Observer<Boolean> = Observer {
                     if (it != null && it) {
-                        if (loadTypes(state, appdb)) state.typesLoaded.postValue(true)
-                        else showDbError(ctx, "Failed to load Event Types")
-                        if (loadEvents(state, appdb)) state.eventsLoaded.postValue(true)
-                        else showDbError(ctx, "Failed to load Events")
+                        // must have != true to accommodate null case
+                        if (state.typesLoaded.value != true) loadTypes(state, appdb)
+                        if (state.eventsLoaded.value != true) loadEvents(state, appdb)
+                    }
+                }
+                val typesLoadingObserver: Observer<List<EventType>> = Observer {
+                    if (it == null || it.isEmpty())
+                        showDbError(ctx, "Failed to load Event Types")
+                    else {
+                        state.typesLoaded.postValue(true)
+                        generateFABS(it)
+                    }
+                }
+                val eventsLoadingObserver: Observer<List<UserEvent>> = Observer {
+                    if (it == null || it.isEmpty())
+                        showDbError(ctx, "Failed to load Events")
+                    else if (state.typesLoaded.value != null && state.typesLoaded.value!!) {
+                        it.forEach {
+                            if (!it.loadType(appdb))
+                                throw TypeNotPresentException(it.typeName, Throwable())
+                        }
+                        state.eventsLoaded.postValue(true)
                     }
                 }
 
+                val finishedLoadingObserver: Observer<Boolean> = Observer {
+                    if (state.typesLoaded.value != null && state.typesLoaded.value!!
+                            && state.eventsLoaded.value != null && state.eventsLoaded.value!!)
+                        render(SummaryViewState.Passive(dayToggle.id), ctx)
+                }
+
+                // bind observables
                 state.dbLoaded.observe(this, dbLoadingObserver)
+                state.types.observe(this, typesLoadingObserver)
+                state.events.observe(this, eventsLoadingObserver)
+                state.typesLoaded.observe(this, finishedLoadingObserver)
+                state.eventsLoaded.observe(this, finishedLoadingObserver)
 
                 // load database if not already done so
                 if (state.dbLoaded.value == null || !state.dbLoaded.value!!) {
@@ -230,6 +269,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
                     else showDbError(ctx, "Failed to load Database")
                 }
 
+            }
+            is SummaryViewState.Passive -> {
                 // set display fragment
                 // TODO: only replace fragment when previous is different from requested
                 val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
@@ -265,20 +306,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 view.isChecked = view.id == checkedId
             }
         })
-
-        // generate FABS
-        state.types.value?.forEach {
-            val button = FloatingActionButton(ctx)
-            button.size = FloatingActionButton.SIZE_MINI
-            button.setColorNormalResId(it.colorNormal)
-            button.setColorPressedResId(it.colorPressed)
-            button.title = it.name
-            button.setOnClickListener { _ ->
-                addMenu.collapse()
-                addIntent(ctx, it)
-            }
-            addMenu.addButton(button)
-        }
 
     }
 

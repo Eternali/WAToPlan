@@ -3,6 +3,7 @@ package com.example.fa11en.watoplan
 import android.app.Fragment
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ class DayFragment : Fragment () {
             val view: View = inflater.inflate(R.layout.day_fragment_layout, null)
 
             val dayListView: ListView = view.findViewById(R.id.dayView)
+            Log.i("DAYEVENTS", SummaryViewState.DayViewModel.getInstance(0).events.value!!.toString())
             dayListView.adapter = EventAdapter(activity, 0,
                     SummaryViewState.DayViewModel.getInstance().events.value!! as MutableList<UserEvent>)
 
@@ -29,12 +31,6 @@ class DayFragment : Fragment () {
         }
 
         return View(activity)
-    }
-
-    companion object {
-        fun newInstance (state: SummaryViewState.DayViewModel) {
-
-        }
     }
 
 }

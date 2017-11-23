@@ -18,39 +18,43 @@ sealed class SummaryViewState: ViewModel () {
 
     class Loading private constructor (dbIsLoaded: Boolean = false,
                                        typesAreLoaded: Boolean = false,
-                                       eventsAreLoaded: Boolean = false,
-                                       fragToDisplay: Int)
+                                       eventsAreLoaded: Boolean = false)
         : SummaryViewState() {
 
         val dbLoaded: MutableLiveData<Boolean> = MutableLiveData()
-        val eventsLoaded: MutableLiveData<Boolean> = MutableLiveData()
         val typesLoaded: MutableLiveData<Boolean> = MutableLiveData()
-        val displayFrag: MutableLiveData<Int> = MutableLiveData()
+        val eventsLoaded: MutableLiveData<Boolean> = MutableLiveData()
 
         // initialize variables
         init {
             dbLoaded.postValue(dbIsLoaded)
             typesLoaded.postValue(typesAreLoaded)
             eventsLoaded.postValue(eventsAreLoaded)
-            displayFrag.postValue(fragToDisplay)
-            types.postValue(mutableListOf())
-            events.postValue(mutableListOf())
         }
 
         companion object {
             private var INSTANCE: Loading? = null
             fun getInstance (dbIsLoaded: Boolean = false,
                              typesAreLoaded: Boolean = false,
-                             eventsAreLoaded: Boolean = false,
-                             fragToDisplay: Int): Loading {
+                             eventsAreLoaded: Boolean = false): Loading {
                 if (INSTANCE == null)
-                    INSTANCE = Loading(dbIsLoaded, typesAreLoaded, eventsAreLoaded, fragToDisplay)
+                    INSTANCE = Loading(dbIsLoaded, typesAreLoaded, eventsAreLoaded)
 
                 return INSTANCE!!
             }
             fun destroyInstance () {
                 INSTANCE = null
             }
+        }
+
+    }
+
+    class Passive constructor (fragToDisplay: Int): SummaryViewState() {
+
+        val displayFrag: MutableLiveData<Int> = MutableLiveData()
+
+        init {
+            displayFrag.postValue(fragToDisplay)
         }
 
     }
