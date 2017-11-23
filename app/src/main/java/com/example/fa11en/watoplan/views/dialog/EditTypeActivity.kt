@@ -38,18 +38,6 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         render(EditTypeViewState(), this)
     }
 
-    class listener: AmbilWarnaDialog.OnAmbilWarnaListener {
-        override fun onOk(dialog: AmbilWarnaDialog?, color: Int) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
-        override fun onCancel(dialog: AmbilWarnaDialog?) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-    }
-
-    val colorDialog = AmbilWarnaDialog(this, R.color.colorAccent, listener()).dialog.show()
-
 
     ////**** INTENTS ****////
 
@@ -79,10 +67,38 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
     }
 
+    override fun showColorChooser(ctx: Context, colorData: MutableLiveData<Int>) {
+        class listener: AmbilWarnaDialog.OnAmbilWarnaListener {
+            override fun onOk(dialog: AmbilWarnaDialog?, color: Int) {
+                colorData.postValue(color)
+            }
+
+            override fun onCancel(dialog: AmbilWarnaDialog?) {
+            }
+        }
+
+        AmbilWarnaDialog(ctx, if (colorData.value != null) colorData.value!! else R.color.colorAccent, listener()).dialog.show()
+    }
+
     override fun render(state: EditTypeViewState, ctx: Context) {
 
-        // initialize observables/listeners
+        //  initialize observables/listeners  //
+
+        // name listener
         name.addTextChangedListener(EditParamWatcher(state.typeName))
+
+        // color observer
+        val colorNormalObserver: Observer<Int> = Observer {
+            if (it != null)
+                colorNormalButton.setBackgroundColor(it)
+        }
+        val colorPressedObserver: Observer<Int> = Observer {
+            if (it != null)
+                colorPressedButton.setBackgroundColor(it)
+        }
+
+        state.typeColorNormal.observe(this, colorNormalObserver)
+        state.typeColorPressed.observe(this, colorPressedObserver)
 
         //  radio listeners  //
         for (c in 0 until paramsContainer.childCount) {
@@ -94,8 +110,12 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
 
         //  button listeners  //
 
-        colorNormalButton.setOnClickListener {  }
-        colorPressedButton.setOnClickListener {  }
+        colorNormalButton.setOnClickListener {
+            showColorChooser(ctx, state.typeColorNormal)
+        }
+        colorPressedButton.setOnClickListener {
+            showColorChooser(ctx, state.typeColorPressed)
+        }
 
         cancelButton.setOnClickListener{
             val code = Intent()

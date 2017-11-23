@@ -42,4 +42,5 @@
     <string name="repeatRadioText">REPETITIONS</string>
     <string name="cancelText">CANCEL</string>
     <string name="saveText">SAVE</string>
+    <string name="addTypeText">ADD TYPE</string>
 </resources>

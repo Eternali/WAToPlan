@@ -29,7 +29,8 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     // event types
     private val eventContainer: LinearLayout by bindView(R.id.eventTypesContainer)
-    private val eventList: ListView by bindView(R.id.eventsEditList)
+    private val typeList: ListView by bindView(R.id.typesEditList)
+    private val addTypeButton: Button by bindView(R.id.addTypeButton)
 
     lateinit override var appdb: AppDatabase
 
@@ -122,7 +123,8 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             }
             is SettingsViewState.Passive -> {
                 // now that everything is loaded, set listview adapter
-                eventList.adapter = TypeAdapter(this, 0, state.types)
+                typeList.adapter = TypeAdapter(this, 0, state.types)
+                addTypeButton.setOnClickListener { editDialog(ctx, state) }
             }
         }
 

@@ -26,12 +26,7 @@ import kotlinx.android.synthetic.main.activity_main.view.*
 import kotterknife.bindView
 
 
-/*
-    Models:
-        - mainViewState: eventTypes, userEvents, pos, displayType
-        - editViewState: parameterTypes, userEvent
-        -
- */
+/* TODO: Refactor strings.xml to use underscores instead of camelCase */
 
 
 // global enum of themes

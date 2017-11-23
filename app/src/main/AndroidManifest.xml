@@ -19,7 +19,7 @@
         <activity android:name=".EditActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".views.dialog.EditTypeActivity"
-            android:theme="@android:style/Theme.Dialog"
+            android:theme="@style/edit_type_dialog_style"
             android:excludeFromRecents="true" />
     </application>
 

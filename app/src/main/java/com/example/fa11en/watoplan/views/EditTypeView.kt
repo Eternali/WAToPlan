@@ -1,5 +1,6 @@
 package com.example.fa11en.watoplan.views
 
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import com.example.fa11en.watoplan.AppDatabase
 import com.example.fa11en.watoplan.viewmodels.EditTypeViewState
@@ -16,6 +17,9 @@ interface EditTypeView {
 
     // show errors from the database
     fun showDbError (ctx: Context, msg: String)
+
+    // show color dialog
+    fun showColorChooser (ctx: Context, colorData: MutableLiveData<Int>)
 
     /*
         Render the view

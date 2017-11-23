@@ -3,8 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal">
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:layout_margin="12dp">
 
     <EditText
         android:id="@+id/nameEditText"
@@ -32,8 +33,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:textStyle="bold"
-            android:textColor="@color/colorAccent"
             android:textSize="16sp"
+            android:background="@color/colorAccent"
+            android:textColor="@color/white"
             android:text="@string/normalText"/>
 
         <Button
@@ -44,7 +46,8 @@
             android:layout_marginStart="4dp"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:textColor="@color/colorAccent_pressed"
+            android:background="@color/colorAccent_pressed"
+            android:textColor="@color/white"
             android:text="@string/pressedText"/>
 
     </LinearLayout>
@@ -59,66 +62,48 @@
         android:textSize="18sp"/>
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/parametersContainer"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <Space
-            android:layout_weight="0.3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-
-        <LinearLayout
-            android:id="@+id/parametersContainer"
-            android:orientation="vertical"
-            android:layout_weight="0.4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:id="@+id/TITLE"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/titleRadioText"
-                android:checked="true"/>
-            <RadioButton
-                android:id="@+id/DESCRIPTION"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/descRadioText"
-                android:checked="true"/>
-            <RadioButton
-                android:id="@+id/DATETIME"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/datetimeRadioText"/>
-            <RadioButton
-                android:id="@+id/LOCATION"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/locationRadioText"/>
-            <RadioButton
-                android:id="@+id/ENTITIES"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/entitiesRadioText"/>
-            <RadioButton
-                android:id="@+id/REPEAT"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/repeatRadioText"/>
-        </LinearLayout>
-
-        <Space
-            android:layout_weight="0.3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-
+        <RadioButton
+            android:id="@+id/TITLE"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/titleRadioText"
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/DESCRIPTION"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/descRadioText"
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/DATETIME"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/datetimeRadioText"/>
+        <RadioButton
+            android:id="@+id/LOCATION"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/locationRadioText"/>
+        <RadioButton
+            android:id="@+id/ENTITIES"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/entitiesRadioText"/>
+        <RadioButton
+            android:id="@+id/REPEAT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/repeatRadioText"/>
     </LinearLayout>
 
     <LinearLayout
@@ -134,6 +119,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
+            android:background="@color/cancel_button"
             android:textStyle="bold"
             android:textSize="16sp"
             android:text="@string/cancelText"/>
@@ -143,6 +129,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
+            android:background="@color/colorPrimary"
             android:textStyle="bold"
             android:textSize="16sp"
             android:text="@string/saveText"/>

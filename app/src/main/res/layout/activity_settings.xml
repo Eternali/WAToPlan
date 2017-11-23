@@ -35,12 +35,21 @@
             android:layout_height="wrap_content"
             android:text="@string/eventTypesEditTitle"/>
         <ListView
-            android:id="@+id/eventsEditList"
+            android:id="@+id/typesEditList"
             android:layout_weight="0.6"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/addTypeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginEnd="26dp"
+        app:layout_constraintTop_toBottomOf="@id/eventTypesContainer"
+        android:text="@string/addTypeText" />
 
 </android.support.constraint.ConstraintLayout>

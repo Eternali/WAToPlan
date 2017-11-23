@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.fa11en.watoplan.EventType
@@ -35,7 +36,7 @@ class TypeAdapter (val ctx: Context, var resource: Int, var events: MutableList<
 
             // click listeners
             typeContainer.setOnClickListener {
-                ctx
+                
             }
 
             return typeView
