@@ -2,31 +2,69 @@ package com.example.fa11en.watoplan.viewmodels
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.example.fa11en.watoplan.EventType
 import com.example.fa11en.watoplan.ParameterTypes
 import com.example.fa11en.watoplan.R
 
 
-class EditTypeViewState: ViewModel () {
+sealed class EditTypeViewState: ViewModel () {
 
     val typeName: MutableLiveData<String> = MutableLiveData()
     val typeParams: HashMap<ParameterTypes, MutableLiveData<Boolean>> = hashMapOf()
     val typeColorNormal: MutableLiveData<Int> = MutableLiveData()
     val typeColorPressed: MutableLiveData<Int> = MutableLiveData()
 
-    init {
-        // initialize all parameters to false
-        ParameterTypes.values().forEach {
-            typeParams[it] = MutableLiveData()
-            typeParams[it]!!.postValue(false)  // WATCH NULL-SAFE ASSERTION
-        }
-        // set defaults
-        typeParams[ParameterTypes.TITLE]!!.postValue(true)
-        typeParams[ParameterTypes.DESCRIPTION]!!.postValue(true)
+    class New: EditTypeViewState () {
 
-        // initialize other event type parameters
-        typeName.postValue("")
-        typeColorNormal.postValue(R.color.colorAccent)
-        typeColorPressed.postValue(R.color.colorAccent_pressed)
+        init {
+            // initialize all parameters to false
+            ParameterTypes.values().forEach {
+                typeParams[it] = MutableLiveData()
+                typeParams[it]!!.postValue(false)  // WATCH NULL-SAFE ASSERTION
+            }
+            // set defaults
+            typeParams[ParameterTypes.TITLE]!!.postValue(true)
+            typeParams[ParameterTypes.DESCRIPTION]!!.postValue(true)
+
+            // initialize other event type parameters
+            typeName.postValue("")
+            typeColorNormal.postValue(R.color.colorAccent)
+            typeColorPressed.postValue(R.color.colorAccent_pressed)
+        }
+
+    }
+
+    class Edit private constructor (type: EventType): EditTypeViewState () {
+
+        init {
+            // initialize all values to those of the type
+            typeName.postValue(type.name)
+
+            ParameterTypes.values().forEach { typeParams[it] = MutableLiveData() }
+            type.parameters.forEach {
+                typeParams[it]!!.postValue(true)
+            }
+
+            typeColorNormal.postValue(type.colorNormal)
+            typeColorPressed.postValue(type.colorPressed)
+        }
+
+        companion object {
+            private var INSTANCE: Edit? = null
+            fun getInstance (type: EventType?): EditTypeViewState {
+                if (INSTANCE == null && type != null)
+                    INSTANCE = Edit(type)
+                else if (INSTANCE == null)
+                    return EditTypeViewState.New()
+
+                return INSTANCE!!
+            }
+            fun isInstantiated (): Boolean = INSTANCE != null
+            fun destroyInstance () {
+                INSTANCE = null
+            }
+        }
+
     }
 
 }

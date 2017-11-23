@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.TextWatcher
 import android.util.Log
@@ -12,6 +13,7 @@ import android.widget.*
 import com.example.fa11en.watoplan.*
 import com.example.fa11en.watoplan.viewmodels.EditTypeViewState
 import com.example.fa11en.watoplan.views.EditTypeView
+import kotlinx.android.synthetic.main.edittype_layout.*
 import kotterknife.bindView
 import yuku.ambilwarna.AmbilWarnaDialog
 
@@ -33,7 +35,10 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edittype_layout)
 
-        render(EditTypeViewState(), this)
+        if (EditTypeViewState.Edit.isInstantiated())
+            render(EditTypeViewState.Edit.getInstance(null), this)
+        else
+            render(EditTypeViewState.New(), this)
     }
 
 
@@ -75,7 +80,10 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
             }
         }
 
-        AmbilWarnaDialog(ctx, if (colorData.value != null) colorData.value!! else R.color.colorAccent, listener()).dialog.show()
+        AmbilWarnaDialog(ctx,
+                if (colorData.value != null) colorData.value!!
+                else ResourcesCompat.getColor(resources, R.color.colorAccent, null),
+                listener()).dialog.show()
     }
 
     override fun render(state: EditTypeViewState, ctx: Context) {
@@ -101,11 +109,11 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         state.typeColorNormal.observe(this, colorNormalObserver)
         state.typeColorPressed.observe(this, colorPressedObserver)
 
-        //  radio listeners  //
+        //  checkbox listeners  //
         for (c in 0 until paramsContainer.childCount) {
             paramsContainer.getChildAt(c).setOnClickListener {
                 // assuming param radio button text are only values of ParameterTypes.param
-                state.typeParams[paramToParamType((it as RadioButton).text.toString())]
+                state.typeParams[paramToParamType((it as CheckBox).text.toString())]
                         ?.postValue(!state.typeParams[paramToParamType(it.text.toString())]?.value!!)
             }
         }
@@ -132,6 +140,15 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
             else
                 setResult(ResultCodes.TYPEFAILED.code, code)
             finish()
+        }
+
+        // after everything is initialized then check if specific defaults set
+        when (state) {
+            is EditTypeViewState.Edit -> {
+                nameEditText.setText(state.typeName.value)
+                colorNormalButton.setBackgroundColor(state.typeColorNormal.value!!)
+                colorPressedButton.setBackgroundColor(state.typeColorPressed.value!!)
+            }
         }
 
     }

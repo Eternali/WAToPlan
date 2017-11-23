@@ -37,7 +37,8 @@ enum class Themes {
 
 // global enum for request codes
 enum class RequestCodes (val code: Int) {
-    NEWEVENTTYPE(0)
+    NEWEVENTTYPE(0),
+    EDITEVENTTYPE(1)
 }
 
 // global enum for result codes
@@ -162,10 +163,10 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadTypes (state: SummaryViewState, db: AppDatabase): Boolean {
         db.beginTransaction()
         return try {
-            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
-                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null))
-            db.typeDao().insert(type)
+//            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
+//                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
+//                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null))
+//            db.typeDao().insert(type)
             state.types.postValue(db.typeDao().getAll())
             true
         } catch (e: Exception) {
@@ -178,11 +179,11 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadEvents (state: SummaryViewState, db: AppDatabase): Boolean {
         db.beginTransaction()
         return try {
-            val event = UserEvent("TestType")
-            event.loadType(db)
-            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
-            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
-            db.eventDao().insert(event)
+//            val event = UserEvent("TestType")
+//            event.loadType(db)
+//            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
+//            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
+//            db.eventDao().insert(event)
 //            val gets: List<UserEvent> = db.eventDao().getAll()
 //            if (gets[0] != event) throw TypeNotPresentException(event.typeName, Throwable())
             state.events.postValue(db.eventDao().getAll())

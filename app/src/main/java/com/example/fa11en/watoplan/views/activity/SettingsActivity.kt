@@ -7,10 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.*
+import com.example.fa11en.watoplan.viewmodels.EditTypeViewState
 import com.example.fa11en.watoplan.viewmodels.SettingsViewState
 import com.example.fa11en.watoplan.views.SettingsView
 import com.example.fa11en.watoplan.views.adapter.TypeAdapter
@@ -50,8 +52,11 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             RequestCodes.NEWEVENTTYPE.code -> {
                 if (resultCode == ResultCodes.TYPESAVED.code) {
                     // notify adapter of type changed
-                    typeList.adapter = TypeAdapter(this, 0, state.types)
+//                    typeList.adapter = TypeAdapter(this, 0, state.types)
                 }
+            }
+            RequestCodes.EDITEVENTTYPE.code -> {
+                EditTypeViewState.Edit.destroyInstance()
             }
         }
     }
@@ -77,7 +82,8 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         db.beginTransaction()
         return try {
             val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-                    R.color.colorAccent, R.color.colorAccent_pressed)
+                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
+                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null))
             db.typeDao().insert(type)
             state.types.postValue(db.typeDao().getAll())
             true
@@ -88,8 +94,12 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         }
     }
 
-    override fun editDialog(ctx: Context, state: SettingsViewState.Passive) {
-        startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
+    override fun editDialog(ctx: Context, eventType: EventType?) {
+        if (eventType != null) {
+            EditTypeViewState.Edit.getInstance(eventType)
+            startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.EDITEVENTTYPE.code)
+        } else
+            startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
     }
 
     override fun render(state: SettingsViewState, ctx: Context) {
@@ -125,7 +135,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             is SettingsViewState.Passive -> {
                 // now that everything is loaded, set listview adapter
                 typeList.adapter = TypeAdapter(this, 0, state.types)
-                addTypeButton.setOnClickListener { editDialog(ctx, state) }
+                addTypeButton.setOnClickListener { editDialog(ctx, null) }
             }
         }
 

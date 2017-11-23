@@ -9,6 +9,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.fa11en.watoplan.EventType
 import com.example.fa11en.watoplan.R
+import com.example.fa11en.watoplan.SettingsActivity
+import com.example.fa11en.watoplan.viewmodels.SettingsViewState
+import com.example.fa11en.watoplan.views.SettingsView
 import com.example.fa11en.watoplan.views.view.TypeListView
 
 
@@ -30,13 +33,13 @@ class TypeAdapter (val ctx: Context, var resource: Int, var events: MutableList<
             val typeName = typeView.findViewById<TextView>(R.id.typeName)
 
             // set layout to proper values
-            typeContainer.setBackgroundResource(events[position].colorNormal)
+            typeContainer.setBackgroundColor(events[position].colorNormal)
             typeName.text = events[position].name
-            typeName.setBackgroundResource(events[position].colorPressed)
+            typeName.setBackgroundColor(events[position].colorPressed)
 
             // click listeners
             typeContainer.setOnClickListener {
-                
+                (ctx as SettingsActivity).editDialog(ctx, events[position])
             }
 
             return typeView
