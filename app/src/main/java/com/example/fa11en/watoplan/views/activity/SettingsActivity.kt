@@ -48,9 +48,10 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             RequestCodes.NEWEVENTTYPE.code -> {
-                if (resultCode == ResultCodes.TYPESAVED.code)
+                if (resultCode == ResultCodes.TYPESAVED.code) {
                     // notify adapter of type changed
-                    {}
+                    typeList.adapter = TypeAdapter(this, 0, state.types)
+                }
             }
         }
     }

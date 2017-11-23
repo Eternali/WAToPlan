@@ -7,10 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.util.Log
+import android.widget.*
 import com.example.fa11en.watoplan.*
 import com.example.fa11en.watoplan.viewmodels.EditTypeViewState
 import com.example.fa11en.watoplan.views.EditTypeView
@@ -82,6 +80,9 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
 
     override fun render(state: EditTypeViewState, ctx: Context) {
 
+        // get database TODO fix db
+        appdb = EventsDB.getInstance(ctx)
+
         //  initialize observables/listeners  //
 
         // name listener
@@ -103,8 +104,9 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         //  radio listeners  //
         for (c in 0 until paramsContainer.childCount) {
             paramsContainer.getChildAt(c).setOnClickListener {
-                state.typeParams[ParameterTypes.valueOf(
-                        it.toString())]?.postValue(!state.typeParams[ParameterTypes.valueOf(it.toString())]?.value!!)
+                // assuming param radio button text are only values of ParameterTypes.param
+                state.typeParams[paramToParamType((it as RadioButton).text.toString())]
+                        ?.postValue(!state.typeParams[paramToParamType(it.text.toString())]?.value!!)
             }
         }
 
@@ -123,6 +125,7 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
             finish()
         }
         saveButton.setOnClickListener {
+            saveType(state)
             val code = Intent()
             if (saveType(state))
                 setResult(ResultCodes.TYPESAVED.code, code)
