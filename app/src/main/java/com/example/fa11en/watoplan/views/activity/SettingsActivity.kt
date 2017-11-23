@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan
 
 import android.app.Activity
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
@@ -71,7 +72,9 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     override fun loadTypes(db: AppDatabase, state: SettingsViewState): Boolean {
         db.beginTransaction()
         return try {
-            state.types.postValue(db.typeDao().getAll().toMutableList())
+            Log.i("TYPES", state.types.value.toString())
+            state.types.postValue(db.typeDao().getAll())
+            Log.i("TYPES", state.types.value.toString())
             true
         } catch (e: Exception) {
             false
@@ -90,18 +93,14 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 // watch loading status
                 val dbLoadingObserver: Observer<Boolean> = Observer {
                     if (it != null && it) {
-                        // LOOK OUT FOR NULL-SAFETY PROMISE
                         if (loadTypes(appdb, state)) state.typesLoaded.postValue(true)
                         else showDbError(ctx, "Failed to load Event Types")
                     }
                 }
                 val typesLoadingObserver: Observer<Boolean> = Observer {
                     if (it != null && it) {
-                        // LOOK OUT FOR NULL-SAFETY PROMISE
-//                        if (state.types.value != null)
-//                            render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
-//                        else
-                            render(SettingsViewState.Passive(state.theme.value!!), ctx)
+                        // if typesLoaded is true then types is guaranteed to be defined.
+                        render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
                     }
                 }
                 state.dbLoaded.observe(this, dbLoadingObserver)
@@ -113,7 +112,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             }
             is SettingsViewState.Passive -> {
                 // now that everything is loaded, set listview adapter
-                eventList.adapter = TypeAdapter(this, 0, state.types.value!!)
+                eventList.adapter = TypeAdapter(this, 0, state.types.value!!.toMutableList())
             }
         }
 

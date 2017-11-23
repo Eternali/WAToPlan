@@ -107,16 +107,12 @@ class Converters {
 
     /* EventType parameters to encoded string */
     @TypeConverter
-    fun paramsToString (parameters: MutableList<ParameterTypes>?): String? {
-        return parameters?.joinToString {
-            if(parameters.indexOf(it) == parameters.size - 1) it.param + '&'
-            else it.param
-        }
-    }
+    fun paramsToString (parameters: MutableList<ParameterTypes>?): String? =
+            parameters?.joinToString("&", transform = { it -> it.param})
 
     /* Encoded string to event parameters */
     @TypeConverter
     fun stringToParams (encodedStr: String?): List<ParameterTypes>? =
-            encodedStr?.split('&')?.map { ParameterTypes.valueOf(it) }
+            encodedStr?.split('&')?.map { paramToParamType(it) }
 
 }

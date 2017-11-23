@@ -23,7 +23,7 @@ class DayFragment : Fragment () {
 
             val dayListView: ListView = view.findViewById(R.id.dayView)
             dayListView.adapter = EventAdapter(activity, 0,
-                    SummaryViewState.DayViewModel.getInstance().events.value!!)
+                    SummaryViewState.DayViewModel.getInstance().events.value!! as MutableList<UserEvent>)
 
             return view
         }

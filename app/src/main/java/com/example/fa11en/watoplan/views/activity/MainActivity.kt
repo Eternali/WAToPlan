@@ -60,6 +60,14 @@ enum class ParameterTypes (val param: String) {
     REPEAT ("REPEAT")
 }
 
+// This must be defined to get ParameterTypes object based on its param
+fun paramToParamType (param: String): ParameterTypes {
+    ParameterTypes.values()
+            .filter { it.param == param }
+            .forEach { return it }
+    throw TypeNotPresentException(param, Throwable())
+}
+
 
 class MainActivity: AppCompatActivity (), SummaryView {
 
@@ -94,9 +102,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
         *  I have gone with the 2nd option for now */
         render(SummaryViewState.Loading.getInstance
                 (false, false, false, dayToggle.id), this)
-//        render(ViewModelProviders.of(this)
-//                .get(SummaryViewState.Loading.getInstance(false, false, false, dayToggle.id)
-//                ::class.java), this)
     }
 
     override fun onCreateOptionsMenu (menu: Menu?): Boolean {
@@ -130,12 +135,12 @@ class MainActivity: AppCompatActivity (), SummaryView {
     ////**** INTENTS ****////
 
     override fun loadDatabase (ctx: Context): Boolean {
-//        return try {
+        return try {
             appdb = EventsDB.getInstance(ctx)
             return true
-//        } catch (e: Exception) {
-//            false
-//        }
+        } catch (e: Exception) {
+            false
+        }
     }
 
     override fun showDbError(ctx: Context, msg: String) {
@@ -145,7 +150,12 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadTypes (state: SummaryViewState, db: AppDatabase): Boolean {
         db.beginTransaction()
         return try {
-            state.types.postValue(db.typeDao().getAll().toMutableList())
+//            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
+//                    R.color.colorAccent, R.color.colorAccent_pressed)
+//            db.typeDao().insert(type)
+//            val gets: List<EventType> = db.typeDao().getAll()
+//            if (!gets.contains(type)) throw TypeNotPresentException(type.name, Throwable())
+            state.types.postValue(db.typeDao().getAll())
             true
         } catch (e: Exception) {
             false
@@ -157,9 +167,16 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadEvents (state: SummaryViewState, db: AppDatabase): Boolean {
         db.beginTransaction()
         return try {
-            // alter state to reflect success
-            state.events.postValue(db.eventDao().getAll().toMutableList())
-            state.events.value!!.forEach {
+//            val event = UserEvent(EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
+//                    R.color.colorAccent, R.color.colorAccent_pressed))
+//            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
+//            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
+//            db.eventDao().insert(event)
+//            val gets: List<UserEvent> = db.eventDao().getAll()
+//            if (gets[0] != event) throw TypeNotPresentException(event.typeName, Throwable())
+
+            state.events.postValue(db.eventDao().getAll())
+            state.events.value?.forEach {
                 if (!it.loadType(db))
                     throw TypeNotPresentException(it.typeName, Throwable())
             }
@@ -198,11 +215,10 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 // watch loading status
                 val dbLoadingObserver: Observer<Boolean> = Observer {
                     if (it != null && it) {
-                        // LOOK OUT FOR NULL-SAFETY PROMISE
                         if (loadTypes(state, appdb)) state.typesLoaded.postValue(true)
-                        else showDbError(ctx, "Failed to load Event Types.")
+                        else showDbError(ctx, "Failed to load Event Types")
                         if (loadEvents(state, appdb)) state.eventsLoaded.postValue(true)
-                        else showDbError(ctx, "Failed to load Events.")
+                        else showDbError(ctx, "Failed to load Events")
                     }
                 }
 
@@ -211,7 +227,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 // load database if not already done so
                 if (state.dbLoaded.value == null || !state.dbLoaded.value!!) {
                     if (loadDatabase(ctx)) state.dbLoaded.postValue(true)
-                    else showDbError(ctx, "Failed to load Database.")
+                    else showDbError(ctx, "Failed to load Database")
                 }
 
                 // set display fragment

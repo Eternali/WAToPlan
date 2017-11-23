@@ -10,7 +10,7 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
 
     // LiveData objects for all settings states
     val theme: MutableLiveData<Themes> = MutableLiveData()
-    val types: MutableLiveData<MutableList<EventType>> = MutableLiveData()
+    val types: MutableLiveData<List<EventType>> = MutableLiveData()
 
     init {
         // set or load theme
@@ -24,7 +24,7 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
         }
     }
 
-    class Loading (t: Themes, dbIsLoaded: Boolean = false, typesIsLoaded: Boolean = false, etypes: MutableList<EventType> = mutableListOf())
+    class Loading (t: Themes, dbIsLoaded: Boolean = false, typesIsLoaded: Boolean = false, etypes: List<EventType> = mutableListOf())
         : SettingsViewState (t) {
 
         val dbLoaded: MutableLiveData<Boolean> = MutableLiveData()
@@ -40,11 +40,11 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
 
     }
 
-    class Passive (t: Themes, etypes: MutableList<EventType> = mutableListOf()): SettingsViewState (t) {
+    class Passive (t: Themes, etypes: List<EventType> = mutableListOf()): SettingsViewState (t) {
 
         init {
             // set event types
-            types.postValue(mutableListOf())
+            types.postValue(etypes)
         }
 
     }
