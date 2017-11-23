@@ -224,7 +224,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
                 // watch loading status
                 val dbLoadingObserver: Observer<Boolean> = Observer {
-                    if (it != null && it) {
+                    if (it == true) {
                         // must have != true to accommodate null case
                         if (state.typesLoaded.value != true) loadTypes(state, appdb)
                         if (state.eventsLoaded.value != true) loadEvents(state, appdb)
@@ -241,7 +241,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 val eventsLoadingObserver: Observer<List<UserEvent>> = Observer {
                     if (it == null || it.isEmpty())
                         showDbError(ctx, "Failed to load Events")
-                    else if (state.typesLoaded.value != null && state.typesLoaded.value!!) {
+                    else if (state.typesLoaded.value == true) {
                         it.forEach {
                             if (!it.loadType(appdb))
                                 throw TypeNotPresentException(it.typeName, Throwable())
@@ -251,8 +251,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 }
 
                 val finishedLoadingObserver: Observer<Boolean> = Observer {
-                    if (state.typesLoaded.value != null && state.typesLoaded.value!!
-                            && state.eventsLoaded.value != null && state.eventsLoaded.value!!)
+                    if (state.typesLoaded.value == true && state.eventsLoaded.value == true)
                         render(SummaryViewState.Passive(dayToggle.id), ctx)
                 }
 
@@ -264,7 +263,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 state.eventsLoaded.observe(this, finishedLoadingObserver)
 
                 // load database if not already done so
-                if (state.dbLoaded.value == null || !state.dbLoaded.value!!) {
+                if (state.dbLoaded.value != true) {
                     if (loadDatabase(ctx)) state.dbLoaded.postValue(true)
                     else showDbError(ctx, "Failed to load Database")
                 }

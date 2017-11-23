@@ -17,6 +17,9 @@ import com.example.fa11en.watoplan.views.adapter.TypeAdapter
 import com.example.fa11en.watoplan.views.dialog.EditTypeActivity
 import kotterknife.bindView
 
+
+// global note: it == true is shorthand for it != null && it
+
 class SettingsActivity : AppCompatActivity (), SettingsView {
 
     // use kotterknife to bind views to vals
@@ -72,6 +75,9 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     override fun loadTypes(db: AppDatabase, state: SettingsViewState): Boolean {
         db.beginTransaction()
         return try {
+            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
+                    R.color.colorAccent, R.color.colorAccent_pressed)
+            db.typeDao().insert(type)
             state.types.postValue(db.typeDao().getAll())
             true
         } catch (e: Exception) {
@@ -90,19 +96,26 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             is SettingsViewState.Loading -> {
                 // watch loading status
                 val dbLoadingObserver: Observer<Boolean> = Observer {
-                    if (it != null && it) {
-                        if (loadTypes(appdb, state)) state.typesLoaded.postValue(true)
-                        else showDbError(ctx, "Failed to load Event Types")
+                    if (it == true) {
+                        loadTypes(appdb, state)
                     }
                 }
-                val typesLoadingObserver: Observer<Boolean> = Observer {
-                    if (it != null && it) {
+                val typesLoadingObserver: Observer<List<EventType>> = Observer {
+                    if (it == null || it.isEmpty()) {
+                        showDbError(ctx, "Failed to load Event Types")
+                    } else {
+                        state.typesLoaded.postValue(true)
+                    }
+                }
+                val finishedLoadingObserver: Observer<Boolean> = Observer {
+                    if (state.typesLoaded.value == true) {
                         // if typesLoaded is true then types is guaranteed to be defined.
-                        render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
+                        render(SettingsViewState.Passive(Themes.LIGHT, state.types.value!!), ctx)
                     }
                 }
                 state.dbLoaded.observe(this, dbLoadingObserver)
-                state.typesLoaded.observe(this, typesLoadingObserver)
+                state.types.observe(this, typesLoadingObserver)
+                state.typesLoaded.observe(this, finishedLoadingObserver)
 
                 // load database
                 if (loadDatabase(ctx)) state.dbLoaded.postValue(true)
