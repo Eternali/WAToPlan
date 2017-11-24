@@ -51,6 +51,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         when (requestCode) {
             RequestCodes.NEWEVENTTYPE.code -> {
                 if (resultCode == ResultCodes.TYPESAVED.code) {
+                    Log.i("TYPES", appdb.typeDao().getAll().toString())
                     // notify adapter of type changed
 //                    typeList.adapter = TypeAdapter(this, 0, state.types)
                 }
@@ -78,19 +79,15 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     }
 
     // TODO: make a database intents class for application-wide data loading
-    override fun loadTypes(db: AppDatabase, state: SettingsViewState.Loading): Boolean {
-        db.beginTransaction()
+    override fun loadTypes(state: SettingsViewState.Loading): Boolean {
+//        appdb.beginTransaction()
         return try {
-            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
-                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null))
-            db.typeDao().insert(type)
-            state.types.postValue(db.typeDao().getAll())
+            state.types.postValue(appdb.typeDao().getAll())
             true
         } catch (e: Exception) {
             false
         } finally {
-            db.endTransaction()
+//            appdb.endTransaction()
         }
     }
 
@@ -108,11 +105,11 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 // watch loading status
                 val dbLoadingObserver: Observer<Boolean> = Observer {
                     if (it == true) {
-                        loadTypes(appdb, state)
+                        loadTypes(state)
                     }
                 }
                 val typesLoadingObserver: Observer<List<EventType>> = Observer {
-                    if (it == null || it.isEmpty()) {
+                    if (it == null) {
                         showDbError(ctx, "Failed to load Event Types")
                     } else {
                         state.typesLoaded.postValue(true)

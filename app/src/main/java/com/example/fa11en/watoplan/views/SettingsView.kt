@@ -22,7 +22,7 @@ interface SettingsView {
     fun showDbError (ctx: Context, msg: String)
 
     // load types if necessary. See loadDatabase notes.
-    fun loadTypes (db: AppDatabase, state: SettingsViewState.Loading): Boolean
+    fun loadTypes (state: SettingsViewState.Loading): Boolean
 
     // make dialog popup to edit event types
     fun editDialog (ctx: Context, eventType: EventType?)

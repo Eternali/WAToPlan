@@ -53,15 +53,14 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
                     ArrayList(state.typeParams.keys.filter {
                         state.typeParams[it]?.value!!
                     }), state.typeColorNormal.value!!, state.typeColorPressed.value!!)
-
-            appdb.beginTransaction()
+//            appdb.beginTransaction()
             try {
                 appdb.typeDao().insert(eventType)
                 true
             } catch (e: Exception) {
                 false
             } finally {
-                appdb.endTransaction()
+//                appdb.endTransaction()
             }
         } else false
     }

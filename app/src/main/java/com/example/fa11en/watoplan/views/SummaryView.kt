@@ -21,10 +21,10 @@ interface SummaryView {
     fun showDbError (ctx: Context, msg: String)
 
     // load types
-    fun loadTypes (state: SummaryViewState, db: AppDatabase): Boolean
+    fun loadTypes (state: SummaryViewState): Boolean
 
     // load events
-    fun loadEvents (state: SummaryViewState, db: AppDatabase): Boolean
+    fun loadEvents (state: SummaryViewState): Boolean
 
     // switch view fragment
     fun toggleDisplay (view: View)

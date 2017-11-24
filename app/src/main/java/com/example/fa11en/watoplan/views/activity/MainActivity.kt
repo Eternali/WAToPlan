@@ -160,24 +160,20 @@ class MainActivity: AppCompatActivity (), SummaryView {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
     }
 
-    override fun loadTypes (state: SummaryViewState, db: AppDatabase): Boolean {
-        db.beginTransaction()
+    override fun loadTypes (state: SummaryViewState): Boolean {
+//        appdb.beginTransaction()
         return try {
-//            val type = EventType("TestType", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-//                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
-//                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null))
-//            db.typeDao().insert(type)
-            state.types.postValue(db.typeDao().getAll())
+            state.types.postValue(appdb.typeDao().getAll())
             true
         } catch (e: Exception) {
             false
         } finally {
-            db.endTransaction()
+//            appdb.endTransaction()
         }
     }
 
-    override fun loadEvents (state: SummaryViewState, db: AppDatabase): Boolean {
-        db.beginTransaction()
+    override fun loadEvents (state: SummaryViewState): Boolean {
+//        appdb.beginTransaction()
         return try {
 //            val event = UserEvent("TestType")
 //            event.loadType(db)
@@ -186,12 +182,12 @@ class MainActivity: AppCompatActivity (), SummaryView {
 //            db.eventDao().insert(event)
 //            val gets: List<UserEvent> = db.eventDao().getAll()
 //            if (gets[0] != event) throw TypeNotPresentException(event.typeName, Throwable())
-            state.events.postValue(db.eventDao().getAll())
+            state.events.postValue(appdb.eventDao().getAll())
             true
         } catch (e: Exception) {
             false
         } finally {
-            db.endTransaction()
+//            appdb.endTransaction()
         }
     }
 
@@ -224,20 +220,20 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 val dbLoadingObserver: Observer<Boolean> = Observer {
                     if (it == true) {
                         // must have != true to accommodate null case
-                        if (state.typesLoaded.value != true) loadTypes(state, appdb)
-                        if (state.eventsLoaded.value != true) loadEvents(state, appdb)
+                        if (state.typesLoaded.value != true) loadTypes(state)
                     }
                 }
                 val typesLoadingObserver: Observer<List<EventType>> = Observer {
-                    if (it == null || it.isEmpty())
+                    if (it == null)
                         showDbError(ctx, "Failed to load Event Types")
                     else {
                         state.typesLoaded.postValue(true)
                         generateFABS(it)
+                        if (state.eventsLoaded.value != true) loadEvents(state)
                     }
                 }
                 val eventsLoadingObserver: Observer<List<UserEvent>> = Observer {
-                    if (it == null || it.isEmpty())
+                    if (it == null)
                         showDbError(ctx, "Failed to load Events")
                     else if (state.typesLoaded.value == true) {
                         it.forEach {
@@ -249,8 +245,9 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 }
 
                 val finishedLoadingObserver: Observer<Boolean> = Observer {
-                    if (state.typesLoaded.value == true && state.eventsLoaded.value == true)
+                    if (state.typesLoaded.value == true && state.eventsLoaded.value == true) {
                         render(SummaryViewState.Passive(dayToggle.id), ctx)
+                    }
                 }
 
                 // bind observables
