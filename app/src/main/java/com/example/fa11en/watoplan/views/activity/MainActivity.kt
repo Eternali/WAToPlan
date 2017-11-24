@@ -55,8 +55,8 @@ enum class ParameterTypes (val param: String) {
     DESCRIPTION ("DESCRIPTION"),
     DATETIME ("DATETIME"),
     LOCATION ("LOCATION"),
-    ENTITIES ("ENTITIES"),
-    REPEAT ("REPEAT")
+    ENTITIES ("PEOPLE"),
+    REPEAT ("REPETITIONS")
 }
 
 // This must be defined to get ParameterTypes object based on its param

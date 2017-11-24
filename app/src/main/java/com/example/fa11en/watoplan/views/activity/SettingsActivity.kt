@@ -51,13 +51,14 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         when (requestCode) {
             RequestCodes.NEWEVENTTYPE.code -> {
                 if (resultCode == ResultCodes.TYPESAVED.code) {
-                    Log.i("TYPES", appdb.typeDao().getAll().toString())
-                    // notify adapter of type changed
-//                    typeList.adapter = TypeAdapter(this, 0, state.types)
+                    render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
                 }
             }
             RequestCodes.EDITEVENTTYPE.code -> {
                 EditTypeViewState.Edit.destroyInstance()
+                if (resultCode == ResultCodes.TYPEDELETED.code) {
+                    render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
+                }
             }
         }
     }

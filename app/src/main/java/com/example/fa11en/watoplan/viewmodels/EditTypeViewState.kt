@@ -2,6 +2,7 @@ package com.example.fa11en.watoplan.viewmodels
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import com.example.fa11en.watoplan.EventType
 import com.example.fa11en.watoplan.ParameterTypes
 import com.example.fa11en.watoplan.R
@@ -38,21 +39,23 @@ sealed class EditTypeViewState: ViewModel () {
 
         init {
             // initialize all values to those of the type
-            typeName.postValue(type.name)
 
-            ParameterTypes.values().forEach { typeParams[it] = MutableLiveData() }
-            type.parameters.forEach {
-                typeParams[it]!!.postValue(true)
+            ParameterTypes.values().forEach {
+                typeParams[it] = MutableLiveData()
+                if (it in type.parameters) typeParams[it]!!.postValue(true)
+                else typeParams[it]!!.postValue(false)
             }
 
+            typeName.postValue(type.name)
             typeColorNormal.postValue(type.colorNormal)
             typeColorPressed.postValue(type.colorPressed)
         }
 
         companion object {
             private var INSTANCE: Edit? = null
+            // only specify type if reinstantiating
             fun getInstance (type: EventType?): EditTypeViewState {
-                if (INSTANCE == null && type != null)
+                if (type != null)
                     INSTANCE = Edit(type)
                 else if (INSTANCE == null)
                     return EditTypeViewState.New()

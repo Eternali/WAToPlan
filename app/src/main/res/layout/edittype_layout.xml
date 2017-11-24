@@ -72,15 +72,13 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:text="@string/titleRadioText"
-            android:checked="true"
             android:clickable="false"/>
         <CheckBox
             android:id="@+id/DESCRIPTION"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:text="@string/descRadioText"
-            android:checked="true"/>
+            android:text="@string/descRadioText"/>
         <CheckBox
             android:id="@+id/DATETIME"
             android:layout_width="match_parent"

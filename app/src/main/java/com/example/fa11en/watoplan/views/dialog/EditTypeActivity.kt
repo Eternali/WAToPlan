@@ -65,6 +65,24 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         } else false
     }
 
+    override fun updateType(state: EditTypeViewState.Edit): Boolean {
+        return if (state.typeName.value != null && state.typeColorNormal.value != null && state.typeColorPressed.value != null) {
+            val eventType = EventType(state.typeName.value!!,
+                    ArrayList(state.typeParams.keys.filter {
+                        state.typeParams[it]?.value!!
+                    }), state.typeColorNormal.value!!, state.typeColorPressed.value!!)
+//            appdb.beginTransaction()
+            try {
+                appdb.typeDao().update(eventType)
+                true
+            } catch (e: Exception) {
+                false
+            } finally {
+//                appdb.endTransaction()
+            }
+        } else false
+    }
+
     override fun showDbError(ctx: Context, msg: String) {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
     }
@@ -92,6 +110,18 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
 
         //  initialize observables/listeners  //
 
+        // wait until all typeParams have initialized to set checkboxes
+        val paramsLoaded: Observer<Boolean> = Observer {
+            state.typeParams.values.forEach {
+                if (it.value == null) return@Observer
+            }
+            (0 until paramsContainer.childCount)
+                    .map { paramsContainer.getChildAt(it) }
+                    .forEach { it.isActivated =
+                            state.typeParams[paramToParamType((it as CheckBox).text.toString())]?.value!! }
+        }
+        state.typeParams.values.forEach { it.observe(this, paramsLoaded) }
+
         // name listener
         name.addTextChangedListener(EditParamWatcher(state.typeName))
 
@@ -108,10 +138,10 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         state.typeColorNormal.observe(this, colorNormalObserver)
         state.typeColorPressed.observe(this, colorPressedObserver)
 
-        //  checkbox listeners  //
+        //  checkbox initialization and listeners  //
         for (c in 0 until paramsContainer.childCount) {
             paramsContainer.getChildAt(c).setOnClickListener {
-                // assuming param radio button text are only values of ParameterTypes.param
+                // assuming param checkbox text are only values of ParameterTypes.param
                 state.typeParams[paramToParamType((it as CheckBox).text.toString())]
                         ?.postValue(!state.typeParams[paramToParamType(it.text.toString())]?.value!!)
             }
@@ -124,16 +154,6 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         }
         colorPressedButton.setOnClickListener {
             showColorChooser(ctx, state.typeColorPressed)
-        }
-
-        saveButton.setOnClickListener {
-            saveType(state)
-            val code = Intent()
-            if (saveType(state))
-                setResult(ResultCodes.TYPESAVED.code, code)
-            else
-                setResult(ResultCodes.TYPEFAILED.code, code)
-            finish()
         }
 
         // after everything is initialized then check if specific defaults set
@@ -153,12 +173,32 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
                     setResult(ResultCodes.TYPEDELETED.code, code)
                     finish()
                 }
+
+                // update button
+                saveButton.setOnClickListener {
+                    val code = Intent()
+                    if (updateType(state))
+                        setResult(ResultCodes.TYPESAVED.code, code)
+                    else
+                        setResult(ResultCodes.TYPEFAILED.code, code)
+                    finish()
+                }
             }
             is EditTypeViewState.New -> {
                 // cancel button
                 cancelButton.setOnClickListener{
                     val code = Intent()
                     setResult(ResultCodes.TYPECANCELED.code, code)
+                    finish()
+                }
+
+                // save button
+                saveButton.setOnClickListener {
+                    val code = Intent()
+                    if (saveType(state))
+                        setResult(ResultCodes.TYPESAVED.code, code)
+                    else
+                        setResult(ResultCodes.TYPEFAILED.code, code)
                     finish()
                 }
             }
