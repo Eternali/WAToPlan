@@ -14,7 +14,7 @@ class EventsDB (ctx: Context) {
     }
 
     companion object {
-        private val DATABASE_NAME = "events-database"
+        private val DATABASE_NAME = "app-database"
         private var INSTANCE: EventsDB? = null
         fun getInstance (ctx: Context) : AppDatabase {
             if (INSTANCE == null)
