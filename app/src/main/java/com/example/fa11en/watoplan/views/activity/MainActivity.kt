@@ -165,6 +165,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
 //        appdb.beginTransaction()
         return try {
             state.types.postValue(appdb.typeDao().getAll())
+            Log.i("TYPES", appdb.typeDao().getAll().toString())
             true
         } catch (e: Exception) {
             false

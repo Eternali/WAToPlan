@@ -48,6 +48,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+//        Log.i("TYPES", appdb.typeDao().getAll().toString())
         when (requestCode) {
             RequestCodes.NEWEVENTTYPE.code -> {
                 if (resultCode == ResultCodes.TYPESAVED.code) {
