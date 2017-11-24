@@ -27,7 +27,6 @@
     <string name="addEntityButtonText">ADD PERSON</string>
     <string name="locationLabelText">CHOOSE LOCATION</string>
     <string name="mapButtonText">OPEN MAP</string>
-    <string name="cancelButtonText">CANCEL</string>
     <string name="saveButtonText">SAVE</string>
     <string name="eventTypesEditTitle">ACTIVITY TYPES</string>
     <string name="pressedText">ACTIVE</string>
@@ -41,6 +40,7 @@
     <string name="entitiesRadioText">PEOPLE</string>
     <string name="repeatRadioText">REPETITIONS</string>
     <string name="cancelText">CANCEL</string>
+    <string name="deleteText">DELETE</string>
     <string name="saveText">SAVE</string>
     <string name="addTypeText">ADD TYPE</string>
 </resources>

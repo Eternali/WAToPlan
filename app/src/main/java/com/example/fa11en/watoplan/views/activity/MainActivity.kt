@@ -45,7 +45,8 @@ enum class RequestCodes (val code: Int) {
 enum class ResultCodes (val code: Int) {
     TYPECANCELED(0),
     TYPESAVED(1),
-    TYPEFAILED(2)
+    TYPEFAILED(2),
+    TYPEDELETED(3)
 }
 
 // This can be put here because it will never change and is required globally

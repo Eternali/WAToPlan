@@ -126,11 +126,6 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
             showColorChooser(ctx, state.typeColorPressed)
         }
 
-        cancelButton.setOnClickListener{
-            val code = Intent()
-            setResult(ResultCodes.TYPECANCELED.code, code)
-            finish()
-        }
         saveButton.setOnClickListener {
             saveType(state)
             val code = Intent()
@@ -147,6 +142,25 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
                 nameEditText.setText(state.typeName.value)
                 colorNormalButton.setBackgroundColor(state.typeColorNormal.value!!)
                 colorPressedButton.setBackgroundColor(state.typeColorPressed.value!!)
+                cancelButton.text = getText(R.string.deleteText)
+
+                // delete button
+                cancelButton.setOnClickListener{
+                    try {
+                        appdb.typeDao().delete(appdb.typeDao().get(state.typeName.value!!))
+                    } catch (e: Exception) {  }
+                    val code = Intent()
+                    setResult(ResultCodes.TYPEDELETED.code, code)
+                    finish()
+                }
+            }
+            is EditTypeViewState.New -> {
+                // cancel button
+                cancelButton.setOnClickListener{
+                    val code = Intent()
+                    setResult(ResultCodes.TYPECANCELED.code, code)
+                    finish()
+                }
             }
         }
 
