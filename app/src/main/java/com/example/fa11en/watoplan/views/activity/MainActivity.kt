@@ -98,6 +98,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         *       (but this requires vararg parameter in render method to specify how to set the state)
         *  2: Make each SummaryViewState subclass a singleton and get the instance across fragments
         *       (but this is not lifecycle aware)
+        *       -- there is an issue with this where the instance persists accross soft restarts of the app (i think)
         *  I have gone with the 2nd option for now */
         render(SummaryViewState.Loading.getInstance
                 (false, false, false), this)
