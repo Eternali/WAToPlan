@@ -11,7 +11,7 @@ import com.example.fa11en.watoplan.R
 sealed class EditTypeViewState: ViewModel () {
 
     val typeName: MutableLiveData<String> = MutableLiveData()
-    val typeParams: HashMap<ParameterTypes, MutableLiveData<Boolean>> = hashMapOf()
+    val typeParams: LinkedHashMap<ParameterTypes, MutableLiveData<Boolean>> = linkedMapOf()
     val typeColorNormal: MutableLiveData<Int> = MutableLiveData()
     val typeColorPressed: MutableLiveData<Int> = MutableLiveData()
 

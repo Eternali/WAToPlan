@@ -38,7 +38,8 @@ enum class Themes {
 // global enum for request codes
 enum class RequestCodes (val code: Int) {
     NEWEVENTTYPE(0),
-    EDITEVENTTYPE(1)
+    EDITEVENTTYPE(1),
+    EVENTTYPECHANGED(2)
 }
 
 // global enum for result codes
@@ -46,7 +47,8 @@ enum class ResultCodes (val code: Int) {
     TYPECANCELED(0),
     TYPESAVED(1),
     TYPEFAILED(2),
-    TYPEDELETED(3)
+    TYPEDELETED(3),
+    TYPECHANGED(4)
 }
 
 // This can be put here because it will never change and is required globally
@@ -98,7 +100,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         *       (but this requires vararg parameter in render method to specify how to set the state)
         *  2: Make each SummaryViewState subclass a singleton and get the instance across fragments
         *       (but this is not lifecycle aware)
-        *       -- there is an issue with this where the instance persists accross soft restarts of the app (i think)
+        *       -- there is an issue with this where the instance persists across soft restarts of the app (i think)
         *  I have gone with the 2nd option for now */
         render(SummaryViewState.Loading.getInstance
                 (false, false, false), this)
@@ -129,6 +131,21 @@ class MainActivity: AppCompatActivity (), SummaryView {
         }
 
         return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.i("RESULT", "SAVE RESULTED TO RELOAD DISPLAY")
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            RequestCodes.EVENTTYPECHANGED.code -> {
+                if (resultCode == ResultCodes.TYPECHANGED.code
+                        || resultCode == ResultCodes.TYPESAVED.code
+                        || resultCode == ResultCodes.TYPEDELETED.code) {
+                    render(SummaryViewState.Loading.getInstance
+                    (false, false, false), this)
+                }
+            }
+        }
     }
 
 
@@ -165,11 +182,15 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadTypes (state: SummaryViewState): Boolean {
         appdb.beginTransaction()
         return try {
+//            appdb.typeDao().insert(EventType("TEST", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
+//                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
+//                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null)))
             state.types.postValue(appdb.typeDao().getAll())
-            Log.i("TYPES", "asdf")
+            Log.i("TYPES", state.types.value.toString())
             appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {
+            showDbError(applicationContext, "Failed to load Event Types")
             false
         } finally {
             appdb.endTransaction()
@@ -190,6 +211,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
             appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {
+            showDbError(applicationContext, "Failed to load Events")
             false
         } finally {
             appdb.endTransaction()
@@ -212,7 +234,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun settingsIntent (ctx: Context) {
-        startActivity(Intent(ctx, SettingsActivity::class.java))
+        startActivityForResult(Intent(ctx, SettingsActivity::class.java), RequestCodes.EVENTTYPECHANGED.code)
     }
 
     override fun render (state: SummaryViewState, ctx: Context) {

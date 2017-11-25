@@ -48,20 +48,32 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-//        Log.i("TYPES", appdb.typeDao().getAll().toString())
+        Log.i("TYPES", appdb.typeDao().getAll().toString())
         when (requestCode) {
             RequestCodes.NEWEVENTTYPE.code -> {
                 if (resultCode == ResultCodes.TYPESAVED.code) {
                     render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
+                } else {
+                    showDbError(applicationContext, "Failed to Save Event.")
                 }
             }
             RequestCodes.EDITEVENTTYPE.code -> {
                 EditTypeViewState.Edit.destroyInstance()
                 if (resultCode == ResultCodes.TYPEDELETED.code) {
                     render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
+                } else if (resultCode == ResultCodes.TYPESAVED.code) {
+                    render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
+                } else {
+                    showDbError(applicationContext, "Failed to Save Event.")
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        val code = Intent()
+        setResult(ResultCodes.TYPECHANGED.code, code)
+        finish()
     }
 
 

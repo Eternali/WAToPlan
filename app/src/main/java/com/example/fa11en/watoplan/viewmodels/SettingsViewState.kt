@@ -11,6 +11,8 @@ sealed class SettingsViewState (t: Themes): ViewModel () {
     // LiveData objects for all settings states
     val theme: MutableLiveData<Themes> = MutableLiveData()
 
+    val resultCode: ResultCodes = ResultCodes.TYPECANCELED
+
     init {
         // set or load theme
         when (t) {

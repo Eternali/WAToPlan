@@ -114,13 +114,13 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
 
         // wait until all typeParams have initialized to set checkboxes
         val paramsLoaded: Observer<Boolean> = Observer {
-            state.typeParams.values.forEach {
-                if (it.value == null) return@Observer
+            state.typeParams.forEach {
+                if (it.value.value == null) return@Observer
+                else {
+                    (paramsContainer.getChildAt(state.typeParams.keys.toList().indexOf(it.key)) as CheckBox)
+                            .isChecked = it.value.value!!
+                }
             }
-            (0 until paramsContainer.childCount)
-                    .map { paramsContainer.getChildAt(it) }
-                    .forEach { it.isActivated =
-                            state.typeParams[paramToParamType((it as CheckBox).text.toString())]?.value!! }
         }
         state.typeParams.values.forEach { it.observe(this, paramsLoaded) }
 
