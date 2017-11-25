@@ -162,20 +162,21 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun loadTypes (state: SummaryViewState): Boolean {
-//        appdb.beginTransaction()
+        appdb.beginTransaction()
         return try {
             state.types.postValue(appdb.typeDao().getAll())
-            Log.i("TYPES", appdb.typeDao().getAll().toString())
+            Log.i("TYPES", "asdf")
+            appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {
             false
         } finally {
-//            appdb.endTransaction()
+            appdb.endTransaction()
         }
     }
 
     override fun loadEvents (state: SummaryViewState): Boolean {
-//        appdb.beginTransaction()
+        appdb.beginTransaction()
         return try {
 //            val event = UserEvent("TestType")
 //            event.loadType(db)
@@ -185,11 +186,12 @@ class MainActivity: AppCompatActivity (), SummaryView {
 //            val gets: List<UserEvent> = db.eventDao().getAll()
 //            if (gets[0] != event) throw TypeNotPresentException(event.typeName, Throwable())
             state.events.postValue(appdb.eventDao().getAll())
+            appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {
             false
         } finally {
-//            appdb.endTransaction()
+            appdb.endTransaction()
         }
     }
 

@@ -82,14 +82,15 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     // TODO: make a database intents class for application-wide data loading
     override fun loadTypes(state: SettingsViewState.Loading): Boolean {
-//        appdb.beginTransaction()
+        appdb.beginTransaction()
         return try {
             state.types.postValue(appdb.typeDao().getAll())
+            appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {
             false
         } finally {
-//            appdb.endTransaction()
+            appdb.endTransaction()
         }
     }
 
