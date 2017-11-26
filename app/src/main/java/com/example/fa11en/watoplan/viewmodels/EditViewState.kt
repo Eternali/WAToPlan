@@ -13,7 +13,7 @@ class EditViewState : ViewModel () {
 
     var types: List<EventType> = listOf()
     val curType: MutableLiveData<EventType> = MutableLiveData()
-    val params: MutableLiveData<LinkedHashMap<ParameterTypes, MutableLiveData<Any>>> = MutableLiveData()
+    val params: MutableLiveData<LinkedHashMap<ParameterTypes, MutableLiveData<*>>> = MutableLiveData()
     val isEdit: MutableLiveData<Boolean> = MutableLiveData()
     val loaded: MutableLiveData<Boolean> = MutableLiveData()
 

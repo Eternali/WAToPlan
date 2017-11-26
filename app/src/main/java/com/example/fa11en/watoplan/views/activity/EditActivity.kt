@@ -1,5 +1,6 @@
 package com.example.fa11en.watoplan
 
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.content.Context
@@ -26,6 +27,23 @@ class EditActivity : AppCompatActivity (), EditView {
     private val cancelButton: Button by bindView(R.id.cancelButton)
     private val typeSpinner: Spinner by bindView(R.id.eventTypeSpinner)
 
+    // initialize parameter views and mappings
+    private val titleContainer: LinearLayout by bindView(R.id.eventTitleContainer)
+    private val descriptionContainer: LinearLayout by bindView(R.id.eventDescContainer)
+    private val datetimeContainer: LinearLayout by bindView(R.id.eventDateTimeContainer)
+    private val locationContainer: LinearLayout by bindView(R.id.eventLocationContainer)
+    private val entitiesContainer: LinearLayout by bindView(R.id.eventEntitiesContainer)
+    private val repeatContainer: LinearLayout by bindView(R.id.eventRepeatContainer)
+
+    override val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout> = linkedMapOf(
+            ParameterTypes.TITLE to titleContainer,
+            ParameterTypes.DESCRIPTION to descriptionContainer,
+            ParameterTypes.DATETIME to datetimeContainer,
+            ParameterTypes.LOCATION to locationContainer,
+            ParameterTypes.ENTITIES to entitiesContainer,
+            ParameterTypes.REPEAT to repeatContainer
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
@@ -42,7 +60,6 @@ class EditActivity : AppCompatActivity (), EditView {
                 return
 
             state.curType.postValue(state.types[position])
-            body.set(event)
         }
 
         override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -160,11 +177,18 @@ class EditActivity : AppCompatActivity (), EditView {
         }
         val typeObserver: Observer<EventType> = Observer { type ->
             ParameterTypes.values().forEach {
-                if (state.params.value?.keys!!.contains(it) && !type?.parameters!!.contains(it))
+                if (state.params.value?.keys!!.contains(it) && !type?.parameters!!.contains(it)) {
+                    paramtoView[it]?.visibility = LinearLayout.GONE
                     state.params.value?.remove(it)
-                else if (!state.params.value?.keys!!.contains(it) && type?.parameters!!.contains(it))
+                }
+                else if (!state.params.value?.keys!!.contains(it) && type?.parameters!!.contains(it)) {
+                    paramtoView[it]?.visibility = LinearLayout.VISIBLE
                     state.params.value?.put(it, EditViewState.initializeParam(it, true))
+                }
             }
+        }
+        val paramsObserver: Observer<LinkedHashMap<ParameterTypes, MutableLiveData<*>>> = Observer {
+
         }
 
         state.loaded.observe(this, loadingObserver)
@@ -204,7 +228,7 @@ class EditActivity : AppCompatActivity (), EditView {
         }
         saveButton.setOnClickListener {
             val code = Intent()
-            if (saveEvent()) setResult(ResultCodes.TYPESAVED.code, code)
+            if (saveEvent(ctx)) setResult(ResultCodes.TYPESAVED.code, code)
             else setResult(ResultCodes.TYPEFAILED.code, code)
             finish()
         }

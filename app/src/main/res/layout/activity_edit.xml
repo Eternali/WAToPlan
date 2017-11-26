@@ -40,7 +40,21 @@
         android:orientation="horizontal"
         android:layout_marginLeft="14dp"
         android:layout_marginTop="14dp"
-        android:layout_marginRight="14dp" />
+        android:layout_marginRight="14dp">
+        <TextView
+            android:id="@+id/eventTitleLabel"
+            android:layout_weight="0.4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="TITLE"/>
+        <EditText
+            android:id="@+id/eventTitleEdit"
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="title" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/eventDescContainer"

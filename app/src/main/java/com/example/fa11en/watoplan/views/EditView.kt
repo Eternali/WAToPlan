@@ -1,8 +1,11 @@
 package com.example.fa11en.watoplan.views
 
 import android.content.Context
+import android.widget.AdapterView
+import android.widget.LinearLayout
 import com.example.fa11en.watoplan.AppDatabase
 import com.example.fa11en.watoplan.EventType
+import com.example.fa11en.watoplan.ParameterTypes
 import com.example.fa11en.watoplan.UserEvent
 import com.example.fa11en.watoplan.viewmodels.EditViewState
 
@@ -11,6 +14,7 @@ interface EditView {
 
     var appdb: AppDatabase
     val state: EditViewState
+    val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout>
 
     // load database
     fun loadDatabase(ctx: Context): Boolean
