@@ -160,7 +160,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
             button.title = it.name
             button.setOnClickListener { _ ->
                 addMenu.collapse()
-                addIntent(this, it)
+                addIntent(this, it.name)
             }
             addMenu.addButton(button)
         }
