@@ -9,6 +9,9 @@ interface UserEventDao {
     @Query("SELECT * FROM userevent")
     fun getAll(): List<UserEvent>
 
+    @Query("SELECT * FROM userevent WHERE eid = :eid")
+    fun get(eid: Int): UserEvent
+
     @Insert
     fun insert (vararg events: UserEvent)
 

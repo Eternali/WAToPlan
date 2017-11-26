@@ -39,7 +39,9 @@ enum class Themes {
 enum class RequestCodes (val code: Int) {
     NEWEVENTTYPE(0),
     EDITEVENTTYPE(1),
-    EVENTTYPECHANGED(2)
+    EVENTTYPECHANGED(2),
+    EDITEVENT(3),
+    NEWEVENT(4)
 }
 
 // global enum for result codes
@@ -48,7 +50,9 @@ enum class ResultCodes (val code: Int) {
     TYPESAVED(1),
     TYPEFAILED(2),
     TYPEDELETED(3),
-    TYPECHANGED(4)
+    TYPECHANGED(4),
+    EVENTADDED(5),
+    EVENTCHANGED(6)
 }
 
 // This can be put here because it will never change and is required globally
@@ -169,7 +173,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadDatabase (ctx: Context): Boolean {
         return try {
             appdb = EventsDB.getInstance(ctx)
-            return true
+            true
         } catch (e: Exception) {
             false
         }
@@ -225,12 +229,16 @@ class MainActivity: AppCompatActivity (), SummaryView {
         render(SummaryViewState.Passive(view.id), this)
     }
 
-    override fun editIntent (ctx: Context, event: UserEvent) {
-        startActivity(Intent(ctx, EditActivity::class.java))
+    override fun editIntent (ctx: Context, eid: Int) {
+        val editor = Intent(ctx, EditActivity::class.java)
+        editor.putExtra("eid", eid)
+        startActivityForResult(Intent(ctx, EditActivity::class.java), RequestCodes.EDITEVENT.code)
     }
 
-    override fun addIntent (ctx: Context, type: EventType) {
-        startActivity(Intent(ctx, EditActivity::class.java))
+    override fun addIntent (ctx: Context, typeName: String) {
+        val adder = Intent(ctx, EditActivity::class.java)
+        adder.putExtra("typename", typeName)
+        startActivityForResult(Intent(ctx, EditActivity::class.java), RequestCodes.NEWEVENT.code)
     }
 
     override fun settingsIntent (ctx: Context) {

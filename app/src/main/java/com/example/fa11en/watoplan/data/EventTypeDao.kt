@@ -9,7 +9,7 @@ interface EventTypeDao {
     @Query("SELECT * FROM eventtype")
     fun getAll(): List<EventType>
 
-    @Query("SELECT * FROM eventtype where name = :name")
+    @Query("SELECT * FROM eventtype WHERE name = :name")
     fun get(name: String): EventType
 
     @Insert

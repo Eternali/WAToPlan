@@ -30,10 +30,10 @@ interface SummaryView {
     fun toggleDisplay (view: View)
 
     // click on an event intent
-    fun editIntent (ctx: Context, event: UserEvent)
+    fun editIntent (ctx: Context, eid: Int)
 
     // click on a FAB
-    fun addIntent (ctx: Context, type: EventType)
+    fun addIntent (ctx: Context, typeName: String)
 
     // click on settings menu item
     fun settingsIntent (ctx: Context)
