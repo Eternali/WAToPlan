@@ -167,7 +167,7 @@ class EditActivity : AppCompatActivity (), EditView {
         val cHour = curTime.get(Calendar.HOUR_OF_DAY)
         val cMinute = curTime.get(Calendar.MINUTE)
 
-        val timeDialog = TimePickerDialog(applicationContext,
+        val timeDialog = TimePickerDialog(this,
                 TimePickerDialog.OnTimeSetListener { view, hour, minute -> run {
                     val labelText = findViewById<TextView>(R.id.eventDatetimeLabel)
                     val text = labelText.text.split(", ") as MutableList<String>
@@ -183,12 +183,17 @@ class EditActivity : AppCompatActivity (), EditView {
         val cYear = curDate.get(Calendar.YEAR)
         val cMonth = curDate.get(Calendar.MONTH)
         val cDay = curDate.get(Calendar.DAY_OF_MONTH)
-        val dateDialog = DatePickerDialog(applicationContext,
+        val dateDialog = DatePickerDialog(this,
                 DatePickerDialog.OnDateSetListener { view, year, month, day -> run {
                     val labelText = findViewById<TextView>(R.id.eventDatetimeLabel)
                     val text = labelText.text.split(", ") as MutableList<String>
                     text[1] = day.toString() + " " + month.toString() + " " + year.toString()
                     labelText.text = text.joinToString(", ")
+                    val date = Calendar.getInstance()
+                    date.set(Calendar.YEAR, year)
+                    date.set(Calendar.MONTH, month)
+                    date.set(Calendar.DAY_OF_MONTH, day)
+                    state.params.value!![ParameterTypes.DATETIME]!!.postValue(date)
                 } }, cYear, cMonth, cDay)
         dateDialog.setTitle("Select Date")
         dateDialog.show()
@@ -196,14 +201,14 @@ class EditActivity : AppCompatActivity (), EditView {
 
     override fun mapDialog(view: View) {
         // create dialog
-        val dialog = Dialog(applicationContext)
+        val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_map)
         dialog.show()
 
         // set up view
         val mapView = dialog.findViewById<MapView>(R.id.mapViewOnEdit)
-        MapsInitializer.initialize(applicationContext)
+        MapsInitializer.initialize(this)
         mapView.onCreate(dialog.onSaveInstanceState())
         mapView.onResume()
         val googleMap = mapView.getMapAsync( {
@@ -223,9 +228,7 @@ class EditActivity : AppCompatActivity (), EditView {
 
         // add parameter container specific button event listeners
         // must defer displaying popup until after all lifecycle methods are called
-        datetimeContainer.timeButton.post({
-            datetimeContainer.timeButton.setOnClickListener { timeChooser(it) }
-        })
+        datetimeContainer.timeButton.setOnClickListener { timeChooser(it) }
         datetimeContainer.dateButton.setOnClickListener { dateChooser(it) }
         locationContainer.eventLocationEdit.setOnClickListener { mapDialog(it) }
 
@@ -261,14 +264,14 @@ class EditActivity : AppCompatActivity (), EditView {
                 }
             }
         }
-        val paramsObserver: Observer<LinkedHashMap<ParameterTypes, MutableLiveData<*>>> = Observer {
-
-        }
 
         state.loaded.observe(this, loadingObserver)
         state.isEdit.observe(this, isEditObserver)
         state.curType.observe(this, typeObserver)
 
+        // parameter string data observers
+        titleContainer.eventTitleEdit.addTextChangedListener()
+        descriptionContainer.eventDescEdit.addTextChangedListener()
 
         // initialize data
         if (loadDatabase(ctx))
