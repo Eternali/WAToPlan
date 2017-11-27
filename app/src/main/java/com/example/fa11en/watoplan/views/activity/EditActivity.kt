@@ -1,5 +1,8 @@
 package com.example.fa11en.watoplan
 
+import android.app.DatePickerDialog
+import android.app.Dialog
+import android.app.TimePickerDialog
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
@@ -9,11 +12,15 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.*
 import com.example.fa11en.watoplan.viewmodels.EditViewState
 import com.example.fa11en.watoplan.views.EditTypeView
 import com.example.fa11en.watoplan.views.EditView
+import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.MapsInitializer
 import kotterknife.bindView
+import java.util.*
 
 
 class EditActivity : AppCompatActivity (), EditView {
@@ -151,6 +158,55 @@ class EditActivity : AppCompatActivity (), EditView {
         } finally {
             appdb.endTransaction()
         }
+    }
+
+    override fun timeChooser(view: View) {
+        val curTime = Calendar.getInstance()
+        val cHour = curTime.get(Calendar.HOUR_OF_DAY)
+        val cMinute = curTime.get(Calendar.MINUTE)
+
+        val timeDialog = TimePickerDialog(applicationContext,
+                TimePickerDialog.OnTimeSetListener { view, hour, minute -> run {
+                    val labelText = findViewById<TextView>(R.id.eventDatetimeLabel)
+                    val text = labelText.text.split(", ") as MutableList<String>
+                    text[0] = hour.toString() + ": " + minute.toString()
+                    labelText.text = text.joinToString(", ")
+                } }, cHour, cMinute, true)
+        timeDialog.setTitle("Select Time")
+        timeDialog.show()
+    }
+
+    override fun dateChooser(view: View) {
+        val curDate = Calendar.getInstance()
+        val cYear = curDate.get(Calendar.YEAR)
+        val cMonth = curDate.get(Calendar.MONTH)
+        val cDay = curDate.get(Calendar.DAY_OF_MONTH)
+        val dateDialog = DatePickerDialog(applicationContext,
+                DatePickerDialog.OnDateSetListener { view, year, month, day -> run {
+                    val labelText = findViewById<TextView>(R.id.eventDatetimeLabel)
+                    val text = labelText.text.split(", ") as MutableList<String>
+                    text[1] = day.toString() + " " + month.toString() + " " + year.toString()
+                    labelText.text = text.joinToString(", ")
+                } }, cYear, cMonth, cDay)
+        dateDialog.setTitle("Select Date")
+        dateDialog.show()
+    }
+
+    override fun mapDialog(view: View) {
+        // create dialog
+        val dialog = Dialog(applicationContext)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_map)
+        dialog.show()
+
+        // set up view
+        val mapView = dialog.findViewById<MapView>(R.id.mapViewOnEdit)
+        MapsInitializer.initialize(applicationContext)
+        mapView.onCreate(dialog.onSaveInstanceState())
+        mapView.onResume()
+        val googleMap = mapView.getMapAsync( {
+
+        } )
     }
 
     override fun render(ctx: Context) {

@@ -77,6 +77,7 @@
             android:text="DESCRIPTION" />
 
         <EditText
+            android:id="@+id/eventDescEdit"
             android:layout_weight="0.6"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -95,8 +96,32 @@
         android:layout_marginRight="14dp">
 
         <TextView
+            android:id="@+id/eventDatetimeLabel"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:textAlignment="center"
+            android:text="Choose TIME, and DATE" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/timeButton"
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="TIME"
+                android:onClick="timeChooser" />
+            <Button
+                android:id="@+id/dateButton"
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="DATE"
+                android:onClick="dateChooser" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -107,7 +132,26 @@
         android:orientation="horizontal"
         android:layout_marginLeft="14dp"
         android:layout_marginTop="14dp"
-        android:layout_marginRight="14dp" />
+        android:layout_marginRight="14dp">
+
+        <TextView
+            android:id="@+id/eventLocationLabel"
+            android:layout_weight="0.4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="CHOOSE LOCATION" />
+
+        <Button
+            android:id="@+id/eventLocationEdit"
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="OPEN MAP"
+            android:onClick="mapDialog"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/eventEntitiesContainer"
@@ -116,7 +160,35 @@
         android:orientation="horizontal"
         android:layout_marginLeft="14dp"
         android:layout_marginTop="14dp"
-        android:layout_marginRight="14dp" />
+        android:layout_marginRight="14dp">
+
+        <TextView
+            android:id="@+id/eventEntitiesLabel"
+            android:layout_weight="0.4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="RELATED CONTACTS" />
+
+        <LinearLayout
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <ListView
+                android:id="@+id/eventEntitiesList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/eventEntityAdd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/addEntityButtonText" />
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/eventRepeatContainer"
@@ -141,16 +213,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="7dp"
-            android:text="@string/cancelText"
-            android:onClick="cancelEvent" />
+            android:text="@string/cancelText" />
         <Button
             android:id="@+id/saveButton"
             android:layout_weight="0.5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="7dp"
-            android:text="@string/saveButtonText"
-            android:onClick="saveEvent" />
+            android:text="@string/saveButtonText" />
     </LinearLayout>
 
 </LinearLayout>

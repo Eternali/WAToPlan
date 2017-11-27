@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan.views
 
 import android.content.Context
+import android.view.View
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import com.example.fa11en.watoplan.AppDatabase
@@ -36,6 +37,13 @@ interface EditView {
 
     // end the activity on fatal failure
     fun fail(ctx: Context, msg: String)
+
+    // dialog openers
+    fun timeChooser (view: View)
+
+    fun dateChooser (view: View)
+
+    fun mapDialog (view: View)
 
     /*
         Render the view
