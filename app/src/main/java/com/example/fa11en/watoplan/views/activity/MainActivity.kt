@@ -204,12 +204,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadEvents (state: SummaryViewState): Boolean {
         appdb.beginTransaction()
         return try {
-            val event = UserEvent("EVENT")
-            event.loadType(appdb)
-            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
-            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
-            appdb.eventDao().insert(event)
             state.events.postValue(appdb.eventDao().getAll())
+            Log.i("EVENTS", appdb.eventDao().getAll()[0].params.toString())
             appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {

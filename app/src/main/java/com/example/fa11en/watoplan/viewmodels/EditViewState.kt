@@ -7,13 +7,14 @@ import com.example.fa11en.watoplan.EventType
 import com.example.fa11en.watoplan.ParameterTypes
 import com.example.fa11en.watoplan.Person
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 
 class EditViewState : ViewModel () {
 
     var types: List<EventType> = listOf()
     val curType: MutableLiveData<EventType> = MutableLiveData()
-    val params: MutableLiveData<LinkedHashMap<ParameterTypes, MutableLiveData<*>>> = MutableLiveData()
+    val params: MutableLiveData<LinkedHashMap<ParameterTypes, MutableLiveData<Any>>> = MutableLiveData()
     val isEdit: MutableLiveData<Boolean> = MutableLiveData()
     val loaded: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -32,36 +33,39 @@ class EditViewState : ViewModel () {
             ParameterTypes.REPEAT -> mutableListOf<Calendar>()
         }
 
-        fun initializeParam (param: ParameterTypes, live: Boolean): MutableLiveData<*> = when (param) {
+        fun initializeParam (paramMap: LinkedHashMap<ParameterTypes, MutableLiveData<Any>>, param: ParameterTypes)
+                = when (param) {
             ParameterTypes.TITLE -> {
-                val data = MutableLiveData<String>()
+                val data = MutableLiveData<Any>()
                 data.postValue("")
-                data
+                paramMap.put(param, data)
             }
             ParameterTypes.DESCRIPTION -> {
-                val data = MutableLiveData<String>()
+                val data = MutableLiveData<Any>()
                 data.postValue("")
-                data
+                paramMap.put(param, data)
             }
             ParameterTypes.DATETIME -> {
-                val data = MutableLiveData<Calendar>()
+                val data = MutableLiveData<Any>()
                 data.postValue(Calendar.getInstance())
-                data
+                paramMap.put(param, data)
             }
             ParameterTypes.LOCATION -> {
-                val data = MutableLiveData<Location>()
+                val data = MutableLiveData<Any>()
                 data.postValue(Location("gps"))
-                data
+                paramMap.put(param, data)
             }
             ParameterTypes.ENTITIES -> {
-                val data: MutableLiveData<MutableList<Person>> = MutableLiveData()
-                data.postValue(mutableListOf())
-                data
+                val data: MutableLiveData<Any> = MutableLiveData()
+                val initList: MutableList<Person> = mutableListOf()
+                data.postValue(initList)
+                paramMap.put(param, data)
             }
             ParameterTypes.REPEAT -> {
-                val data: MutableLiveData<MutableList<Calendar>> = MutableLiveData()
-                data.postValue(mutableListOf())
-                data
+                val data: MutableLiveData<Any> = MutableLiveData()
+                val initList: MutableList<Date> = mutableListOf()
+                data.postValue(initList)
+                paramMap.put(param, data)
             }
         }
     }

@@ -125,7 +125,7 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         state.typeParams.values.forEach { it.observe(this, paramsLoaded) }
 
         // name listener
-        name.addTextChangedListener(EditParamWatcher(state.typeName))
+        name.addTextChangedListener(TextParamWatcher(state.typeName))
 
         // color observer
         val colorNormalObserver: Observer<Int> = Observer {
