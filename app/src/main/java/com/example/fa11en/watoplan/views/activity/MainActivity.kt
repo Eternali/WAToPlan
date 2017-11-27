@@ -204,13 +204,11 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadEvents (state: SummaryViewState): Boolean {
         appdb.beginTransaction()
         return try {
-//            val event = UserEvent("TestType")
-//            event.loadType(db)
-//            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
-//            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
-//            db.eventDao().insert(event)
-//            val gets: List<UserEvent> = db.eventDao().getAll()
-//            if (gets[0] != event) throw TypeNotPresentException(event.typeName, Throwable())
+            val event = UserEvent("EVENT")
+            event.loadType(appdb)
+            event.setParam(ParameterTypes.TITLE, "TEST TITLE")
+            event.setParam(ParameterTypes.DESCRIPTION, "TEST DESCRIPTION")
+            appdb.eventDao().insert(event)
             state.events.postValue(appdb.eventDao().getAll())
             appdb.setTransactionSuccessful()
             true
@@ -232,13 +230,13 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun editIntent (ctx: Context, eid: Int) {
         val editor = Intent(ctx, EditActivity::class.java)
         editor.putExtra("eid", eid)
-        startActivityForResult(Intent(ctx, EditActivity::class.java), RequestCodes.EDITEVENT.code)
+        startActivityForResult(editor, RequestCodes.EDITEVENT.code)
     }
 
     override fun addIntent (ctx: Context, typeName: String) {
         val adder = Intent(ctx, EditActivity::class.java)
         adder.putExtra("typename", typeName)
-        startActivityForResult(Intent(ctx, EditActivity::class.java), RequestCodes.NEWEVENT.code)
+        startActivityForResult(adder, RequestCodes.NEWEVENT.code)
     }
 
     override fun settingsIntent (ctx: Context) {

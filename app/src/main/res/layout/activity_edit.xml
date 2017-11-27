@@ -112,15 +112,13 @@
                 android:layout_weight="0.5"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="TIME"
-                android:onClick="timeChooser" />
+                android:text="TIME" />
             <Button
                 android:id="@+id/dateButton"
                 android:layout_weight="0.5"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="DATE"
-                android:onClick="dateChooser" />
+                android:text="DATE" />
         </LinearLayout>
 
     </LinearLayout>
@@ -148,8 +146,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:text="OPEN MAP"
-            android:onClick="mapDialog"/>
+            android:text="OPEN MAP" />
 
     </LinearLayout>
 
@@ -197,7 +194,22 @@
         android:orientation="horizontal"
         android:layout_marginLeft="14dp"
         android:layout_marginTop="14dp"
-        android:layout_marginRight="14dp" />
+        android:layout_marginRight="14dp">
+
+        <TextView
+            android:id="@+id/eventRepeatLabel"
+            android:layout_weight="0.4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="REPETITIONS" />
+        <ListView
+            android:id="@+id/eventRepeatList"
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/finalEditButtons"

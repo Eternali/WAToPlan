@@ -19,6 +19,7 @@ import com.example.fa11en.watoplan.views.EditTypeView
 import com.example.fa11en.watoplan.views.EditView
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
+import kotlinx.android.synthetic.main.activity_edit.view.*
 import kotterknife.bindView
 import java.util.*
 
@@ -42,23 +43,13 @@ class EditActivity : AppCompatActivity (), EditView {
     private val entitiesContainer: LinearLayout by bindView(R.id.eventEntitiesContainer)
     private val repeatContainer: LinearLayout by bindView(R.id.eventRepeatContainer)
 
-    override val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout> = linkedMapOf(
-            ParameterTypes.TITLE to titleContainer,
-            ParameterTypes.DESCRIPTION to descriptionContainer,
-            ParameterTypes.DATETIME to datetimeContainer,
-            ParameterTypes.LOCATION to locationContainer,
-            ParameterTypes.ENTITIES to entitiesContainer,
-            ParameterTypes.REPEAT to repeatContainer
-    )
+    override val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout> = linkedMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
         render(applicationContext)
-
-        body = ParametersBody(this, event)
-
     }
 
     inner class TypeSelectedListener : AdapterView.OnItemSelectedListener {
@@ -111,15 +102,26 @@ class EditActivity : AppCompatActivity (), EditView {
     }
 
     override fun setType(typeName: String): Boolean {
+        // initialize spinner
+        val typeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
+                state.types.map { it.name })
+        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        typeSpinner.adapter = typeAdapter
+
         appdb.beginTransaction()
         return try {
-            state.curType.postValue(appdb.typeDao().get(typeName))
+            val type = appdb.typeDao().get(typeName)
+            state.curType.postValue(type)
             appdb.setTransactionSuccessful()
+
+            typeSpinner.setSelection(typeAdapter.getPosition(type.name))
             true
         } catch (e: Exception) {
+            typeSpinner.setSelection(0)
             false
         } finally {
             appdb.endTransaction()
+            typeSpinner.onItemSelectedListener = TypeSelectedListener()
         }
     }
 
@@ -211,6 +213,22 @@ class EditActivity : AppCompatActivity (), EditView {
 
     override fun render(ctx: Context) {
 
+        // initialize containers
+        paramtoView.put(ParameterTypes.TITLE, titleContainer)
+        paramtoView.put(ParameterTypes.DESCRIPTION, descriptionContainer)
+        paramtoView.put(ParameterTypes.DATETIME, datetimeContainer)
+        paramtoView.put(ParameterTypes.LOCATION, locationContainer)
+        paramtoView.put(ParameterTypes.ENTITIES, entitiesContainer)
+        paramtoView.put(ParameterTypes.REPEAT, repeatContainer)
+
+        // add parameter container specific button event listeners
+        // must defer displaying popup until after all lifecycle methods are called
+        datetimeContainer.timeButton.post({
+            datetimeContainer.timeButton.setOnClickListener { timeChooser(it) }
+        })
+        datetimeContainer.dateButton.setOnClickListener { dateChooser(it) }
+        locationContainer.eventLocationEdit.setOnClickListener { mapDialog(it) }
+
         // initialize observers
         val loadingObserver: Observer<Boolean> = Observer {
             if (it == true) {
@@ -232,14 +250,14 @@ class EditActivity : AppCompatActivity (), EditView {
             }
         }
         val typeObserver: Observer<EventType> = Observer { type ->
+            Log.i("TYPE", type?.parameters.toString())
             ParameterTypes.values().forEach {
-                if (state.params.value?.keys!!.contains(it) && !type?.parameters!!.contains(it)) {
-                    paramtoView[it]?.visibility = LinearLayout.GONE
-                    state.params.value?.remove(it)
-                }
-                else if (!state.params.value?.keys!!.contains(it) && type?.parameters!!.contains(it)) {
+                if (type?.parameters!!.contains(it)) {
                     paramtoView[it]?.visibility = LinearLayout.VISIBLE
                     state.params.value?.put(it, EditViewState.initializeParam(it, true))
+                } else {
+                    paramtoView[it]?.visibility = LinearLayout.GONE
+                    state.params.value?.remove(it)
                 }
             }
         }
@@ -259,20 +277,12 @@ class EditActivity : AppCompatActivity (), EditView {
             fail(ctx, "Failed to Load the Database")
         }
 
-        // initialize spinner
-        val typeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
-                state.types.map { it.name })
-        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        typeSpinner.adapter = typeAdapter
-        typeSpinner.setSelection(typeAdapter.getPosition(state.curType.value?.name))
-        typeSpinner.onItemSelectedListener = TypeSelectedListener()
-
         // ender clickers
 
         if (state.isEdit.value == true)
-            cancelButton.text = R.string.deleteText.toString()
+            cancelButton.text = getString(R.string.deleteText)
         else
-            cancelButton.text = R.string.cancelText.toString()
+            cancelButton.text = getString(R.string.cancelText)
 
         cancelButton.setOnClickListener {
             val code = Intent()

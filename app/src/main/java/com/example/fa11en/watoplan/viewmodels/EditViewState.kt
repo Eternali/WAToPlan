@@ -19,6 +19,7 @@ class EditViewState : ViewModel () {
 
     init {
         loaded.postValue(false)
+        params.postValue(linkedMapOf())
     }
 
     companion object {
