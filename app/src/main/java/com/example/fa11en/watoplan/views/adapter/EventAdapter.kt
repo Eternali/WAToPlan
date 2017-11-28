@@ -1,12 +1,19 @@
 package com.example.fa11en.watoplan
 
 import android.content.Context
+import android.content.Intent
+import android.location.Location
+import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import android.widget.TextView
+import java.util.*
 
+
+// TODO: Give this fragment a state
 
 class EventAdapter (val ctx: Context, var resource: Int, var events: MutableList<UserEvent>)
         : ArrayAdapter<UserEvent> (ctx, resource, events) {
@@ -22,26 +29,31 @@ class EventAdapter (val ctx: Context, var resource: Int, var events: MutableList
             val eventView = EventListView(ctx)
 
             // get data from event layout
-            val dateTime = eventView.findViewById<TextView>(R.id.eventTime)
+            val eventContainer = eventView.findViewById<LinearLayout>(R.id.eventElementContainer)
+            val time = eventView.findViewById<TextView>(R.id.eventTime)
+            val date = eventView.findViewById<TextView>(R.id.eventDate)
             val title = eventView.findViewById<TextView>(R.id.eventTitle)
             val desc = eventView.findViewById<TextView>(R.id.eventDesc)
-            val type = eventView.findViewById<TextView>(R.id.eventType)
 
             // since not all events are shown at once, we can't used the passed position argument
             title.text = events[position].params[ParameterTypes.TITLE] as String
             desc.text = events[position].params[ParameterTypes.DESCRIPTION] as String
-            type.text = events[position].type?.name
-            
+            time.text = (events[position].params[ParameterTypes.DATETIME] as Calendar).timestr()
+            date.text = (events[position].params[ParameterTypes.DATETIME] as Calendar).datestr()
+            eventView.setBackgroundColor(events[position].type!!.colorNormal)
+            eventView.background.alpha = 50
+
+            // onclick listeners
+            eventContainer.setOnClickListener {
+                val editor = Intent(ctx, EditActivity::class.java)
+                editor.putExtra("eid", events[position].eid)
+                (ctx as AppCompatActivity).startActivityForResult(editor, RequestCodes.EDITEVENT.code)
+            }
 
             return eventView
         }
 
         return convertView
     }
-
-    fun onClick (view: View) {
-        
-    }
-
 
 }

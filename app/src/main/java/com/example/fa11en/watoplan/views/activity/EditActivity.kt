@@ -8,6 +8,7 @@ import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -20,6 +21,7 @@ import com.example.fa11en.watoplan.views.EditView
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
 import kotlinx.android.synthetic.main.activity_edit.view.*
+import kotlinx.android.synthetic.main.edittype_layout.*
 import kotterknife.bindView
 import java.util.*
 import kotlin.collections.HashMap
@@ -250,10 +252,26 @@ class EditActivity : AppCompatActivity (), EditView {
         }
         val isEditObserver: Observer<Boolean> = Observer {
             if (it == true) {
+                // set cancel button text and functionality
+                cancelButton.text = getString(R.string.deleteText)
+
                 val event: UserEvent? = getEvent(intent.extras.getInt("eid"))
                 if (event == null) fail(ctx, "Invalid Event ID")
                 else if (!setType(event.typeName)) fail(ctx, "Invalid Type Name")
+
+                // set defaults according to event
+                event!!.params.keys.forEach {
+                    when (it) {
+                        ParameterTypes.TITLE -> titleContainer.eventTitleEdit.setText(event.params[it] as String)
+                        ParameterTypes.DESCRIPTION -> descriptionContainer.eventDescEdit.setText(event.params[it] as String)
+                        ParameterTypes.DATETIME-> state.datetime.postValue(event.params[it] as Calendar)
+                        ParameterTypes.LOCATION -> state.location.postValue(event.params[it] as Location)
+                        ParameterTypes.ENTITIES -> state.entities.postValue((event.params[it] as List<Person>).toMutableList())
+                        ParameterTypes.REPEAT -> state.repetitions.postValue((event.params[it] as List<Calendar>).toMutableList())
+                    }
+                }
             } else {
+                cancelButton.text = getString(R.string.cancelText)
                 if (!setType(intent.extras.getString("typename")))
                     fail(ctx, "Invalid Type Name")
             }
@@ -285,12 +303,6 @@ class EditActivity : AppCompatActivity (), EditView {
         }
 
         // ender clickers
-
-        if (state.isEdit.value == true)
-            cancelButton.text = getString(R.string.deleteText)
-        else
-            cancelButton.text = getString(R.string.cancelText)
-
         cancelButton.setOnClickListener {
             val code = Intent()
             if (state.isEdit.value == true)

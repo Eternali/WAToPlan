@@ -24,6 +24,7 @@ import com.getbase.floatingactionbutton.FloatingActionButton
 import com.getbase.floatingactionbutton.FloatingActionsMenu
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotterknife.bindView
+import java.util.*
 
 
 /* TODO: Refactor strings.xml to use underscores instead of camelCase */
@@ -65,6 +66,17 @@ enum class ParameterTypes (val param: String) {
     REPEAT ("REPETITIONS")
 }
 
+
+// Location extension methods to generate printable text
+fun Calendar.timestr (): String {
+    return this.get(Calendar.HOUR_OF_DAY).toString() + ": " + this.get(Calendar.MINUTE)
+}
+
+fun Calendar.datestr (): String {
+    return this.get(Calendar.DAY_OF_MONTH).toString() + " " + this.get(Calendar.MONTH) + " " + this.get(Calendar.YEAR)
+}
+
+
 // This must be defined to get ParameterTypes object based on its param
 fun paramToParamType (param: String): ParameterTypes {
     ParameterTypes.values()
@@ -104,7 +116,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
         *       (but this requires vararg parameter in render method to specify how to set the state)
         *  2: Make each SummaryViewState subclass a singleton and get the instance across fragments
         *       (but this is not lifecycle aware)
-        *       -- there is an issue with this where the instance persists across soft restarts of the app (i think)
         *  I have gone with the 2nd option for now */
         render(SummaryViewState.Loading.getInstance
                 (false, false, false), this)
