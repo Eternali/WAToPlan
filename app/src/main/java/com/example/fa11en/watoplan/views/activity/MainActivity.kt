@@ -138,13 +138,15 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.i("RESULT", "SAVE RESULTED TO RELOAD DISPLAY")
         super.onActivityResult(requestCode, resultCode, data)
+        Log.i("REQUESTCODE", "asdfadfasdfasdfa")
         when (requestCode) {
             RequestCodes.EVENTTYPECHANGED.code -> {
                 if (resultCode == ResultCodes.TYPECHANGED.code
                         || resultCode == ResultCodes.TYPESAVED.code
                         || resultCode == ResultCodes.TYPEDELETED.code) {
+                    Log.i("RESULT", "SAVE RESULTED TO RELOAD DISPLAY")
+                    SummaryViewState.Loading.destroyInstance()
                     render(SummaryViewState.Loading.getInstance
                     (false, false, false), this)
                 }
@@ -186,9 +188,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadTypes (state: SummaryViewState): Boolean {
         appdb.beginTransaction()
         return try {
-//            appdb.typeDao().insert(EventType("TEST", mutableListOf(ParameterTypes.TITLE, ParameterTypes.DESCRIPTION),
-//                    ResourcesCompat.getColor(resources, R.color.colorAccent, null),
-//                    ResourcesCompat.getColor(resources, R.color.colorAccent_pressed, null)))
             state.types.postValue(appdb.typeDao().getAll())
             Log.i("TYPES", state.types.value.toString())
             appdb.setTransactionSuccessful()

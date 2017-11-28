@@ -39,6 +39,12 @@ class EditViewState : ViewModel () {
 
     init {
         loaded.postValue(false)
+        name.postValue("")
+        desc.postValue("")
+        datetime.postValue(Calendar.getInstance())
+        location.postValue(Location("gps"))
+        entities.postValue(mutableListOf())
+        repetitions.postValue(mutableListOf())
     }
 
     companion object {

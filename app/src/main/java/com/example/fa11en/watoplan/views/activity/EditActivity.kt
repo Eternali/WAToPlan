@@ -155,11 +155,6 @@ class EditActivity : AppCompatActivity (), EditView {
             event.setParam(ParameterTypes.ENTITIES, state.entities.value as Any)
             event.setParam(ParameterTypes.REPEAT, state.repetitions.value as Any)
 
-//            state.curType.value?.parameters.forEach {
-//                event.setParam(it, state.params[it]!!)
-//                Log.i("PARAM", state.params[it]!!.toString())
-//            }
-
             Log.i("EVENT", event.params.toString())
             // save event to database
             if (state.isEdit.value == true) appdb.eventDao().update(event)
@@ -243,10 +238,6 @@ class EditActivity : AppCompatActivity (), EditView {
         datetimeContainer.dateButton.setOnClickListener { dateChooser(it) }
         locationContainer.eventLocationEdit.setOnClickListener { mapDialog(it) }
 
-        // parameter string data observers
-        var titleTextWatcher: TextParamWatcher? = null
-        var descTextWatcher: TextParamWatcher? = null
-
         // initialize observers
         val loadingObserver: Observer<Boolean> = Observer {
             if (it == true) {
@@ -272,25 +263,8 @@ class EditActivity : AppCompatActivity (), EditView {
             ParameterTypes.values().forEach {
                 if (type?.parameters!!.contains(it)) {
                     paramtoView[it]?.visibility = LinearLayout.VISIBLE
-                    if (it == ParameterTypes.TITLE && titleTextWatcher == null) {
-                        titleTextWatcher = TextParamWatcher(state.name)
-                        titleContainer.eventTitleEdit.addTextChangedListener(titleTextWatcher)
-                    }
-                    if (it == ParameterTypes.DESCRIPTION && descTextWatcher == null) {
-                        descTextWatcher = TextParamWatcher(state.desc)
-                        descriptionContainer.eventDescEdit.addTextChangedListener(descTextWatcher)
-                    }
                 } else {
                     paramtoView[it]?.visibility = LinearLayout.GONE
-
-                    if (it == ParameterTypes.TITLE && titleTextWatcher != null) {
-                        titleContainer.eventTitleEdit.removeTextChangedListener(titleTextWatcher)
-                        titleTextWatcher = null
-                    }
-                    if (it == ParameterTypes.DESCRIPTION && descTextWatcher != null) {
-                        descriptionContainer.eventDescEdit.removeTextChangedListener(descTextWatcher)
-                        descTextWatcher = null
-                    }
                 }
             }
         }
@@ -298,6 +272,10 @@ class EditActivity : AppCompatActivity (), EditView {
         state.loaded.observe(this, loadingObserver)
         state.isEdit.observe(this, isEditObserver)
         state.curType.observe(this, typeObserver)
+
+        // text onchange listeners
+        titleContainer.eventTitleEdit.addTextChangedListener(TextParamWatcher(state.name))
+        descriptionContainer.eventDescEdit.addTextChangedListener(TextParamWatcher(state.desc))
 
         // initialize data
         if (loadDatabase(ctx))
