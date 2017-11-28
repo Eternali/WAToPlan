@@ -12,9 +12,7 @@ class TextParamWatcher (val toSave: MutableLiveData<String>): TextWatcher {
     override fun afterTextChanged(s: Editable?) {  }
 
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        when (toSave.value) {
-            is String -> toSave.postValue(s.toString())
-        }
+            toSave.postValue(s.toString())
     }
 
 }

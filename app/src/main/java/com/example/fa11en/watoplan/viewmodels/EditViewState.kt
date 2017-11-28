@@ -14,7 +14,26 @@ class EditViewState : ViewModel () {
 
     var types: List<EventType> = listOf()
     val curType: MutableLiveData<EventType> = MutableLiveData()
-    val params: LinkedHashMap<ParameterTypes, MutableLiveData<Any>> = linkedMapOf()
+
+    // parameters
+    // NOTE: I HAD THIS AS A LINKED HASHMAP, BUT SINCE ANDROID COMPLAINED THAT IT CAN'T POST TO
+    // MutableLiveData<*> (out projected type) I can't do that
+//    val params: LinkedHashMap<ParameterTypes, *> = linkedMapOf(
+//            ParameterTypes.TITLE to "",
+//            ParameterTypes.DESCRIPTION to "",
+//            ParameterTypes.DATETIME to Calendar.getInstance(),
+//            ParameterTypes.LOCATION to Location("gps"),
+//            ParameterTypes.ENTITIES to mutableListOf<Person>(),
+//            ParameterTypes.REPEAT to mutableListOf<Calendar>()
+//    )
+
+    val name = MutableLiveData<String>()
+    val desc = MutableLiveData<String>()
+    val datetime = MutableLiveData<Calendar>()
+    val location = MutableLiveData<Location>()
+    val entities = MutableLiveData<MutableList<Person>>()
+    val repetitions = MutableLiveData<MutableList<Calendar>>()
+
     val isEdit: MutableLiveData<Boolean> = MutableLiveData()
     val loaded: MutableLiveData<Boolean> = MutableLiveData()
 

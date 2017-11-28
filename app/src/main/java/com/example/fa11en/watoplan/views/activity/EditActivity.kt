@@ -141,8 +141,6 @@ class EditActivity : AppCompatActivity (), EditView {
     }
 
     override fun saveEvent(ctx: Context): Boolean {
-        state.params[ParameterTypes.TITLE]!!.value = "asdffdsaasdf"
-        Log.i("ASDFGFDSA", state.params[ParameterTypes.TITLE]!!.value.toString())
         appdb.beginTransaction()
         return try {
             // initialize event with the state
@@ -150,12 +148,19 @@ class EditActivity : AppCompatActivity (), EditView {
             val event = UserEvent(state.curType.value!!)
 
             // set event parameters
-            state.params.keys.forEach {
-                event.setParam(it, state.params[it]!!.value!!)
-                Log.i("PARAM", state.params[it]!!.value!!.toString())
-            }
+            event.setParam(ParameterTypes.TITLE, state.name.value as Any)
+            event.setParam(ParameterTypes.DESCRIPTION, state.desc.value as Any)
+            event.setParam(ParameterTypes.DATETIME, state.datetime.value as Any)
+            event.setParam(ParameterTypes.LOCATION, state.location.value as Any)
+            event.setParam(ParameterTypes.ENTITIES, state.entities.value as Any)
+            event.setParam(ParameterTypes.REPEAT, state.repetitions.value as Any)
 
-            Log.i("EVENT", state.params.toString())
+//            state.curType.value?.parameters.forEach {
+//                event.setParam(it, state.params[it]!!)
+//                Log.i("PARAM", state.params[it]!!.toString())
+//            }
+
+            Log.i("EVENT", event.params.toString())
             // save event to database
             if (state.isEdit.value == true) appdb.eventDao().update(event)
             else appdb.eventDao().insert(event)
@@ -179,8 +184,8 @@ class EditActivity : AppCompatActivity (), EditView {
                     val text = labelText.text.split(", ") as MutableList<String>
                     text[0] = hour.toString() + ": " + minute.toString()
                     labelText.text = text.joinToString(", ")
-                    (state.params[ParameterTypes.DATETIME]!!.value as Calendar).set(Calendar.HOUR_OF_DAY, hour)
-                    (state.params[ParameterTypes.DATETIME]!!.value as Calendar).set(Calendar.MINUTE, minute)
+                    state.datetime.value?.set(Calendar.HOUR_OF_DAY, hour)
+                    state.datetime.value?.set(Calendar.MINUTE, minute)
                 } }, cHour, cMinute, true)
         timeDialog.setTitle("Select Time")
         timeDialog.show()
@@ -197,9 +202,9 @@ class EditActivity : AppCompatActivity (), EditView {
                     val text = labelText.text.split(", ") as MutableList<String>
                     text[1] = day.toString() + " " + month.toString() + " " + year.toString()
                     labelText.text = text.joinToString(", ")
-                    (state.params[ParameterTypes.DATETIME]!!.value as Calendar).set(Calendar.YEAR, year)
-                    (state.params[ParameterTypes.DATETIME]!!.value as Calendar).set(Calendar.MONTH, month)
-                    (state.params[ParameterTypes.DATETIME]!!.value as Calendar).set(Calendar.DAY_OF_MONTH, day)
+                    state.datetime.value?.set(Calendar.YEAR, year)
+                    state.datetime.value?.set(Calendar.MONTH, month)
+                    state.datetime.value?.set(Calendar.DAY_OF_MONTH, day)
                 } }, cYear, cMonth, cDay)
         dateDialog.setTitle("Select Date")
         dateDialog.show()
@@ -239,8 +244,8 @@ class EditActivity : AppCompatActivity (), EditView {
         locationContainer.eventLocationEdit.setOnClickListener { mapDialog(it) }
 
         // parameter string data observers
-        var titleTextWatcher: EditParamWatcher? = null
-        var descTextWatcher: EditParamWatcher? = null
+        var titleTextWatcher: TextParamWatcher? = null
+        var descTextWatcher: TextParamWatcher? = null
 
         // initialize observers
         val loadingObserver: Observer<Boolean> = Observer {
@@ -267,26 +272,16 @@ class EditActivity : AppCompatActivity (), EditView {
             ParameterTypes.values().forEach {
                 if (type?.parameters!!.contains(it)) {
                     paramtoView[it]?.visibility = LinearLayout.VISIBLE
-                    EditViewState.initializeParam(state.params, it)
-
                     if (it == ParameterTypes.TITLE && titleTextWatcher == null) {
-                        val testobserver: Observer<Any> = Observer {
-                            val view = state.params[ParameterTypes.TITLE]!!.value
-                            when (view) {
-                                is String -> Log.i("fsadlj;kasfdjlksdf", "lklk")
-                            }
-                        }
-                        titleTextWatcher = EditParamWatcher(state.params[ParameterTypes.TITLE]!!.value!!)
+                        titleTextWatcher = TextParamWatcher(state.name)
                         titleContainer.eventTitleEdit.addTextChangedListener(titleTextWatcher)
-                        state.params[ParameterTypes.TITLE]!!.observe(this, testobserver)
                     }
                     if (it == ParameterTypes.DESCRIPTION && descTextWatcher == null) {
-                        descTextWatcher = EditParamWatcher(state.params[ParameterTypes.DESCRIPTION]!!.value!!)
+                        descTextWatcher = TextParamWatcher(state.desc)
                         descriptionContainer.eventDescEdit.addTextChangedListener(descTextWatcher)
                     }
                 } else {
                     paramtoView[it]?.visibility = LinearLayout.GONE
-                    state.params.remove(it)
 
                     if (it == ParameterTypes.TITLE && titleTextWatcher != null) {
                         titleContainer.eventTitleEdit.removeTextChangedListener(titleTextWatcher)
