@@ -73,7 +73,6 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     override fun onBackPressed() {
         val code = Intent()
         setResult(ResultCodes.TYPECHANGED.code, code)
-        Log.i("ON BACK PRESSED", "TYPECHANGED")
         finish()
     }
 

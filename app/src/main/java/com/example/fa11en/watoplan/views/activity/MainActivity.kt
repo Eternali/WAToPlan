@@ -203,7 +203,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun loadEvents (state: SummaryViewState): Boolean {
         appdb.beginTransaction()
         return try {
-            state.events.postValue(appdb.eventDao().getAll())
+            SummaryViewState.events.postValue(appdb.eventDao().getAll())
             Log.i("EVENTS", appdb.eventDao().getAll()[0].params.toString())
             appdb.setTransactionSuccessful()
             true
@@ -215,11 +215,27 @@ class MainActivity: AppCompatActivity (), SummaryView {
         }
     }
 
-    override fun toggleDisplay (view: View) {
+    override fun toggleDisplay (viewid: Int) {
         displayGroup.clearCheck()
-        displayGroup.check(view.id)
+        displayGroup.check(viewid)
 
-        render(SummaryViewState.Passive(view.id), this)
+        // TODO: only replace fragment when previous is different from requested
+        val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
+        when (viewid) {
+            R.id.dayToggle -> {
+                fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "day")
+                fragTransaction.commit()
+            }
+            R.id.weekToggle -> {
+                fragTransaction.replace(R.id.displayFragContainer, WeekFragment(), "day")
+                fragTransaction.commit()
+            }
+            R.id.monthToggle -> {
+                fragTransaction.replace(R.id.displayFragContainer, MonthFragment(), "day")
+                fragTransaction.commit()
+            }
+            else -> fragTransaction.commit()
+        }
     }
 
     override fun editIntent (ctx: Context, eid: Int) {
@@ -281,7 +297,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 // bind observables
                 state.dbLoaded.observe(this, dbLoadingObserver)
                 state.types.observe(this, typesLoadingObserver)
-                state.events.observe(this, eventsLoadingObserver)
+                SummaryViewState.events.observe(this, eventsLoadingObserver)
                 state.typesLoaded.observe(this, finishedLoadingObserver)
                 state.eventsLoaded.observe(this, finishedLoadingObserver)
 
@@ -294,33 +310,19 @@ class MainActivity: AppCompatActivity (), SummaryView {
             }
             is SummaryViewState.Passive -> {
                 // set display fragment
-                // TODO: only replace fragment when previous is different from requested
-                val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
-                when (state.displayFrag.value) {
-                    R.id.dayToggle -> {
-                        fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "day")
-                        fragTransaction.commit()
-                        render(SummaryViewState.DayViewModel.getInstance(0), this)
-                    }
-                    R.id.weekToggle -> {
-                        fragTransaction.replace(R.id.displayFragContainer, WeekFragment(), "day")
-                        fragTransaction.commit()
-                        render(SummaryViewState.WeekViewModel(), this)
-                    }
-                    R.id.monthToggle -> {
-                        fragTransaction.replace(R.id.displayFragContainer, MonthFragment(), "day")
-                        fragTransaction.commit()
-                        render(SummaryViewState.MonthViewModel(), this)
-                    }
-                    else -> fragTransaction.commit()
+                val fragObserver: Observer<Int> = Observer {
+                    if (it != null) toggleDisplay(it)
                 }
+                state.displayFrag.observe(this, fragObserver)
             }
-            is SummaryViewState.DayViewModel -> {  }
-            is SummaryViewState.WeekViewModel -> {  }
-            is SummaryViewState.MonthViewModel -> {  }
         }
 
         // make radio group from togglers
+
+        displayGroup.dayToggle.setOnClickListener { toggleDisplay(it.id) }
+        displayGroup.weekToggle.setOnClickListener { toggleDisplay(it.id) }
+        displayGroup.monthToggle.setOnClickListener { toggleDisplay(it.id) }
+
         displayGroup.setOnCheckedChangeListener({group, checkedId ->
             for (t in 0..group.childCount) {
                 if (group.getChildAt(t) == null) continue

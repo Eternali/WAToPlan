@@ -31,6 +31,7 @@ class EventAdapter (val ctx: Context, var resource: Int, var events: MutableList
             title.text = events[position].params[ParameterTypes.TITLE] as String
             desc.text = events[position].params[ParameterTypes.DESCRIPTION] as String
             type.text = events[position].type?.name
+            
 
             return eventView
         }

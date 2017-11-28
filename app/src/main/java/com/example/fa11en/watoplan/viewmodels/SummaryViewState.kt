@@ -13,8 +13,8 @@ sealed class SummaryViewState: ViewModel () {
 
     // LiveData objects for all summary states
     val types: MutableLiveData<List<EventType>> = MutableLiveData()
+
     // TODO: possibly make application wide livedata (in its own ViewModel) (events, maybe types?)
-    val events: MutableLiveData<List<UserEvent>> = MutableLiveData()
 
     class Loading private constructor (dbIsLoaded: Boolean = false,
                                        typesAreLoaded: Boolean = false,
@@ -52,44 +52,17 @@ sealed class SummaryViewState: ViewModel () {
     class Passive constructor (fragToDisplay: Int): SummaryViewState() {
 
         val displayFrag: MutableLiveData<Int> = MutableLiveData()
-
-        init {
-            displayFrag.postValue(fragToDisplay)
-        }
-
-    }
-
-    class DayViewModel private constructor (p: Int = 0)
-        : SummaryViewState() {
-
-        // LiveData objects for day view state
         val pos: MutableLiveData<Int> = MutableLiveData()
 
         init {
-            pos.postValue(p)
-        }
-
-        companion object {
-            private var INSTANCE: DayViewModel? = null
-            fun getInstance (p: Int = 0): DayViewModel {
-                if (INSTANCE == null)
-                    INSTANCE = DayViewModel(p)
-
-                return INSTANCE!!
-            }
-            fun destroyInstance () {
-                INSTANCE = null
-            }
+            displayFrag.postValue(fragToDisplay)
+            pos.postValue(0)
         }
 
     }
 
-    class WeekViewModel: SummaryViewState() {
-
-    }
-
-    class MonthViewModel: SummaryViewState() {
-
+    companion object {
+        val events: MutableLiveData<List<UserEvent>> = MutableLiveData()
     }
 
 }

@@ -27,7 +27,7 @@ interface SummaryView {
     fun loadEvents (state: SummaryViewState): Boolean
 
     // switch view fragment
-    fun toggleDisplay (view: View)
+    fun toggleDisplay (viewid: Int)
 
     // click on an event intent
     fun editIntent (ctx: Context, eid: Int)
