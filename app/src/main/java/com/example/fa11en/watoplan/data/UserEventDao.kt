@@ -18,6 +18,12 @@ interface UserEventDao {
     @Delete
     fun delete (vararg events: UserEvent)
 
+    @Query("DELETE FROM userevent WHERE eid = :eid")
+    fun deleteById(eid: Int)
+
+    @Query("DELETE FROM userevent WHERE typename = :typename")
+    fun deleteByTypeName(typename: String)
+
     @Update
     fun update (vararg events: UserEvent)
 

@@ -152,30 +152,31 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
+        super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             RequestCodes.ISEVENTTYPECHANGED.code -> {
+                Log.i("TYPECHANGED", "ONRESULT FOR TYPECHANGED CALLED")
                 if (resultCode == ResultCodes.TYPESAVED.code
                         || resultCode == ResultCodes.TYPEDELETED.code
                         || resultCode == ResultCodes.TYPECHANGED.code) {
-                    Log.i("RESULT", "SAVE RESULTED TO RELOAD DISPLAY")
                     SummaryViewState.Loading.destroyInstance()
                     render(SummaryViewState.Loading.getInstance
-                    (false, false, false), this)
+                    (true, false, true), this)
                 }
             }
             RequestCodes.NEWEVENT.code -> {
                 if (resultCode == ResultCodes.EVENTSAVED.code) {
-                    Log.i("RESULT", "EVENT SAVED")
+                    SummaryViewState.Loading.destroyInstance()
+                    render(SummaryViewState.Loading.getInstance
+                    (true, true, false), this)
                 }
             }
             RequestCodes.EDITEVENT.code -> {
                 if (resultCode == ResultCodes.EVENTDELETED.code
                         || resultCode == ResultCodes.EVENTCHANGED.code) {
-                    Log.i("RESULT", "SAVE RESULTED TO RELOAD DISPLAY")
                     SummaryViewState.Loading.destroyInstance()
                     render(SummaryViewState.Loading.getInstance
-                    (false, false, false), this)
+                    (true, true, false), this)
                 }
             }
         }
@@ -216,7 +217,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
         appdb.beginTransaction()
         return try {
             state.types.postValue(appdb.typeDao().getAll())
-            Log.i("TYPES", state.types.value.toString())
             appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {
@@ -287,11 +287,21 @@ class MainActivity: AppCompatActivity (), SummaryView {
         when (state) {
             is SummaryViewState.Loading -> {
 
+                val dataLoadedObserver: Observer<Boolean> = Observer {
+                    if (state.typesLoaded.value != true)
+                        loadTypes(state)
+                    if (state.typesLoaded.value == true && state.eventsLoaded.value != true)
+                        loadEvents(state)
+                    if (state.typesLoaded.value == true && state.eventsLoaded.value == true) {
+                        render(SummaryViewState.Passive(dayToggle.id), ctx)
+                    }
+                }
                 // watch loading status
                 val dbLoadingObserver: Observer<Boolean> = Observer {
+                    // == true for null safety
                     if (it == true) {
-                        // must have != true to accommodate null case
-                        if (state.typesLoaded.value != true) loadTypes(state)
+                        state.typesLoaded.observe(this, dataLoadedObserver)
+                        state.eventsLoaded.observe(this, dataLoadedObserver)
                     }
                 }
                 val typesLoadingObserver: Observer<List<EventType>> = Observer {
@@ -300,7 +310,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
                     else {
                         state.typesLoaded.postValue(true)
                         generateFABS(it)
-                        if (state.eventsLoaded.value != true) loadEvents(state)
                     }
                 }
                 val eventsLoadingObserver: Observer<List<UserEvent>> = Observer {
@@ -315,18 +324,10 @@ class MainActivity: AppCompatActivity (), SummaryView {
                     }
                 }
 
-                val finishedLoadingObserver: Observer<Boolean> = Observer {
-                    if (state.typesLoaded.value == true && state.eventsLoaded.value == true) {
-                        render(SummaryViewState.Passive(dayToggle.id), ctx)
-                    }
-                }
-
                 // bind observables
                 state.dbLoaded.observe(this, dbLoadingObserver)
                 state.types.observe(this, typesLoadingObserver)
                 SummaryViewState.events.observe(this, eventsLoadingObserver)
-                state.typesLoaded.observe(this, finishedLoadingObserver)
-                state.eventsLoaded.observe(this, finishedLoadingObserver)
 
                 // load database if not already done so
                 if (state.dbLoaded.value != true) {

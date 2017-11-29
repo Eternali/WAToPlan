@@ -169,6 +169,19 @@ class EditActivity : AppCompatActivity (), EditView {
         }
     }
 
+    override fun deleteEvent(eid: Int): Boolean {
+        appdb.beginTransaction()
+        return try {
+            appdb.eventDao().deleteById(eid)
+            appdb.setTransactionSuccessful()
+            true
+        } catch (e: Exception) {
+            false
+        } finally {
+            appdb.endTransaction()
+        }
+    }
+
     override fun timeChooser(view: View) {
         val curTime = Calendar.getInstance()
         val cHour = curTime.get(Calendar.HOUR_OF_DAY)
@@ -321,8 +334,11 @@ class EditActivity : AppCompatActivity (), EditView {
         // ender clickers
         cancelButton.setOnClickListener {
             val code = Intent()
-            if (state.isEdit.value == true)
-                setResult(ResultCodes.EVENTDELETED.code, code)
+            if (state.isEdit.value == true) {
+                if (deleteEvent(intent.extras.getInt("eid")))
+                    setResult(ResultCodes.EVENTDELETED.code, code)
+                else setResult(ResultCodes.EVENTFAILED.code, code)
+            }
             else
                 setResult(ResultCodes.EVENTCANCELED.code, code)
             finish()

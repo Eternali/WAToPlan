@@ -18,6 +18,9 @@ interface EditTypeView {
     // update the event type being edited
     fun updateType (state: EditTypeViewState.Edit): Boolean
 
+    // delete event type
+    fun deleteType (state: EditTypeViewState.Edit): Boolean
+
     // show errors from the database
     fun showDbError (ctx: Context, msg: String)
 

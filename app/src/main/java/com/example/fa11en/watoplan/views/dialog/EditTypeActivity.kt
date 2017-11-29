@@ -85,6 +85,24 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         } else false
     }
 
+    override fun deleteType(state: EditTypeViewState.Edit): Boolean {
+        appdb.beginTransaction()
+        return try {
+            if (state.typeName.value == null) throw NullPointerException("Typename is empty.")
+            appdb.typeDao().delete(appdb.typeDao().get(state.typeName.value!!))
+            if (state.typeName.value!! in appdb.typeDao().getAll().map { it.name })
+                appdb.eventDao().deleteByTypeName(state.typeName.value!!)
+            else
+                showDbError(applicationContext, "Invalid Type Name")
+            appdb.setTransactionSuccessful()
+            true
+        } catch (e: Exception) {
+            false
+        } finally {
+            appdb.endTransaction()
+        }
+    }
+
     override fun showDbError(ctx: Context, msg: String) {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
     }
@@ -168,11 +186,11 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
 
                 // delete button
                 cancelButton.setOnClickListener{
-                    try {
-                        appdb.typeDao().delete(appdb.typeDao().get(state.typeName.value!!))
-                    } catch (e: Exception) {  }
                     val code = Intent()
-                    setResult(ResultCodes.TYPEDELETED.code, code)
+                    if (deleteType(state))
+                        setResult(ResultCodes.TYPEDELETED.code, code)
+                    else
+                        setResult(ResultCodes.TYPEFAILED.code, code)
                     finish()
                 }
 

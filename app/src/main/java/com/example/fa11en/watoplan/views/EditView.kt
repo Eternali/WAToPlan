@@ -33,6 +33,9 @@ interface EditView {
     // save event to database
     fun saveEvent (ctx: Context): Boolean
 
+    // remove event from database
+    fun deleteEvent (eid: Int): Boolean
+
     // show errors from the database
     fun showDbError (ctx: Context, msg: String)
 
