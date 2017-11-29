@@ -68,12 +68,18 @@ class Converters {
                         params[ParameterTypes.DESCRIPTION] = it.split("=")[1]
                     ParameterTypes.DATETIME.param ->
                         params[ParameterTypes.DATETIME] = fromTimestamp(it.split("=")[1].toLong())!!
+                    ParameterTypes.NOTIS.param ->
+                        params[ParameterTypes.NOTIS] = stringToNotis(it.split("=")[1])!!
                     ParameterTypes.LOCATION.param ->
                         params[ParameterTypes.LOCATION] = fromLocstring(it.split("=")[1])!!
                     ParameterTypes.ENTITIES.param ->
                         params[ParameterTypes.ENTITIES] = it.split("=")[1]
                     ParameterTypes.REPEAT.param ->
                         params[ParameterTypes.REPEAT] = fromListString(it.split("=")[1])!!
+                    ParameterTypes.PROGRESS.param ->
+                        params[ParameterTypes.PROGRESS] = it.split("=")[1].toInt()
+                    ParameterTypes.PRIORITY.param ->
+                        params[ParameterTypes.PRIORITY] = it.split("=")[1].toInt()
                 }
             }
 
@@ -87,7 +93,7 @@ class Converters {
         return if (params != null) {
             var encodedStr = ""
 
-            // TODO: figure out a better way to typecheck ParameterTypes enum vals
+            // TODO: encode params better: eg. at start of new param, put length of the param to avoid special character confusion
             params.keys.forEach{
                 if (encodedStr.isNotEmpty()) encodedStr += "&"
                 encodedStr += it.toString() + "="
@@ -95,7 +101,7 @@ class Converters {
                     ParameterTypes.TITLE -> params[it]
                     ParameterTypes.DESCRIPTION -> params[it]
                     ParameterTypes.DATETIME -> calToTimestamp(params[it] as Calendar).toString()
-                    ParameterTypes.NOTIS -> 
+                    ParameterTypes.NOTIS -> notisToString(params[it] as MutableList<Int>)
                     ParameterTypes.LOCATION -> locToStr(params[it] as Location)
                     ParameterTypes.ENTITIES -> params[it]
                     ParameterTypes.REPEAT -> toRepeatStr(params[it] as MutableList<Long>)
@@ -117,5 +123,18 @@ class Converters {
     @TypeConverter
     fun stringToParams (encodedStr: String?): List<ParameterTypes>? =
             encodedStr?.split('&')?.map { paramToParamType(it) }
+
+
+    /* Notification list as string */
+    @TypeConverter
+    fun notisToString (notiIds: MutableList<Int>?): String? {
+        return notiIds?.map { it.toString() }?.joinToString(",") ?: ""
+    }
+
+    /* Encoded string to noti list */
+    @TypeConverter
+    fun stringToNotis (encodedStr: String?): List<Int>? {
+        return encodedStr?.split(",")?.map { it.toInt() }
+    }
 
 }
