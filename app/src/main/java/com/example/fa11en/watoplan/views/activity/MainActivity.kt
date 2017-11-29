@@ -161,7 +161,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                         || resultCode == ResultCodes.TYPECHANGED.code) {
                     SummaryViewState.Loading.destroyInstance()
                     render(SummaryViewState.Loading.getInstance
-                    (true, false, true), this)
+                    (true, false, false), this)
                 }
             }
             RequestCodes.NEWEVENT.code -> {
