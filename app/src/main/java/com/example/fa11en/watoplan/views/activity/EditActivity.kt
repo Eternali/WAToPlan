@@ -157,7 +157,6 @@ class EditActivity : AppCompatActivity (), EditView {
             event.setParam(ParameterTypes.ENTITIES, state.entities.value as Any)
             event.setParam(ParameterTypes.REPEAT, state.repetitions.value as Any)
 
-            Log.i("EVENT", event.params.toString())
             // save event to database
             if (state.isEdit.value == true) appdb.eventDao().update(event)
             else appdb.eventDao().insert(event)
@@ -264,7 +263,8 @@ class EditActivity : AppCompatActivity (), EditView {
                     when (it) {
                         ParameterTypes.TITLE -> titleContainer.eventTitleEdit.setText(event.params[it] as String)
                         ParameterTypes.DESCRIPTION -> descriptionContainer.eventDescEdit.setText(event.params[it] as String)
-                        ParameterTypes.DATETIME-> state.datetime.postValue(event.params[it] as Calendar)
+                        ParameterTypes.DATETIME-> datetimeContainer.eventDatetimeLabel.text = getString(R.string.dateFormattedText,
+                                (event.params[it] as Calendar).timestr(), (event.params[it] as Calendar).datestr())
                         ParameterTypes.LOCATION -> state.location.postValue(event.params[it] as Location)
                         ParameterTypes.ENTITIES -> state.entities.postValue((event.params[it] as List<Person>).toMutableList())
                         ParameterTypes.REPEAT -> state.repetitions.postValue((event.params[it] as List<Calendar>).toMutableList())
@@ -291,6 +291,22 @@ class EditActivity : AppCompatActivity (), EditView {
         state.isEdit.observe(this, isEditObserver)
         state.curType.observe(this, typeObserver)
 
+        // param observers
+        val locationObserver: Observer<Location> = Observer {
+
+        }
+        val entitiesObserver: Observer<List<Person>> = Observer {
+
+        }
+        val repetitionsObserver: Observer<List<Calendar>> = Observer {
+
+        }
+
+        state.location.observe(this, locationObserver)
+//        state.entities.observe(this, entitiesObserver)
+//        state.repetitions.observe(this, repetitionsObserver)
+
+
         // text onchange listeners
         titleContainer.eventTitleEdit.addTextChangedListener(TextParamWatcher(state.name))
         descriptionContainer.eventDescEdit.addTextChangedListener(TextParamWatcher(state.desc))
@@ -306,15 +322,20 @@ class EditActivity : AppCompatActivity (), EditView {
         cancelButton.setOnClickListener {
             val code = Intent()
             if (state.isEdit.value == true)
-                setResult(ResultCodes.TYPEDELETED.code, code)
+                setResult(ResultCodes.EVENTDELETED.code, code)
             else
-                setResult(ResultCodes.TYPECANCELED.code, code)
+                setResult(ResultCodes.EVENTCANCELED.code, code)
             finish()
         }
         saveButton.setOnClickListener {
             val code = Intent()
-            if (saveEvent(ctx)) setResult(ResultCodes.TYPESAVED.code, code)
-            else setResult(ResultCodes.TYPEFAILED.code, code)
+            if (saveEvent(ctx)) {
+                if (state.isEdit.value == true)
+                    setResult(ResultCodes.EVENTCHANGED.code, code)
+                else
+                    setResult(ResultCodes.EVENTSAVED.code, code)
+            }
+            else setResult(ResultCodes.EVENTFAILED.code, code)
             finish()
         }
 

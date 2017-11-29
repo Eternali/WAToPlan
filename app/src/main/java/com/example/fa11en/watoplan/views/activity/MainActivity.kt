@@ -40,9 +40,9 @@ enum class Themes {
 enum class RequestCodes (val code: Int) {
     NEWEVENTTYPE(100),
     EDITEVENTTYPE(101),
-    EVENTTYPECHANGED(102),
-    EDITEVENT(103),
-    NEWEVENT(104)
+    NEWEVENT(103),
+    EDITEVENT(104),
+    ISEVENTTYPECHANGED(105)
 }
 
 // global enum for result codes
@@ -52,8 +52,11 @@ enum class ResultCodes (val code: Int) {
     TYPEFAILED(202),
     TYPEDELETED(203),
     TYPECHANGED(204),
-    EVENTADDED(205),
-    EVENTCHANGED(206)
+    EVENTCANCELED(205),
+    EVENTSAVED(206),
+    EVENTFAILED(207),
+    EVENTDELETED(208),
+    EVENTCHANGED(209)
 }
 
 // This can be put here because it will never change and is required globally
@@ -150,12 +153,25 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 //        super.onActivityResult(requestCode, resultCode, data)
-        Log.i("REQUESTCODE", "asdfadfasdfasdfa")
         when (requestCode) {
-            RequestCodes.EVENTTYPECHANGED.code -> {
-                if (resultCode == ResultCodes.TYPECHANGED.code
-                        || resultCode == ResultCodes.TYPESAVED.code
-                        || resultCode == ResultCodes.TYPEDELETED.code) {
+            RequestCodes.ISEVENTTYPECHANGED.code -> {
+                if (resultCode == ResultCodes.TYPESAVED.code
+                        || resultCode == ResultCodes.TYPEDELETED.code
+                        || resultCode == ResultCodes.TYPECHANGED.code) {
+                    Log.i("RESULT", "SAVE RESULTED TO RELOAD DISPLAY")
+                    SummaryViewState.Loading.destroyInstance()
+                    render(SummaryViewState.Loading.getInstance
+                    (false, false, false), this)
+                }
+            }
+            RequestCodes.NEWEVENT.code -> {
+                if (resultCode == ResultCodes.EVENTSAVED.code) {
+                    Log.i("RESULT", "EVENT SAVED")
+                }
+            }
+            RequestCodes.EDITEVENT.code -> {
+                if (resultCode == ResultCodes.EVENTDELETED.code
+                        || resultCode == ResultCodes.EVENTCHANGED.code) {
                     Log.i("RESULT", "SAVE RESULTED TO RELOAD DISPLAY")
                     SummaryViewState.Loading.destroyInstance()
                     render(SummaryViewState.Loading.getInstance
@@ -262,7 +278,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun settingsIntent (ctx: Context) {
-        startActivityForResult(Intent(ctx, SettingsActivity::class.java), RequestCodes.EVENTTYPECHANGED.code)
+        startActivityForResult(Intent(ctx, SettingsActivity::class.java), RequestCodes.ISEVENTTYPECHANGED.code)
     }
 
     override fun render (state: SummaryViewState, ctx: Context) {

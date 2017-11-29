@@ -48,12 +48,11 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.i("TYPES", appdb.typeDao().getAll().toString())
         when (requestCode) {
             RequestCodes.NEWEVENTTYPE.code -> {
                 if (resultCode == ResultCodes.TYPESAVED.code) {
                     render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
-                } else {
+                } else if (resultCode == ResultCodes.TYPEFAILED.code) {
                     showDbError(applicationContext, "Failed to Save Event.")
                 }
             }
@@ -61,9 +60,9 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 EditTypeViewState.Edit.destroyInstance()
                 if (resultCode == ResultCodes.TYPEDELETED.code) {
                     render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
-                } else if (resultCode == ResultCodes.TYPESAVED.code) {
+                } else if (resultCode == ResultCodes.TYPECHANGED.code) {
                     render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
-                } else {
+                } else if (resultCode == ResultCodes.TYPEFAILED.code) {
                     showDbError(applicationContext, "Failed to Save Event.")
                 }
             }

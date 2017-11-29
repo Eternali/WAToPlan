@@ -180,7 +180,7 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
                 saveButton.setOnClickListener {
                     val code = Intent()
                     if (updateType(state))
-                        setResult(ResultCodes.TYPESAVED.code, code)
+                        setResult(ResultCodes.TYPECHANGED.code, code)
                     else
                         setResult(ResultCodes.TYPEFAILED.code, code)
                     finish()

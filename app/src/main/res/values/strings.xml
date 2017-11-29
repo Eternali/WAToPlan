@@ -43,4 +43,6 @@
     <string name="deleteText">DELETE</string>
     <string name="saveText">SAVE</string>
     <string name="addTypeText">ADD TYPE</string>
+
+    <string name="dateFormattedText">%1$s, %2$s</string>
 </resources>
