@@ -74,6 +74,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         val code = Intent()
         setResult(ResultCodes.TYPECHANGED.code, code)
         finish()
+        super.onBackPressed()
     }
 
 

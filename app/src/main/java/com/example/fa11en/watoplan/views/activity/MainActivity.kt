@@ -38,22 +38,22 @@ enum class Themes {
 
 // global enum for request codes
 enum class RequestCodes (val code: Int) {
-    NEWEVENTTYPE(0),
-    EDITEVENTTYPE(1),
-    EVENTTYPECHANGED(2),
-    EDITEVENT(3),
-    NEWEVENT(4)
+    NEWEVENTTYPE(100),
+    EDITEVENTTYPE(101),
+    EVENTTYPECHANGED(102),
+    EDITEVENT(103),
+    NEWEVENT(104)
 }
 
 // global enum for result codes
 enum class ResultCodes (val code: Int) {
-    TYPECANCELED(0),
-    TYPESAVED(1),
-    TYPEFAILED(2),
-    TYPEDELETED(3),
-    TYPECHANGED(4),
-    EVENTADDED(5),
-    EVENTCHANGED(6)
+    TYPECANCELED(200),
+    TYPESAVED(201),
+    TYPEFAILED(202),
+    TYPEDELETED(203),
+    TYPECHANGED(204),
+    EVENTADDED(205),
+    EVENTCHANGED(206)
 }
 
 // This can be put here because it will never change and is required globally
@@ -149,7 +149,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+//        super.onActivityResult(requestCode, resultCode, data)
         Log.i("REQUESTCODE", "asdfadfasdfasdfa")
         when (requestCode) {
             RequestCodes.EVENTTYPECHANGED.code -> {
