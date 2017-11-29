@@ -64,7 +64,7 @@ enum class ParameterTypes (val param: String) {
     TITLE ("TITLE"),
     DESCRIPTION ("DESCRIPTION"),
     DATETIME ("DATETIME"),
-//    NOTIS ("NOTIFICATIONS"),
+    NOTIS ("NOTIFICATIONS"),
     LOCATION ("LOCATION"),
     ENTITIES ("PEOPLE"),
     REPEAT ("REPETITIONS"),

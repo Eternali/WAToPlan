@@ -95,6 +95,7 @@ class Converters {
                     ParameterTypes.TITLE -> params[it]
                     ParameterTypes.DESCRIPTION -> params[it]
                     ParameterTypes.DATETIME -> calToTimestamp(params[it] as Calendar).toString()
+                    ParameterTypes.NOTIS -> 
                     ParameterTypes.LOCATION -> locToStr(params[it] as Location)
                     ParameterTypes.ENTITIES -> params[it]
                     ParameterTypes.REPEAT -> toRepeatStr(params[it] as MutableList<Long>)
