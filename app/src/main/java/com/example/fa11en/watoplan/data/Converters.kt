@@ -98,6 +98,8 @@ class Converters {
                     ParameterTypes.LOCATION -> locToStr(params[it] as Location)
                     ParameterTypes.ENTITIES -> params[it]
                     ParameterTypes.REPEAT -> toRepeatStr(params[it] as MutableList<Long>)
+                    ParameterTypes.PROGRESS -> params[it] as Double
+                    ParameterTypes.PRIORITY -> params[it] as Int
                 }
             }
 

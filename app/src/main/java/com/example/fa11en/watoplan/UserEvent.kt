@@ -52,9 +52,12 @@ class UserEvent (@ColumnInfo(name = "typename") val typeName: String) {
             ParameterTypes.TITLE -> value is String
             ParameterTypes.DESCRIPTION -> value is String
             ParameterTypes.DATETIME -> value is Calendar
+//            ParameterTypes.NOTIS -> value is MutableList<*>
             ParameterTypes.LOCATION -> value is Location
             ParameterTypes.ENTITIES -> value is MutableList<*>
             ParameterTypes.REPEAT -> value is MutableList<*>
+            ParameterTypes.PROGRESS -> value is Double && value >= 0 && value <= 100
+            ParameterTypes.PRIORITY -> value is Int
         }
     }
 

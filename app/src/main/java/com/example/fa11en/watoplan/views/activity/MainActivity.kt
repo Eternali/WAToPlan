@@ -64,9 +64,19 @@ enum class ParameterTypes (val param: String) {
     TITLE ("TITLE"),
     DESCRIPTION ("DESCRIPTION"),
     DATETIME ("DATETIME"),
+//    NOTIS ("NOTIFICATIONS"),
     LOCATION ("LOCATION"),
     ENTITIES ("PEOPLE"),
-    REPEAT ("REPETITIONS")
+    REPEAT ("REPETITIONS"),
+    PROGRESS ("PROGRESS"),
+    PRIORITY ("PRIORITY")
+}
+
+// notification types supported
+enum class NotiTypes {
+    NOTIFICATION,
+    EMAIL,
+    SMS
 }
 
 

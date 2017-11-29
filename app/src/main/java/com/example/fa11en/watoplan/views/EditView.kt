@@ -31,7 +31,7 @@ interface EditView {
     fun getEvent(eid: Int): UserEvent?
 
     // save event to database
-    fun saveEvent (ctx: Context): Boolean
+    fun saveEvent (ctx: Context, eid: Int?): Boolean
 
     // remove event from database
     fun deleteEvent (eid: Int): Boolean

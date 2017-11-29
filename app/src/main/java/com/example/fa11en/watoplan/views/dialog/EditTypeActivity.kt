@@ -89,11 +89,11 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
         appdb.beginTransaction()
         return try {
             if (state.typeName.value == null) throw NullPointerException("Typename is empty.")
-            appdb.typeDao().delete(appdb.typeDao().get(state.typeName.value!!))
             if (state.typeName.value!! in appdb.typeDao().getAll().map { it.name })
                 appdb.eventDao().deleteByTypeName(state.typeName.value!!)
             else
                 showDbError(applicationContext, "Invalid Type Name")
+            appdb.typeDao().delete(appdb.typeDao().get(state.typeName.value!!))
             appdb.setTransactionSuccessful()
             true
         } catch (e: Exception) {

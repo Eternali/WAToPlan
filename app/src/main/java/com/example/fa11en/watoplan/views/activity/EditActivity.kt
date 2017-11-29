@@ -142,12 +142,16 @@ class EditActivity : AppCompatActivity (), EditView {
         }
     }
 
-    override fun saveEvent(ctx: Context): Boolean {
+    override fun saveEvent(ctx: Context, eid: Int?): Boolean {
         appdb.beginTransaction()
         return try {
             // initialize event with the state
             if (state.curType.value == null) fail(ctx, "Event Type Not Set")
             val event = UserEvent(state.curType.value!!)
+            if (eid != null) {
+                event.eid = eid
+                appdb.eventDao().deleteById(event.eid)
+            }
 
             // set event parameters
             event.setParam(ParameterTypes.TITLE, state.name.value as Any)
@@ -158,9 +162,9 @@ class EditActivity : AppCompatActivity (), EditView {
             event.setParam(ParameterTypes.REPEAT, state.repetitions.value as Any)
 
             // save event to database
-            if (state.isEdit.value == true) appdb.eventDao().update(event)
-            else appdb.eventDao().insert(event)
+            appdb.eventDao().insert(event)
             appdb.setTransactionSuccessful()
+
             true
         } catch (e: Exception) {
             false
@@ -276,8 +280,11 @@ class EditActivity : AppCompatActivity (), EditView {
                     when (it) {
                         ParameterTypes.TITLE -> titleContainer.eventTitleEdit.setText(event.params[it] as String)
                         ParameterTypes.DESCRIPTION -> descriptionContainer.eventDescEdit.setText(event.params[it] as String)
-                        ParameterTypes.DATETIME-> datetimeContainer.eventDatetimeLabel.text = getString(R.string.dateFormattedText,
-                                (event.params[it] as Calendar).timestr(), (event.params[it] as Calendar).datestr())
+                        ParameterTypes.DATETIME-> {
+                            datetimeContainer.eventDatetimeLabel.text = getString(R.string.dateFormattedText,
+                                    (event.params[it] as Calendar).timestr(), (event.params[it] as Calendar).datestr())
+                            state.datetime.postValue(event.params[it] as Calendar)
+                        }
                         ParameterTypes.LOCATION -> state.location.postValue(event.params[it] as Location)
                         ParameterTypes.ENTITIES -> state.entities.postValue((event.params[it] as List<Person>).toMutableList())
                         ParameterTypes.REPEAT -> state.repetitions.postValue((event.params[it] as List<Calendar>).toMutableList())
@@ -319,7 +326,6 @@ class EditActivity : AppCompatActivity (), EditView {
 //        state.entities.observe(this, entitiesObserver)
 //        state.repetitions.observe(this, repetitionsObserver)
 
-
         // text onchange listeners
         titleContainer.eventTitleEdit.addTextChangedListener(TextParamWatcher(state.name))
         descriptionContainer.eventDescEdit.addTextChangedListener(TextParamWatcher(state.desc))
@@ -345,13 +351,17 @@ class EditActivity : AppCompatActivity (), EditView {
         }
         saveButton.setOnClickListener {
             val code = Intent()
-            if (saveEvent(ctx)) {
-                if (state.isEdit.value == true)
+            if (state.isEdit.value == true) {
+                if (saveEvent(ctx, intent.extras.getInt("eid")))
                     setResult(ResultCodes.EVENTCHANGED.code, code)
                 else
+                    setResult(ResultCodes.EVENTFAILED.code, code)
+            } else {
+                if (saveEvent(ctx, null))
                     setResult(ResultCodes.EVENTSAVED.code, code)
+                else
+                    setResult(ResultCodes.EVENTFAILED.code, code)
             }
-            else setResult(ResultCodes.EVENTFAILED.code, code)
             finish()
         }
 
