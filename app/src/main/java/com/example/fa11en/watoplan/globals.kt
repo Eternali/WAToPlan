@@ -64,6 +64,9 @@ enum class NotiTypes (val title: String) {
 }
 
 
+////**** EXTENSION FUNCTIONS ****////
+
+
 // Location extension methods to generate printable text
 fun Calendar.timestr (): String {
     return this.get(Calendar.HOUR_OF_DAY).toString() + ": " + this.get(Calendar.MINUTE)
@@ -71,6 +74,12 @@ fun Calendar.timestr (): String {
 
 fun Calendar.datestr (): String {
     return this.get(Calendar.DAY_OF_MONTH).toString() + " " + this.get(Calendar.MONTH) + " " + this.get(Calendar.YEAR)
+}
+
+
+// add extension to Int to change its range
+fun Int.toRange (instart: Int, inend: Int, outstart: Int, outend: Int): Int {
+    return outstart + ((outend - outstart) / (inend - instart)) * (this - instart)
 }
 
 
@@ -113,31 +122,31 @@ fun Pair<Int, Long>.getEvent (events: List<UserEvent>): UserEvent? {
     return null
 }
 
-fun MutableLiveData<List<UserEvent>>.orderByDate () {
-    val tmpevents: MutableList<Pair<Int, Long>>? = this.value?.map {
+fun List<UserEvent>.orderByDate (): List<UserEvent?>? {
+    val tmpevents: MutableList<Pair<Int, Long>>? = this.map {
         it.eid to if (it.params[ParameterTypes.DATETIME] != null) (it.params[ParameterTypes.DATETIME] as Calendar).timeInMillis else 0
-    }?.toMutableList()
+    }.toMutableList()
 
     if (tmpevents != null) quickSort(tmpevents, 0, tmpevents.size-1)
-    this.postValue(tmpevents?.map { it.getEvent(this.value!!.toList())!! })
+    return tmpevents?.map { it.getEvent(this) }
 }
 
-fun MutableLiveData<List<UserEvent>>.orderByPriority () {
-    val tmpevents: MutableList<Pair<Int, Long>>? = this.value?.map {
+fun List<UserEvent>.orderByPriority (): List<UserEvent?>? {
+    val tmpevents: MutableList<Pair<Int, Long>>? = this.map {
         it.eid to if (it.params[ParameterTypes.PRIORITY] != null) (it.params[ParameterTypes.PRIORITY] as Int).toLong() else 0
-    }?.toMutableList()
+    }.toMutableList()
 
     if (tmpevents != null) quickSort(tmpevents, 0, tmpevents.size-1)
-    this.postValue(tmpevents?.map { it.getEvent(this.value!!.toList())!! })
+    return tmpevents?.map { it.getEvent(this) }
 }
 
-fun MutableLiveData<List<UserEvent>>.orderByProgress () {
-    val tmpevents: MutableList<Pair<Int, Long>>? = this.value?.map {
+fun List<UserEvent>.orderByProgress (): List<UserEvent?>? {
+    val tmpevents: MutableList<Pair<Int, Long>>? = this.map {
         it.eid to if (it.params[ParameterTypes.PROGRESS] != null) (it.params[ParameterTypes.PROGRESS] as Int).toLong() else 0
-    }?.toMutableList()
+    }.toMutableList()
 
     if (tmpevents != null) quickSort(tmpevents, 0, tmpevents.size-1)
-    this.postValue(tmpevents?.map { it.getEvent(this.value!!.toList())!! })
+    return tmpevents?.map { it.getEvent(this) }
 }
 
 

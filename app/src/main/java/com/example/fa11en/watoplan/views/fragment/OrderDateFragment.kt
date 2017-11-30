@@ -3,6 +3,7 @@ package com.example.fa11en.watoplan
 import android.app.Fragment
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,13 +22,13 @@ class OrderDateFragment : Fragment () {
             val byDateListView: ListView = view.findViewById(R.id.dayView)
 
             val byDateAdapter = EventAdapter(activity, 0,
-                    SummaryViewState.events.value as MutableList<UserEvent>)
+                    SummaryViewState.events.value!!.toMutableList())
             byDateListView.adapter = byDateAdapter
 
-            val eventsObserver: Observer<MutableList<UserEvent>> = Observer {
+            val eventsObserver: Observer<List<UserEvent>> = Observer {
                 byDateAdapter.notifyDataSetChanged()
             }
-            SummaryViewState.events.observe(parentFragment, eventsObserver)
+            SummaryViewState.events.observe(activity as AppCompatActivity, eventsObserver)
 
             return view
         }

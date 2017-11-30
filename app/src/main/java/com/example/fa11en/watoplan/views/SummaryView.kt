@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan.views
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.View
@@ -13,6 +14,7 @@ import com.example.fa11en.watoplan.viewmodels.SummaryViewState
 interface SummaryView {
 
     var appdb: AppDatabase
+    val typesRendered: MutableLiveData<MutableList<EventType>>
 
     // load database
     fun loadDatabase (ctx: Context): Boolean
@@ -28,9 +30,6 @@ interface SummaryView {
 
     // switch view fragment
     fun toggleDisplay (viewid: Int, state: SummaryViewState)
-
-    // click on an event intent
-    fun editIntent (ctx: Context, eid: Int)
 
     // click on a FAB
     fun addIntent (ctx: Context, typeName: String)

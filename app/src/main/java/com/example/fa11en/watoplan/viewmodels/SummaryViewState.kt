@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel
 import android.os.Parcel
 import android.os.Parcelable
 import com.example.fa11en.watoplan.AppDatabase
+import com.example.fa11en.watoplan.EventAdapter
 import com.example.fa11en.watoplan.EventType
 import com.example.fa11en.watoplan.UserEvent
 

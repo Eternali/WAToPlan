@@ -1,6 +1,8 @@
 package com.example.fa11en.watoplan.views.adapter
 
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
+import android.support.v4.content.ContextCompat
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -33,7 +35,10 @@ class TypeAdapter (val ctx: Context, var resource: Int, var events: MutableList<
             val typeName = typeView.findViewById<TextView>(R.id.typeName)
 
             // set layout to proper values
-            typeContainer.setBackgroundColor(events[position].colorNormal)
+            val backgroundDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                    intArrayOf(events[position].colorPressed, events[position].colorNormal))
+            backgroundDrawable.cornerRadius = 4f
+            typeContainer.setBackgroundDrawable()
             typeName.text = events[position].name
             typeName.setBackgroundColor(events[position].colorPressed)
 

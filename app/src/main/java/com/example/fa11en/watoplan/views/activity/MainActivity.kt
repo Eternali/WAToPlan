@@ -1,6 +1,7 @@
 package com.example.fa11en.watoplan
 
 import android.app.FragmentTransaction
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
@@ -31,6 +32,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     // FAM
     private val addMenu: FloatingActionsMenu by bindView(R.id.addMenu)
+    override val typesRendered: MutableLiveData<MutableList<EventType>> = MutableLiveData()
 
     // view selection
     private val displayGroup: RadioGroup by bindView(R.id.overviewLayoutSwitcher)
@@ -53,6 +55,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         *  2: Make each SummaryViewState subclass a singleton and get the instance across fragments
         *       (but this is not lifecycle aware)
         *  I have gone with the 2nd option for now */
+        typesRendered.postValue(mutableListOf())
         render(SummaryViewState.Loading.getInstance
                 (false, false, false), this)
     }
@@ -68,7 +71,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
         if (item == null) return false
         when (item.itemId) {
             R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
+                settingsIntent(applicationContext)
             }
         }
 
@@ -88,7 +91,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             RequestCodes.ISEVENTTYPECHANGED.code -> {
-                Log.i("TYPECHANGED", "ONRESULT FOR TYPECHANGED CALLED")
                 if (resultCode == ResultCodes.TYPESAVED.code
                         || resultCode == ResultCodes.TYPEDELETED.code
                         || resultCode == ResultCodes.TYPECHANGED.code) {
@@ -118,8 +120,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     ////**** INTENTS ****////
 
-    fun generateFABS (types: List<EventType>) {
-        types.forEach {
+    fun generateFABS (state: SummaryViewState, isRemove: Boolean = false) {
+        state.types.value?.forEach {
             val button = FloatingActionButton(this)
             button.size = FloatingActionButton.SIZE_MINI
             button.colorNormal = it.colorNormal
@@ -129,7 +131,13 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 addMenu.collapse()
                 addIntent(this, it.name)
             }
-            addMenu.addButton(button)
+            if (isRemove) {
+                addMenu.removeButton(button)
+                typesRendered.value!!.remove(it)
+            } else {
+                addMenu.addButton(button)
+                typesRendered.value!!.add(it)
+            }
         }
     }
 
@@ -183,28 +191,28 @@ class MainActivity: AppCompatActivity (), SummaryView {
         val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         when (viewid) {
             R.id.dateToggle -> {
-                SummaryViewState.events.orderByDate()
+//                val ordered = SummaryViewState.events.value?.orderByDate()
+//                if (ordered != null && null !in ordered)
+//                    SummaryViewState.events.postValue(ordered.map { it!! })
                 fragTransaction.replace(R.id.displayFragContainer, OrderDateFragment(), "date")
                 fragTransaction.commit()
             }
             R.id.priorityToggle -> {
-                SummaryViewState.events.orderByPriority()
+//                val ordered = SummaryViewState.events.value?.orderByPriority()
+//                if (ordered != null && null !in ordered)
+//                    SummaryViewState.events.postValue(ordered.map { it!! })
                 fragTransaction.replace(R.id.displayFragContainer, OrderPriorityFragment(), "priority")
                 fragTransaction.commit()
             }
             R.id.progressToggle -> {
-                SummaryViewState.events.orderByProgress()
+//                val ordered = SummaryViewState.events.value?.orderByProgress()
+//                if (ordered != null && null !in ordered)
+//                    SummaryViewState.events.postValue(ordered.map { it!! })
                 fragTransaction.replace(R.id.displayFragContainer, OrderProgressFragment(), "process")
                 fragTransaction.commit()
             }
             else -> fragTransaction.commit()
         }
-    }
-
-    override fun editIntent (ctx: Context, eid: Int) {
-        val editor = Intent(ctx, EditActivity::class.java)
-        editor.putExtra("eid", eid)
-        startActivityForResult(editor, RequestCodes.EDITEVENT.code)
     }
 
     override fun addIntent (ctx: Context, typeName: String) {
@@ -245,7 +253,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
                         showDbError(ctx, "Failed to load Event Types")
                     else {
                         state.typesLoaded.postValue(true)
-                        generateFABS(it)
+                        generateFABS(state, true)
+                        generateFABS(state)
                     }
                 }
                 val eventsLoadingObserver: Observer<List<UserEvent>> = Observer {
@@ -277,7 +286,12 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 val fragObserver: Observer<Int> = Observer {
                     if (it != null) toggleDisplay(it, state)
                 }
+                val eventsObserver: Observer<List<UserEvent>> = Observer {
+
+                }
+
                 state.displayFrag.observe(this, fragObserver)
+                SummaryViewState.events.observe(this, eventsObserver)
             }
         }
 
