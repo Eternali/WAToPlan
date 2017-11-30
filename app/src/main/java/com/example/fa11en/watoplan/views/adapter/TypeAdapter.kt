@@ -35,12 +35,14 @@ class TypeAdapter (val ctx: Context, var resource: Int, var events: MutableList<
             val typeName = typeView.findViewById<TextView>(R.id.typeName)
 
             // set layout to proper values
-            val backgroundDrawable = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+            // create radial background gradient (orientation is ignored but required for constructor)
+            val backgroundDrawable = GradientDrawable(GradientDrawable.Orientation.TL_BR,
                     intArrayOf(events[position].colorPressed, events[position].colorNormal))
-            backgroundDrawable.cornerRadius = 4f
-            typeContainer.setBackgroundDrawable()
+            backgroundDrawable.gradientType = GradientDrawable.RADIAL_GRADIENT
+            backgroundDrawable.gradientRadius = 200f
+            backgroundDrawable.cornerRadius = 8f
+            typeContainer.background = backgroundDrawable
             typeName.text = events[position].name
-            typeName.setBackgroundColor(events[position].colorPressed)
 
             // click listeners
             typeContainer.setOnClickListener {
