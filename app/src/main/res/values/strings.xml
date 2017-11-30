@@ -45,4 +45,7 @@
     <string name="addTypeText">ADD TYPE</string>
 
     <string name="dateFormattedText">%1$s, %2$s</string>
+    <string name="progress_label">PROGRESS</string>
+    <string name="priority_label">PRIORITY</string>
+    <string name="notification_label">NOTIFICATIONS</string>
 </resources>

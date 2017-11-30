@@ -125,13 +125,13 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
 
     override fun render(state: EditTypeViewState, ctx: Context) {
 
-        // get database TODO fix db
+        // get database
         appdb = EventsDB.getInstance(ctx)
 
         //  initialize observables/listeners  //
 
         // wait until all typeParams have initialized to set checkboxes
-        val paramsLoaded: Observer<Boolean> = Observer {
+        val paramsLoaded: Observer<Boolean> = Observer { _ ->
             state.typeParams.forEach {
                 if (it.value.value == null) return@Observer
                 else {

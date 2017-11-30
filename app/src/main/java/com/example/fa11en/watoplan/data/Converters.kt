@@ -105,7 +105,7 @@ class Converters {
                     ParameterTypes.LOCATION -> locToStr(params[it] as Location)
                     ParameterTypes.ENTITIES -> params[it]
                     ParameterTypes.REPEAT -> toRepeatStr(params[it] as MutableList<Long>)
-                    ParameterTypes.PROGRESS -> params[it] as Double
+                    ParameterTypes.PROGRESS -> params[it] as Int
                     ParameterTypes.PRIORITY -> params[it] as Int
                 }
             }
@@ -131,10 +131,25 @@ class Converters {
         return notiIds?.map { it.toString() }?.joinToString(",") ?: ""
     }
 
-    /* Encoded string to noti list */
+    /* Encoded string to Notification list */
     @TypeConverter
     fun stringToNotis (encodedStr: String?): List<Int>? {
         return encodedStr?.split(",")?.map { it.toInt() }
+    }
+
+    /* Notification type as string */
+    @TypeConverter
+    fun notiTypeToString (noti: NotiTypes?): String? {
+        return noti?.title.toString()
+    }
+
+    /* Encoded string to Notification type */
+    @TypeConverter
+    fun stringToNotiType (encodedStr: String?): NotiTypes? {
+        for (noti in NotiTypes.values())
+            if (noti.title == encodedStr)
+                return noti
+        return null
     }
 
 }

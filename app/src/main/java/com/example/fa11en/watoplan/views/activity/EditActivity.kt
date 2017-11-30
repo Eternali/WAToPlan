@@ -20,6 +20,7 @@ import com.example.fa11en.watoplan.views.EditTypeView
 import com.example.fa11en.watoplan.views.EditView
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.MapsInitializer
+import kotlinx.android.synthetic.main.activity_edit.*
 import kotlinx.android.synthetic.main.activity_edit.view.*
 import kotlinx.android.synthetic.main.edittype_layout.*
 import kotterknife.bindView
@@ -42,7 +43,10 @@ class EditActivity : AppCompatActivity (), EditView {
     // initialize parameter views and mappings
     private val titleContainer: LinearLayout by bindView(R.id.eventTitleContainer)
     private val descriptionContainer: LinearLayout by bindView(R.id.eventDescContainer)
+    private val priorityContainer: LinearLayout by bindView(R.id.eventPriorityContainer)
+    private val progressContainer: LinearLayout by bindView(R.id.eventProgressContainer)
     private val datetimeContainer: LinearLayout by bindView(R.id.eventDateTimeContainer)
+    private val notiContainer: LinearLayout by bindView(R.id.eventNotiContainer)
     private val locationContainer: LinearLayout by bindView(R.id.eventLocationContainer)
     private val entitiesContainer: LinearLayout by bindView(R.id.eventEntitiesContainer)
     private val repeatContainer: LinearLayout by bindView(R.id.eventRepeatContainer)
@@ -157,10 +161,14 @@ class EditActivity : AppCompatActivity (), EditView {
             event.setParam(ParameterTypes.TITLE, state.name.value as Any)
             event.setParam(ParameterTypes.DESCRIPTION, state.desc.value as Any)
             event.setParam(ParameterTypes.DATETIME, state.datetime.value as Any)
+            event.setParam(ParameterTypes.NOTIS, state.notis.value as Any)
             event.setParam(ParameterTypes.LOCATION, state.location.value as Any)
             event.setParam(ParameterTypes.ENTITIES, state.entities.value as Any)
             event.setParam(ParameterTypes.REPEAT, state.repetitions.value as Any)
+            event.setParam(ParameterTypes.PROGRESS, state.progress.value as Any)
+            event.setParam(ParameterTypes.PRIORITY, state.priority.value as Any)
 
+            Log.i("TO SAVE EVENT", event.params.toString())
             // save event to database
             appdb.eventDao().insert(event)
             appdb.setTransactionSuccessful()
@@ -245,7 +253,10 @@ class EditActivity : AppCompatActivity (), EditView {
         // initialize containers
         paramtoView.put(ParameterTypes.TITLE, titleContainer)
         paramtoView.put(ParameterTypes.DESCRIPTION, descriptionContainer)
+        paramtoView.put(ParameterTypes.PRIORITY, priorityContainer)
+        paramtoView.put(ParameterTypes.PROGRESS, progressContainer)
         paramtoView.put(ParameterTypes.DATETIME, datetimeContainer)
+        paramtoView.put(ParameterTypes.NOTIS, notiContainer)
         paramtoView.put(ParameterTypes.LOCATION, locationContainer)
         paramtoView.put(ParameterTypes.ENTITIES, entitiesContainer)
         paramtoView.put(ParameterTypes.REPEAT, repeatContainer)
@@ -274,17 +285,21 @@ class EditActivity : AppCompatActivity (), EditView {
                 val event: UserEvent? = getEvent(intent.extras.getInt("eid"))
                 if (event == null) fail(ctx, "Invalid Event ID")
                 else if (!setType(event.typeName)) fail(ctx, "Invalid Type Name")
+                Log.i("EVENT PARAMS", event!!.params.toString())
 
                 // set defaults according to event
                 event!!.params.keys.forEach {
                     when (it) {
                         ParameterTypes.TITLE -> titleContainer.eventTitleEdit.setText(event.params[it] as String)
                         ParameterTypes.DESCRIPTION -> descriptionContainer.eventDescEdit.setText(event.params[it] as String)
-                        ParameterTypes.DATETIME-> {
+                        ParameterTypes.PRIORITY -> priorityContainer.eventPrioritySeek.progress = event.params[it] as Int
+                        ParameterTypes.PROGRESS -> progressContainer.eventProgressSeek.progress = event.params[it] as Int
+                        ParameterTypes.DATETIME -> {
                             datetimeContainer.eventDatetimeLabel.text = getString(R.string.dateFormattedText,
                                     (event.params[it] as Calendar).timestr(), (event.params[it] as Calendar).datestr())
                             state.datetime.postValue(event.params[it] as Calendar)
                         }
+                        ParameterTypes.NOTIS -> state.notis.postValue((event.params[it] as List<Int>).toMutableList())
                         ParameterTypes.LOCATION -> state.location.postValue(event.params[it] as Location)
                         ParameterTypes.ENTITIES -> state.entities.postValue((event.params[it] as List<Person>).toMutableList())
                         ParameterTypes.REPEAT -> state.repetitions.postValue((event.params[it] as List<Calendar>).toMutableList())
@@ -329,6 +344,10 @@ class EditActivity : AppCompatActivity (), EditView {
         // text onchange listeners
         titleContainer.eventTitleEdit.addTextChangedListener(TextParamWatcher(state.name))
         descriptionContainer.eventDescEdit.addTextChangedListener(TextParamWatcher(state.desc))
+
+        // seekbar listeners
+        eventPriorityContainer.eventPrioritySeek.setOnSeekBarChangeListener(SeekbarListener(state.priority))
+        eventProgressContainer.eventProgressSeek.setOnSeekBarChangeListener(SeekbarListener(state.progress))
 
         // initialize data
         if (loadDatabase(ctx))

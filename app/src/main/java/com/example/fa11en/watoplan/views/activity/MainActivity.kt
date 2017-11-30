@@ -59,24 +59,34 @@ enum class ResultCodes (val code: Int) {
     EVENTCHANGED(209)
 }
 
-// This can be put here because it will never change and is required globally
+/**
+ * TO ADD A NEW PARAMETER TYPE AND IMPLEMENT IT, DO THE FOLLOWING:
+ * 1. append to ParameterTypes enum with a param value of the UI displayable string
+ * 2. add an entry in the when statement of UserEvent's setParam method
+ * 3. add a TypeConverter in Converters.kt for the hashmap of ParameterTypes to Any
+ * 4. add a variable in EditViewState to hold its editable value.
+ *      NOTE: this is required because I cannot use LiveData.postValue on vars of type Any or *
+ * 5. Add a Checkbox in edittype_layout.xml
+ * 6. Add the edit UI element in activity_edit.xml
+ * 7.
+ */
 enum class ParameterTypes (val param: String) {
     TITLE ("TITLE"),
     DESCRIPTION ("DESCRIPTION"),
     DATETIME ("DATETIME"),
     NOTIS ("NOTIFICATIONS"),
     LOCATION ("LOCATION"),
-    ENTITIES ("PEOPLE"),
-    REPEAT ("REPETITIONS"),
     PROGRESS ("PROGRESS"),
-    PRIORITY ("PRIORITY")
+    PRIORITY ("PRIORITY"),
+    ENTITIES ("PEOPLE"),
+    REPEAT ("REPETITIONS")
 }
 
 // notification types supported
-enum class NotiTypes {
-    NOTIFICATION,
-    EMAIL,
-    SMS
+enum class NotiTypes (val title: String) {
+    NOTIFICATION ("NOTIFICATION"),
+    EMAIL ("EMAIL"),
+    SMS ("SMS")
 }
 
 

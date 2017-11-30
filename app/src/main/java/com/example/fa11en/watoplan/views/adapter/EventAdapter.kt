@@ -15,6 +15,11 @@ import java.util.*
 
 // TODO: Give this fragment a state
 
+// add extension to Int to change its range
+fun Int.toRange (instart: Int, inend: Int, outstart: Int, outend: Int): Int {
+    return outstart + ((outend - outstart) / (inend - instart)) * (this - instart)
+}
+
 class EventAdapter (val ctx: Context, var resource: Int, var events: MutableList<UserEvent>)
         : ArrayAdapter<UserEvent> (ctx, resource, events) {
 
@@ -41,7 +46,8 @@ class EventAdapter (val ctx: Context, var resource: Int, var events: MutableList
             time.text = (events[position].params[ParameterTypes.DATETIME] as Calendar).timestr()
             date.text = (events[position].params[ParameterTypes.DATETIME] as Calendar).datestr()
             eventView.setBackgroundColor(events[position].type!!.colorNormal)
-            eventView.background.alpha = 50
+            eventView.background.alpha = (events[position].params[ParameterTypes.PRIORITY] as Int)
+                    .toRange(0, 10, 0, 255)
 
             // onclick listeners
             eventContainer.setOnClickListener {

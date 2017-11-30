@@ -24,8 +24,9 @@ sealed class EditTypeViewState: ViewModel () {
                 typeParams[it]!!.postValue(false)  // WATCH NULL-SAFE ASSERTION
             }
             // set defaults
-            typeParams[ParameterTypes.TITLE]!!.postValue(true)
-            typeParams[ParameterTypes.DESCRIPTION]!!.postValue(true)
+            typeParams[ParameterTypes.TITLE]?.postValue(true)
+            typeParams[ParameterTypes.DESCRIPTION]?.postValue(true)
+            typeParams[ParameterTypes.NOTIS]?.postValue(true)
 
             // initialize other event type parameters
             typeName.postValue("")

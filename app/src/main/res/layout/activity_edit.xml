@@ -55,6 +55,7 @@
             android:layout_weight="0.6"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textAlignment="center"
             android:hint="title" />
 
     </LinearLayout>
@@ -66,7 +67,8 @@
         android:orientation="horizontal"
         android:layout_marginLeft="14dp"
         android:layout_marginTop="10dp"
-        android:layout_marginRight="14dp">
+        android:layout_marginRight="14dp"
+        android:layout_marginBottom="10dp">
 
         <TextView
             android:id="@+id/eventDescLabel"
@@ -82,7 +84,62 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
+            android:textAlignment="center"
             android:hint="description"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/eventPriorityContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="14dp">
+
+        <TextView
+            android:id="@+id/eventPriorityLabel"
+            android:layout_weight="0.4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/priority_label"/>
+
+        <SeekBar
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:id="@+id/eventPrioritySeek"
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:progress="5"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/eventProgressContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="14dp">
+
+        <TextView
+            android:id="@+id/eventProgressLabel"
+            android:layout_weight="0.4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/progress_label"/>
+
+        <SeekBar
+            android:id="@+id/eventProgressSeek"
+            android:layout_weight="0.6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:progress="0"/>
 
     </LinearLayout>
 
@@ -120,6 +177,22 @@
                 android:layout_height="wrap_content"
                 android:text="DATE" />
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/eventNotiContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="14dp">
+
+        <ListView
+            android:id="@+id/eventNotiListEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

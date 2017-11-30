@@ -86,11 +86,29 @@
             android:textAlignment="center"
             android:text="@string/datetimeRadioText"/>
         <CheckBox
+            android:id="@+id/NOTIFICATIONS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/notification_label" />
+        <CheckBox
             android:id="@+id/LOCATION"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:text="@string/locationRadioText"/>
+        <CheckBox
+            android:id="@+id/PROGRESS"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/progress_label"/>
+        <CheckBox
+            android:id="@+id/PRIORITY"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="@string/priority_label"/>
         <CheckBox
             android:id="@+id/ENTITIES"
             android:layout_width="match_parent"
