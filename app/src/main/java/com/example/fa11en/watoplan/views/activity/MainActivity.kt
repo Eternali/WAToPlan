@@ -1,20 +1,15 @@
 package com.example.fa11en.watoplan
 
 import android.app.FragmentTransaction
-import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.RadioGroup
 import android.widget.Toast
 import android.widget.ToggleButton
@@ -30,85 +25,6 @@ import java.util.*
 /* TODO: Refactor strings.xml to use underscores instead of camelCase */
 
 
-// global enum of themes
-enum class Themes {
-    DARK,
-    LIGHT
-}
-
-// global enum for request codes
-enum class RequestCodes (val code: Int) {
-    NEWEVENTTYPE(100),
-    EDITEVENTTYPE(101),
-    NEWEVENT(103),
-    EDITEVENT(104),
-    ISEVENTTYPECHANGED(105)
-}
-
-// global enum for result codes
-enum class ResultCodes (val code: Int) {
-    TYPECANCELED(200),
-    TYPESAVED(201),
-    TYPEFAILED(202),
-    TYPEDELETED(203),
-    TYPECHANGED(204),
-    EVENTCANCELED(205),
-    EVENTSAVED(206),
-    EVENTFAILED(207),
-    EVENTDELETED(208),
-    EVENTCHANGED(209)
-}
-
-/**
- * TO ADD A NEW PARAMETER TYPE AND IMPLEMENT IT, DO THE FOLLOWING:
- * 1. append to ParameterTypes enum with a param value of the UI displayable string
- * 2. add an entry in the when statement of UserEvent's setParam method
- * 3. add a TypeConverter in Converters.kt for the hashmap of ParameterTypes to Any
- * 4. add a variable in EditViewState to hold its editable value.
- *      NOTE: this is required because I cannot use LiveData.postValue on vars of type Any or *
- * 5. Add a Checkbox in edittype_layout.xml
- * 6. Add the edit UI element in activity_edit.xml
- * 7.
- */
-enum class ParameterTypes (val param: String) {
-    TITLE ("TITLE"),
-    DESCRIPTION ("DESCRIPTION"),
-    DATETIME ("DATETIME"),
-    NOTIS ("NOTIFICATIONS"),
-    LOCATION ("LOCATION"),
-    PROGRESS ("PROGRESS"),
-    PRIORITY ("PRIORITY"),
-    ENTITIES ("PEOPLE"),
-    REPEAT ("REPETITIONS")
-}
-
-// notification types supported
-enum class NotiTypes (val title: String) {
-    NOTIFICATION ("NOTIFICATION"),
-    EMAIL ("EMAIL"),
-    SMS ("SMS")
-}
-
-
-// Location extension methods to generate printable text
-fun Calendar.timestr (): String {
-    return this.get(Calendar.HOUR_OF_DAY).toString() + ": " + this.get(Calendar.MINUTE)
-}
-
-fun Calendar.datestr (): String {
-    return this.get(Calendar.DAY_OF_MONTH).toString() + " " + this.get(Calendar.MONTH) + " " + this.get(Calendar.YEAR)
-}
-
-
-// This must be defined to get ParameterTypes object based on its param
-fun paramToParamType (param: String): ParameterTypes {
-    ParameterTypes.values()
-            .filter { it.param == param }
-            .forEach { return it }
-    throw TypeNotPresentException(param, Throwable())
-}
-
-
 class MainActivity: AppCompatActivity (), SummaryView {
 
     // use kotterknife to bind views to vals
@@ -118,9 +34,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     // view selection
     private val displayGroup: RadioGroup by bindView(R.id.overviewLayoutSwitcher)
-    private val dayToggle: ToggleButton by bindView(R.id.dayToggle)
-    private val weekToggle: ToggleButton by bindView(R.id.weekToggle)
-    private val monthToggle: ToggleButton by bindView(R.id.monthToggle)
 
     lateinit private var dotMenu: Menu
 
@@ -262,23 +175,26 @@ class MainActivity: AppCompatActivity (), SummaryView {
         }
     }
 
-    override fun toggleDisplay (viewid: Int) {
+    override fun toggleDisplay (viewid: Int, state: SummaryViewState) {
         displayGroup.clearCheck()
         displayGroup.check(viewid)
 
         // TODO: only replace fragment when previous is different from requested
         val fragTransaction: FragmentTransaction = fragmentManager.beginTransaction()
         when (viewid) {
-            R.id.dayToggle -> {
-                fragTransaction.replace(R.id.displayFragContainer, DayFragment(), "day")
+            R.id.dateToggle -> {
+                SummaryViewState.events.orderByDate()
+                fragTransaction.replace(R.id.displayFragContainer, OrderDateFragment(), "date")
                 fragTransaction.commit()
             }
-            R.id.weekToggle -> {
-                fragTransaction.replace(R.id.displayFragContainer, WeekFragment(), "day")
+            R.id.priorityToggle -> {
+                SummaryViewState.events.orderByPriority()
+                fragTransaction.replace(R.id.displayFragContainer, OrderPriorityFragment(), "priority")
                 fragTransaction.commit()
             }
-            R.id.monthToggle -> {
-                fragTransaction.replace(R.id.displayFragContainer, MonthFragment(), "day")
+            R.id.progressToggle -> {
+                SummaryViewState.events.orderByProgress()
+                fragTransaction.replace(R.id.displayFragContainer, OrderProgressFragment(), "process")
                 fragTransaction.commit()
             }
             else -> fragTransaction.commit()
@@ -313,7 +229,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
                     if (state.typesLoaded.value == true && state.eventsLoaded.value != true)
                         loadEvents(state)
                     if (state.typesLoaded.value == true && state.eventsLoaded.value == true) {
-                        render(SummaryViewState.Passive(dayToggle.id), ctx)
+                        render(SummaryViewState.Passive(displayGroup.dateToggle.id), ctx)
                     }
                 }
                 // watch loading status
@@ -359,7 +275,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
             is SummaryViewState.Passive -> {
                 // set display fragment
                 val fragObserver: Observer<Int> = Observer {
-                    if (it != null) toggleDisplay(it)
+                    if (it != null) toggleDisplay(it, state)
                 }
                 state.displayFrag.observe(this, fragObserver)
             }
@@ -367,9 +283,9 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
         // make radio group from togglers
 
-        displayGroup.dayToggle.setOnClickListener { toggleDisplay(it.id) }
-        displayGroup.weekToggle.setOnClickListener { toggleDisplay(it.id) }
-        displayGroup.monthToggle.setOnClickListener { toggleDisplay(it.id) }
+        displayGroup.dateToggle.setOnClickListener { toggleDisplay(it.id, state) }
+        displayGroup.priorityToggle.setOnClickListener { toggleDisplay(it.id, state) }
+        displayGroup.progressToggle.setOnClickListener { toggleDisplay(it.id, state) }
 
         displayGroup.setOnCheckedChangeListener({group, checkedId ->
             for (t in 0..group.childCount) {

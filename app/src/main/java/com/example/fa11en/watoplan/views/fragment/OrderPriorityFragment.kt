@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 
 
-class WeekFragment : Fragment () {
+class OrderPriorityFragment : Fragment () {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         if (inflater != null && container != null) {
-            val view: View = inflater.inflate(R.layout.week_fragment_layout, null)
+            val view: View = inflater.inflate(R.layout.orderpriority_fragment_layout, null)
 
             return view
         }

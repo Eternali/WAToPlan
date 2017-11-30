@@ -22,33 +22,33 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
         <ToggleButton
-            android:id="@+id/dayToggle"
+            android:id="@+id/dateToggle"
             android:layout_weight="0.3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dayToggleText"
-            android:textOff="@string/dayToggleText"
-            android:textOn="@string/dayToggleText"
-            android:checked="false" />
-
-        <ToggleButton
-            android:id="@+id/weekToggle"
-            android:layout_weight="0.3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/weekToggleText"
-            android:textOff="@string/weekToggleText"
-            android:textOn="@string/weekToggleText"
+            android:text="@string/date_label"
+            android:textOff="@string/date_label"
+            android:textOn="@string/date_label"
             android:checked="true" />
 
         <ToggleButton
-            android:id="@+id/monthToggle"
+            android:id="@+id/priorityToggle"
             android:layout_weight="0.3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/monthToggleText"
-            android:textOff="@string/monthToggleText"
-            android:textOn="@string/monthToggleText"
+            android:text="@string/priority_label"
+            android:textOff="@string/priority_label"
+            android:textOn="@string/priority_label"
+            android:checked="false" />
+
+        <ToggleButton
+            android:id="@+id/progressToggle"
+            android:layout_weight="0.3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/progress_label"
+            android:textOff="@string/progress_label"
+            android:textOn="@string/progress_label"
             android:checked="false" />
         </RadioGroup>
 
