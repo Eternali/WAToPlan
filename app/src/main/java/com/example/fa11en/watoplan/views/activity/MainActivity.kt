@@ -116,7 +116,9 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     ////**** INTENTS ****////
 
-    fun generateFABS (isRemove: Boolean = false) {
+    fun generateFABS () {
+
+        // handle event type additions or modifications
         types.value?.value?.forEach {
             val button = FloatingActionButton(this)
             button.size = FloatingActionButton.SIZE_MINI
@@ -127,12 +129,28 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 addMenu.collapse()
                 addIntent(this, it.name)
             }
-            if (isRemove) {
-                addMenu.removeButton(button)
-            } else {
-                addMenu.addButton(button)
+            if (it.name in state.renderedFABs.keys) {
+                addMenu.removeButton(state.renderedFABs[it.name])
+                state.renderedFABs[it.name] = button
+            }
+            if (it.name !in state.renderedFABs) {
+                state.renderedFABs.put(it.name, button)
+            }
+
+            addMenu.addButton(button)
+        }
+
+        // handle event type deletions
+        val toremove = mutableListOf<String>()
+        state.renderedFABs.forEach {
+            if (types.value == null || types.value!!.value == null) return
+            if (it.key !in types.value!!.value!!.map { it.name }) {
+                addMenu.removeButton(it.value)
+                toremove.add(it.key)
             }
         }
+        toremove.forEach { state.renderedFABs.remove(it) }
+
     }
 
     override fun showDbError(ctx: Context, msg: String) {
@@ -192,10 +210,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun render (ctx: Context) {
 
         // observers
-//        val eventsLoaded: Observer<Boolean> = Observer {
-//            if (it == true) {
-//            }
-//        }
         val typesObserver: Observer<List<EventType>> = Observer {
             generateFABS()
         }
@@ -209,7 +223,6 @@ class MainActivity: AppCompatActivity (), SummaryView {
             }
         }
 
-//        state.eventsLoaded.observe(this, eventsLoaded)
         types.value?.observe(this, typesObserver)
         events.value?.observe(this, eventsObserver)
         state.displayFrag.observe(this, fragObserver)
