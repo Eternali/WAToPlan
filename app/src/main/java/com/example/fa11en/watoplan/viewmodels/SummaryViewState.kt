@@ -7,12 +7,12 @@ import com.example.fa11en.watoplan.*
 
 class SummaryViewState: ViewModel () {
 
-    val eventsLoaded = MutableLiveData<Boolean>()
+//    val eventsLoaded = MutableLiveData<Boolean>()
     val displayFrag = MutableLiveData<Int>()
     val pos = MutableLiveData<Int>()
 
     init {
-        eventsLoaded.postValue(false)
+//        eventsLoaded.postValue(false)
         pos.postValue(0)
     }
 

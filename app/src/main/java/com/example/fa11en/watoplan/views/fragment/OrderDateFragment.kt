@@ -32,7 +32,6 @@ class OrderDateFragment : Fragment () {
             byDateListView.adapter = byDateAdapter
 
             val eventsObserver: Observer<List<UserEvent>> = Observer {
-                Log.i("EVENT", it?.get(0)?.type.toString())
                 byDateAdapter.notifyDataSetChanged()
             }
             events.value!!.observe(activity as AppCompatActivity, eventsObserver)

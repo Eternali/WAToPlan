@@ -140,7 +140,7 @@ class MainActivity: AppCompatActivity (), SummaryView {
     }
 
     override fun reloadEvents() {
-
+        events.loadTypes(types)
     }
 
     override fun reloadTypes() {
@@ -192,12 +192,10 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun render (ctx: Context) {
 
         // observers
-        val eventsLoaded: Observer<Boolean> = Observer {
-            if (it == true) {
-                events.loadTypes(types)
-                state.displayFrag.postValue(R.id.dateToggle)
-            }
-        }
+//        val eventsLoaded: Observer<Boolean> = Observer {
+//            if (it == true) {
+//            }
+//        }
         val typesObserver: Observer<List<EventType>> = Observer {
             generateFABS()
         }
@@ -205,12 +203,13 @@ class MainActivity: AppCompatActivity (), SummaryView {
             if (it != null && events.value != null) toggleDisplay(it)
         }
         val eventsObserver: Observer<List<UserEvent>> = Observer {
-            if (it != null && state.eventsLoaded.value != true)
-                state.eventsLoaded.postValue(true)
-            Log.i("EVENTS", it?.get(0)?.type.toString())
+            if (it != null && types.value != null) {
+                events.loadTypes(types)
+                state.displayFrag.postValue(R.id.dateToggle)
+            }
         }
 
-        state.eventsLoaded.observe(this, eventsLoaded)
+//        state.eventsLoaded.observe(this, eventsLoaded)
         types.value?.observe(this, typesObserver)
         events.value?.observe(this, eventsObserver)
         state.displayFrag.observe(this, fragObserver)
