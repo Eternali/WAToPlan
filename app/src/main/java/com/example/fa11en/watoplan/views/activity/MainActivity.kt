@@ -17,6 +17,7 @@ import android.widget.Toast
 import android.widget.ToggleButton
 import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
 import com.example.fa11en.watoplan.data.dataviewmodel.UserEventsViewModel
+import com.example.fa11en.watoplan.data.dataviewmodel.loadTypes
 import com.example.fa11en.watoplan.viewmodels.SummaryViewState
 import com.example.fa11en.watoplan.views.SummaryView
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -191,14 +192,27 @@ class MainActivity: AppCompatActivity (), SummaryView {
     override fun render (ctx: Context) {
 
         // observers
+        val eventsLoaded: Observer<Boolean> = Observer {
+            if (it == true) {
+                events.loadTypes(types)
+                state.displayFrag.postValue(R.id.dateToggle)
+            }
+        }
         val typesObserver: Observer<List<EventType>> = Observer {
             generateFABS()
         }
         val fragObserver: Observer<Int> = Observer {
-            if (it != null && events.value != null && events.value?.value != null) toggleDisplay(it)
+            if (it != null && events.value != null) toggleDisplay(it)
+        }
+        val eventsObserver: Observer<List<UserEvent>> = Observer {
+            if (it != null && state.eventsLoaded.value != true)
+                state.eventsLoaded.postValue(true)
+            Log.i("EVENTS", it?.get(0)?.type.toString())
         }
 
+        state.eventsLoaded.observe(this, eventsLoaded)
         types.value?.observe(this, typesObserver)
+        events.value?.observe(this, eventsObserver)
         state.displayFrag.observe(this, fragObserver)
 
         // make radio group from togglers
@@ -208,12 +222,10 @@ class MainActivity: AppCompatActivity (), SummaryView {
         displayGroup.progressToggle.setOnClickListener { state.displayFrag.postValue(it.id) }
 
         displayGroup.setOnCheckedChangeListener({group, checkedId ->
-            Log.i("CHECKEDID", checkedId.toString())
             for (t in 0 until group.childCount) {
                 if (group.getChildAt(t) == null) continue
                 val view: ToggleButton = group.getChildAt(t) as ToggleButton
                 view.isChecked = view.id == checkedId
-                Log.i("CHILDID", view.id.toString())
             }
         })
 

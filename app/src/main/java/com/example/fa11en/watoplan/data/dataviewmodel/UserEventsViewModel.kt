@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.os.AsyncTask
+import android.util.Log
 import com.example.fa11en.watoplan.AppDatabase
 import com.example.fa11en.watoplan.EventsDB
 import com.example.fa11en.watoplan.UserEvent
@@ -13,15 +14,15 @@ import com.example.fa11en.watoplan.UserEvent
 class UserEventsViewModel (app: Application) : AndroidViewModel (app) {
 
     var value: LiveData<List<UserEvent>>?
-    var appdb: AppDatabase? = null
 
+    var appdb: AppDatabase? = null
     init {
         appdb = EventsDB.getInstance(app)
         value = appdb?.eventDao()?.getAll()
     }
 
     fun getById (eid: Int): UserEvent? {
-        return value?.value?.filter { it.eid == eid }?.get(0)
+        return value?.value?.filter { it.eid == eid }!!.get(0)
     }
 
     fun add (vararg events: UserEvent) {
@@ -37,6 +38,7 @@ class UserEventsViewModel (app: Application) : AndroidViewModel (app) {
     }
 
     companion object {
+
         private class AddAsyncTask (val db: AppDatabase) : AsyncTask<UserEvent, Unit, Unit>() {
             override fun doInBackground(vararg params: UserEvent?) {
                 db.beginTransaction()
@@ -48,8 +50,8 @@ class UserEventsViewModel (app: Application) : AndroidViewModel (app) {
                 db.endTransaction()
             }
         }
-
         private class DeleteAsyncTask (val db: AppDatabase) : AsyncTask<Any, Unit, Unit>() {
+
             override fun doInBackground(vararg params: Any?) {
                 db.beginTransaction()
                 params.forEach {
@@ -67,4 +69,8 @@ class UserEventsViewModel (app: Application) : AndroidViewModel (app) {
 
     }
 
+}
+
+fun UserEventsViewModel.loadTypes (types: TypesViewModel) {
+    this.value!!.value!!.forEach { it.type = types.getByName(it.typeName) }
 }

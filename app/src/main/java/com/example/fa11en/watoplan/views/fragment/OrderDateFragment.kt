@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,9 +32,10 @@ class OrderDateFragment : Fragment () {
             byDateListView.adapter = byDateAdapter
 
             val eventsObserver: Observer<List<UserEvent>> = Observer {
+                Log.i("EVENT", it?.get(0)?.type.toString())
                 byDateAdapter.notifyDataSetChanged()
             }
-            events.value?.observe(activity as AppCompatActivity, eventsObserver)
+            events.value!!.observe(activity as AppCompatActivity, eventsObserver)
 
             return view
         }

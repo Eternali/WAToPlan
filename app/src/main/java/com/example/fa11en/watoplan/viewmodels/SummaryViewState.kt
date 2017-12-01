@@ -7,11 +7,12 @@ import com.example.fa11en.watoplan.*
 
 class SummaryViewState: ViewModel () {
 
+    val eventsLoaded = MutableLiveData<Boolean>()
     val displayFrag = MutableLiveData<Int>()
     val pos = MutableLiveData<Int>()
 
     init {
-        displayFrag.postValue(R.id.priorityToggle)
+        eventsLoaded.postValue(false)
         pos.postValue(0)
     }
 

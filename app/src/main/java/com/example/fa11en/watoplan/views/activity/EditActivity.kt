@@ -223,11 +223,12 @@ class EditActivity : AppCompatActivity (), EditView {
             }
         }
         val isEditObserver: Observer<Boolean> = Observer {
-            if (it == true) {
+            if (it == true && events.value?.value != null) {
                 // set cancel button text and functionality
                 cancelButton.text = getString(R.string.deleteText)
 
                 val event = events.getById(intent.extras.getInt("eid"))
+                Log.i("EVENT", event.toString())
                 if (event == null) fail(ctx, "Invalid Event ID")
                 else setType(ctx, event.typeName)
 
@@ -256,10 +257,12 @@ class EditActivity : AppCompatActivity (), EditView {
         }
 
         types.value?.observe(this, Observer {
-            if (it != null) {
+            if (it != null)
                 state.curType.observe(this, typeObserver)
+        })
+        events.value?.observe(this, Observer {
+            if (it != null)
                 state.isEdit.observe(this, isEditObserver)
-            }
         })
 
         // param observers
