@@ -3,6 +3,7 @@ package com.example.fa11en.watoplan
 import android.app.Activity
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.*
+import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
 import com.example.fa11en.watoplan.viewmodels.EditTypeViewState
 import com.example.fa11en.watoplan.viewmodels.SettingsViewState
 import com.example.fa11en.watoplan.views.SettingsView
@@ -24,6 +26,11 @@ import kotterknife.bindView
 
 class SettingsActivity : AppCompatActivity (), SettingsView {
 
+    // viewmodels
+    lateinit override var state: SettingsViewState
+    lateinit override var types: TypesViewModel
+
+
     // use kotterknife to bind views to vals
 
     // theme switch
@@ -34,7 +41,6 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     private val typeList: ListView by bindView(R.id.typesEditList)
     private val addTypeButton: Button by bindView(R.id.addTypeButton)
 
-    lateinit override var appdb: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -42,8 +48,10 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        // initialize state to loading (neither the database or events are loaded yet)
-        render(SettingsViewState.Loading(Themes.LIGHT, false, false), this)
+        state = ViewModelProviders.of(this).get(SettingsViewState::class.java)
+        types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
+
+        render(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -51,17 +59,16 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         when (requestCode) {
             RequestCodes.NEWEVENTTYPE.code -> {
                 if (resultCode == ResultCodes.TYPESAVED.code) {
-                    render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
+                    reloadTypes(applicationContext)
                 } else if (resultCode == ResultCodes.TYPEFAILED.code) {
                     showDbError(applicationContext, "Failed to Save Event.")
                 }
             }
             RequestCodes.EDITEVENTTYPE.code -> {
-                EditTypeViewState.Edit.destroyInstance()
                 if (resultCode == ResultCodes.TYPEDELETED.code) {
-                    render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
+                    reloadTypes(applicationContext)
                 } else if (resultCode == ResultCodes.TYPECHANGED.code) {
-                    render(SettingsViewState.Loading(Themes.LIGHT, true, false), this)
+                    reloadTypes(applicationContext)
                 } else if (resultCode == ResultCodes.TYPEFAILED.code) {
                     showDbError(applicationContext, "Failed to Save Event.")
                 }
@@ -70,7 +77,6 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     }
 
     override fun onBackPressed() {
-        Log.i("BACKPRESSED", "FROM SETTINGS")
         val code = Intent()
         setResult(ResultCodes.TYPECHANGED.code, code)
         finish()
@@ -80,78 +86,38 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
     ////**** INTENTS ****////
 
-    override fun loadDatabase(ctx: Context): Boolean {
-        return try {
-            appdb = EventsDB.getInstance(ctx)
-            true
-        } catch (e: Exception) {
-            false
-        }
+    override fun reloadTypes(ctx: Context) {
+
     }
 
     override fun showDbError(ctx: Context, msg: String) {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
     }
 
-    // TODO: make a database intents class for application-wide data loading
-    override fun loadTypes(state: SettingsViewState.Loading): Boolean {
-        appdb.beginTransaction()
-        return try {
-            state.types.postValue(appdb.typeDao().getAll())
-            appdb.setTransactionSuccessful()
-            true
-        } catch (e: Exception) {
-            false
-        } finally {
-            appdb.endTransaction()
-        }
-    }
-
     override fun editDialog(ctx: Context, eventType: EventType?) {
         if (eventType != null) {
-            EditTypeViewState.Edit.getInstance(eventType)
-            startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.EDITEVENTTYPE.code)
+            val editIntent = Intent(ctx, EditTypeActivity::class.java)
+            editIntent.putExtra("typename", eventType.name)
+            startActivityForResult(editIntent, RequestCodes.EDITEVENTTYPE.code)
         } else
             startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
     }
 
-    override fun render(state: SettingsViewState, ctx: Context) {
-        when (state) {
-            is SettingsViewState.Loading -> {
-                // watch loading status
-                val dbLoadingObserver: Observer<Boolean> = Observer {
-                    if (it == true) {
-                        loadTypes(state)
-                    }
-                }
-                val typesLoadingObserver: Observer<List<EventType>> = Observer {
-                    if (it == null) {
-                        showDbError(ctx, "Failed to load Event Types")
-                    } else {
-                        state.typesLoaded.postValue(true)
-                    }
-                }
-                val finishedLoadingObserver: Observer<Boolean> = Observer {
-                    if (state.typesLoaded.value == true) {
-                        // if typesLoaded is true then types is guaranteed to be defined.
-                        render(SettingsViewState.Passive(state.theme.value!!, state.types.value!!), ctx)
-                    }
-                }
-                state.dbLoaded.observe(this, dbLoadingObserver)
-                state.types.observe(this, typesLoadingObserver)
-                state.typesLoaded.observe(this, finishedLoadingObserver)
+    override fun render(ctx: Context) {
 
-                // load database
-                if (loadDatabase(ctx)) state.dbLoaded.postValue(true)
-                else showDbError(ctx, "Failed to Load Database")
-            }
-            is SettingsViewState.Passive -> {
-                // now that everything is loaded, set listview adapter
-                typeList.adapter = TypeAdapter(this, 0, state.types)
-                addTypeButton.setOnClickListener { editDialog(ctx, null) }
-            }
+        // initialize observers
+        val typesObserver: Observer<List<EventType>> = Observer {
+            if (it != null)
+                typeList.adapter = TypeAdapter(this, 0, it.toMutableList())
+        }
+        val themeObserver: Observer<Themes> = Observer {
+
         }
 
+        types.value?.observe(this, typesObserver)
+        state.theme.observe(this, themeObserver)
+
+        addTypeButton.setOnClickListener { editDialog(ctx, null) }
     }
 
 }

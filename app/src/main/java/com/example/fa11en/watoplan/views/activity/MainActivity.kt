@@ -3,6 +3,7 @@ package com.example.fa11en.watoplan
 import android.app.FragmentTransaction
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +15,8 @@ import android.view.MenuItem
 import android.widget.RadioGroup
 import android.widget.Toast
 import android.widget.ToggleButton
+import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
+import com.example.fa11en.watoplan.data.dataviewmodel.UserEventsViewModel
 import com.example.fa11en.watoplan.viewmodels.SummaryViewState
 import com.example.fa11en.watoplan.views.SummaryView
 import com.getbase.floatingactionbutton.FloatingActionButton
@@ -28,19 +31,21 @@ import java.util.*
 
 class MainActivity: AppCompatActivity (), SummaryView {
 
+    // state variables
+    lateinit override var state: SummaryViewState
+    lateinit override var events: UserEventsViewModel
+    lateinit override var types: TypesViewModel
+
+
     // use kotterknife to bind views to vals
 
     // FAM
     private val addMenu: FloatingActionsMenu by bindView(R.id.addMenu)
-    override val typesRendered: MutableLiveData<MutableList<EventType>> = MutableLiveData()
-
     // view selection
     private val displayGroup: RadioGroup by bindView(R.id.overviewLayoutSwitcher)
-
+    // dot menu
     lateinit private var dotMenu: Menu
 
-    // activity state variables
-    lateinit override var appdb: AppDatabase
 
     override fun onCreate (savedInstanceState: Bundle?) {
 
@@ -49,15 +54,11 @@ class MainActivity: AppCompatActivity (), SummaryView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /* I HAVE TWO OPTIONS TO MANAGE STATE:
-        *  1: Use ViewModelProviders to keep a lifecycle aware instance of the model alive across fragments
-        *       (but this requires vararg parameter in render method to specify how to set the state)
-        *  2: Make each SummaryViewState subclass a singleton and get the instance across fragments
-        *       (but this is not lifecycle aware)
-        *  I have gone with the 2nd option for now */
-        typesRendered.postValue(mutableListOf())
-        render(SummaryViewState.Loading.getInstance
-                (false, false, false), this)
+        state = ViewModelProviders.of(this).get(SummaryViewState::class.java)
+        events = ViewModelProviders.of(this).get(UserEventsViewModel::class.java)
+        types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
+
+        render(this)
     }
 
     override fun onCreateOptionsMenu (menu: Menu?): Boolean {
@@ -94,24 +95,18 @@ class MainActivity: AppCompatActivity (), SummaryView {
                 if (resultCode == ResultCodes.TYPESAVED.code
                         || resultCode == ResultCodes.TYPEDELETED.code
                         || resultCode == ResultCodes.TYPECHANGED.code) {
-                    SummaryViewState.Loading.destroyInstance()
-                    render(SummaryViewState.Loading.getInstance
-                    (true, false, false), this)
+                    reloadTypes()
                 }
             }
             RequestCodes.NEWEVENT.code -> {
                 if (resultCode == ResultCodes.EVENTSAVED.code) {
-                    SummaryViewState.Loading.destroyInstance()
-                    render(SummaryViewState.Loading.getInstance
-                    (true, true, false), this)
+                    reloadEvents()
                 }
             }
             RequestCodes.EDITEVENT.code -> {
                 if (resultCode == ResultCodes.EVENTDELETED.code
                         || resultCode == ResultCodes.EVENTCHANGED.code) {
-                    SummaryViewState.Loading.destroyInstance()
-                    render(SummaryViewState.Loading.getInstance
-                    (true, true, false), this)
+                    reloadEvents()
                 }
             }
         }
@@ -120,8 +115,8 @@ class MainActivity: AppCompatActivity (), SummaryView {
 
     ////**** INTENTS ****////
 
-    fun generateFABS (state: SummaryViewState, isRemove: Boolean = false) {
-        state.types.value?.forEach {
+    fun generateFABS (isRemove: Boolean = false) {
+        types.value?.value?.forEach {
             val button = FloatingActionButton(this)
             button.size = FloatingActionButton.SIZE_MINI
             button.colorNormal = it.colorNormal
@@ -133,20 +128,9 @@ class MainActivity: AppCompatActivity (), SummaryView {
             }
             if (isRemove) {
                 addMenu.removeButton(button)
-                typesRendered.value!!.remove(it)
             } else {
                 addMenu.addButton(button)
-                typesRendered.value!!.add(it)
             }
-        }
-    }
-
-    override fun loadDatabase (ctx: Context): Boolean {
-        return try {
-            appdb = EventsDB.getInstance(ctx)
-            true
-        } catch (e: Exception) {
-            false
         }
     }
 
@@ -154,36 +138,15 @@ class MainActivity: AppCompatActivity (), SummaryView {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
     }
 
-    override fun loadTypes (state: SummaryViewState): Boolean {
-        appdb.beginTransaction()
-        return try {
-            state.types.postValue(appdb.typeDao().getAll())
-            appdb.setTransactionSuccessful()
-            true
-        } catch (e: Exception) {
-            showDbError(applicationContext, "Failed to load Event Types")
-            false
-        } finally {
-            appdb.endTransaction()
-        }
+    override fun reloadEvents() {
+
     }
 
-    override fun loadEvents (state: SummaryViewState): Boolean {
-        appdb.beginTransaction()
-        return try {
-            SummaryViewState.events.postValue(appdb.eventDao().getAll())
-            Log.i("EVENTS", appdb.eventDao().getAll()[0].params.toString())
-            appdb.setTransactionSuccessful()
-            true
-        } catch (e: Exception) {
-            showDbError(applicationContext, "Failed to load Events")
-            false
-        } finally {
-            appdb.endTransaction()
-        }
+    override fun reloadTypes() {
+
     }
 
-    override fun toggleDisplay (viewid: Int, state: SummaryViewState) {
+    override fun toggleDisplay (viewid: Int) {
         displayGroup.clearCheck()
         displayGroup.check(viewid)
 
@@ -225,87 +188,32 @@ class MainActivity: AppCompatActivity (), SummaryView {
         startActivityForResult(Intent(ctx, SettingsActivity::class.java), RequestCodes.ISEVENTTYPECHANGED.code)
     }
 
-    override fun render (state: SummaryViewState, ctx: Context) {
+    override fun render (ctx: Context) {
 
-        // fragment handling
-        when (state) {
-            is SummaryViewState.Loading -> {
-
-                val dataLoadedObserver: Observer<Boolean> = Observer {
-                    if (state.typesLoaded.value != true)
-                        loadTypes(state)
-                    if (state.typesLoaded.value == true && state.eventsLoaded.value != true)
-                        loadEvents(state)
-                    if (state.typesLoaded.value == true && state.eventsLoaded.value == true) {
-                        render(SummaryViewState.Passive(displayGroup.dateToggle.id), ctx)
-                    }
-                }
-                // watch loading status
-                val dbLoadingObserver: Observer<Boolean> = Observer {
-                    // == true for null safety
-                    if (it == true) {
-                        state.typesLoaded.observe(this, dataLoadedObserver)
-                        state.eventsLoaded.observe(this, dataLoadedObserver)
-                    }
-                }
-                val typesLoadingObserver: Observer<List<EventType>> = Observer {
-                    if (it == null)
-                        showDbError(ctx, "Failed to load Event Types")
-                    else {
-                        state.typesLoaded.postValue(true)
-                        generateFABS(state, true)
-                        generateFABS(state)
-                    }
-                }
-                val eventsLoadingObserver: Observer<List<UserEvent>> = Observer {
-                    if (it == null)
-                        showDbError(ctx, "Failed to load Events")
-                    else if (state.typesLoaded.value == true) {
-                        it.forEach {
-                            if (!it.loadType(appdb))
-                                throw TypeNotPresentException(it.typeName, Throwable())
-                        }
-                        state.eventsLoaded.postValue(true)
-                    }
-                }
-
-                // bind observables
-                state.dbLoaded.observe(this, dbLoadingObserver)
-                state.types.observe(this, typesLoadingObserver)
-                SummaryViewState.events.observe(this, eventsLoadingObserver)
-
-                // load database if not already done so
-                if (state.dbLoaded.value != true) {
-                    if (loadDatabase(ctx)) state.dbLoaded.postValue(true)
-                    else showDbError(ctx, "Failed to load Database")
-                }
-
-            }
-            is SummaryViewState.Passive -> {
-                // set display fragment
-                val fragObserver: Observer<Int> = Observer {
-                    if (it != null) toggleDisplay(it, state)
-                }
-                val eventsObserver: Observer<List<UserEvent>> = Observer {
-
-                }
-
-                state.displayFrag.observe(this, fragObserver)
-                SummaryViewState.events.observe(this, eventsObserver)
-            }
+        // observers
+        val typesObserver: Observer<List<EventType>> = Observer {
+            generateFABS()
         }
+        val fragObserver: Observer<Int> = Observer {
+            if (it != null && events.value != null && events.value?.value != null) toggleDisplay(it)
+        }
+
+        types.value?.observe(this, typesObserver)
+        state.displayFrag.observe(this, fragObserver)
 
         // make radio group from togglers
 
-        displayGroup.dateToggle.setOnClickListener { toggleDisplay(it.id, state) }
-        displayGroup.priorityToggle.setOnClickListener { toggleDisplay(it.id, state) }
-        displayGroup.progressToggle.setOnClickListener { toggleDisplay(it.id, state) }
+        displayGroup.dateToggle.setOnClickListener { state.displayFrag.postValue(it.id) }
+        displayGroup.priorityToggle.setOnClickListener { state.displayFrag.postValue(it.id) }
+        displayGroup.progressToggle.setOnClickListener { state.displayFrag.postValue(it.id) }
 
         displayGroup.setOnCheckedChangeListener({group, checkedId ->
-            for (t in 0..group.childCount) {
+            Log.i("CHECKEDID", checkedId.toString())
+            for (t in 0 until group.childCount) {
                 if (group.getChildAt(t) == null) continue
                 val view: ToggleButton = group.getChildAt(t) as ToggleButton
                 view.isChecked = view.id == checkedId
+                Log.i("CHILDID", view.id.toString())
             }
         })
 

@@ -9,32 +9,26 @@ import com.example.fa11en.watoplan.AppDatabase
 import com.example.fa11en.watoplan.EventType
 import com.example.fa11en.watoplan.ParameterTypes
 import com.example.fa11en.watoplan.UserEvent
+import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
+import com.example.fa11en.watoplan.data.dataviewmodel.UserEventsViewModel
 import com.example.fa11en.watoplan.viewmodels.EditViewState
 
 
 interface EditView {
 
-    var appdb: AppDatabase
-    val state: EditViewState
+    // viewmodels
+    var state: EditViewState
+    var types: TypesViewModel
+    var events: UserEventsViewModel
+
+    // map each parameter type to a view
     val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout>
 
-    // load database
-    fun loadDatabase(ctx: Context): Boolean
-
-    // load types
-    fun loadTypes(): Boolean
-
     // switch event type
-    fun setType(typeName: String): Boolean
-
-    // get event it specified
-    fun getEvent(eid: Int): UserEvent?
+    fun setType(ctx: Context, typeName: String)
 
     // save event to database
-    fun saveEvent (ctx: Context, eid: Int?): Boolean
-
-    // remove event from database
-    fun deleteEvent (eid: Int): Boolean
+    fun saveEvent (ctx: Context, eid: Int?)
 
     // show errors from the database
     fun showDbError (ctx: Context, msg: String)

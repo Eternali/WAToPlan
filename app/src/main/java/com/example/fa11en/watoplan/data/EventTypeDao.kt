@@ -1,5 +1,6 @@
 package com.example.fa11en.watoplan
 
+import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
 
 
@@ -7,7 +8,7 @@ import android.arch.persistence.room.*
 interface EventTypeDao {
 
     @Query("SELECT * FROM eventtype")
-    fun getAll(): List<EventType>
+    fun getAll(): LiveData<List<EventType>>
 
     @Query("SELECT * FROM eventtype WHERE name = :name")
     fun get(name: String): EventType

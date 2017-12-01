@@ -17,8 +17,8 @@ import com.example.fa11en.watoplan.views.SettingsView
 import com.example.fa11en.watoplan.views.view.TypeListView
 
 
-class TypeAdapter (val ctx: Context, var resource: Int, var events: MutableList<EventType>)
-    : ArrayAdapter<EventType> (ctx, resource, events) {
+class TypeAdapter (val ctx: Context, var resource: Int, var types: MutableList<EventType>)
+    : ArrayAdapter<EventType> (ctx, resource, types) {
 
     override fun notifyDataSetChanged() {
         super.notifyDataSetChanged()
@@ -37,16 +37,16 @@ class TypeAdapter (val ctx: Context, var resource: Int, var events: MutableList<
             // set layout to proper values
             // create radial background gradient (orientation is ignored but required for constructor)
             val backgroundDrawable = GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                    intArrayOf(events[position].colorPressed, events[position].colorNormal))
+                    intArrayOf(types[position].colorPressed, types[position].colorNormal))
             backgroundDrawable.gradientType = GradientDrawable.RADIAL_GRADIENT
             backgroundDrawable.gradientRadius = 200f
             backgroundDrawable.cornerRadius = 8f
             typeContainer.background = backgroundDrawable
-            typeName.text = events[position].name
+            typeName.text = types[position].name
 
             // click listeners
             typeContainer.setOnClickListener {
-                (ctx as SettingsActivity).editDialog(ctx, events[position])
+                (ctx as SettingsActivity).editDialog(ctx, types[position])
             }
 
             return typeView

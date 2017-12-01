@@ -1,5 +1,6 @@
 package com.example.fa11en.watoplan
 
+import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
 
 
@@ -7,7 +8,7 @@ import android.arch.persistence.room.*
 interface UserEventDao {
 
     @Query("SELECT * FROM userevent")
-    fun getAll(): List<UserEvent>
+    fun getAll(): LiveData<List<UserEvent>>
 
     @Query("SELECT * FROM userevent WHERE eid = :eid")
     fun get(eid: Int): UserEvent

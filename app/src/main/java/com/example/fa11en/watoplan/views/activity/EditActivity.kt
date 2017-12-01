@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.app.TimePickerDialog
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.Intent
@@ -15,6 +16,8 @@ import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.*
+import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
+import com.example.fa11en.watoplan.data.dataviewmodel.UserEventsViewModel
 import com.example.fa11en.watoplan.viewmodels.EditViewState
 import com.example.fa11en.watoplan.views.EditTypeView
 import com.example.fa11en.watoplan.views.EditView
@@ -32,14 +35,18 @@ import kotlin.collections.LinkedHashMap
 class EditActivity : AppCompatActivity (), EditView {
 
     // get state variables
-    lateinit override var appdb: AppDatabase
-    override val state = EditViewState()
+    lateinit override var state: EditViewState
+    lateinit override var types: TypesViewModel
+    lateinit override var events: UserEventsViewModel
+
+    override val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout> = linkedMapOf()
+
 
     // initialize ui bindings
     private val saveButton: Button by bindView(R.id.saveButton)
     private val cancelButton: Button by bindView(R.id.cancelButton)
-    private val typeSpinner: Spinner by bindView(R.id.eventTypeSpinner)
 
+    private val typeSpinner: Spinner by bindView(R.id.eventTypeSpinner)
     // initialize parameter views and mappings
     private val titleContainer: LinearLayout by bindView(R.id.eventTitleContainer)
     private val descriptionContainer: LinearLayout by bindView(R.id.eventDescContainer)
@@ -49,23 +56,27 @@ class EditActivity : AppCompatActivity (), EditView {
     private val notiContainer: LinearLayout by bindView(R.id.eventNotiContainer)
     private val locationContainer: LinearLayout by bindView(R.id.eventLocationContainer)
     private val entitiesContainer: LinearLayout by bindView(R.id.eventEntitiesContainer)
-    private val repeatContainer: LinearLayout by bindView(R.id.eventRepeatContainer)
 
-    override val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout> = linkedMapOf()
+    private val repeatContainer: LinearLayout by bindView(R.id.eventRepeatContainer)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
-        render(applicationContext)
+        state = ViewModelProviders.of(this).get(EditViewState::class.java)
+        events = ViewModelProviders.of(this).get(UserEventsViewModel::class.java)
+        types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
+
+        render(this)
     }
 
     inner class TypeSelectedListener : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-            if (parent == null || parent.getItemAtPosition(position) !in state.types.map { it.name })
+            if (types.value == null || types.value!!.value == null
+                || parent == null || parent.getItemAtPosition(position) !in types.value!!.value!!.map { it.name })
                 return
 
-            state.curType.postValue(state.types[position])
+            state.curType.postValue(types.value!!.value!![position])
         }
 
         override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -75,15 +86,6 @@ class EditActivity : AppCompatActivity (), EditView {
 
 
     ////**** INTENTS ****////
-
-    override fun loadDatabase(ctx: Context): Boolean {
-        return try {
-            appdb = EventsDB.getInstance(ctx)
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
 
     override fun showDbError(ctx: Context, msg: String) {
         Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
@@ -96,102 +98,44 @@ class EditActivity : AppCompatActivity (), EditView {
         finish()
     }
 
-    override fun loadTypes(): Boolean {
-        appdb.beginTransaction()
-        return try {
-            state.types = appdb.typeDao().getAll()
-            appdb.setTransactionSuccessful()
-            true
-        } catch (e: Exception) {
-            false
-        } finally {
-            appdb.endTransaction()
-        }
-    }
-
-    override fun setType(typeName: String): Boolean {
+    override fun setType(ctx: Context, typeName: String) {
+        Log.i("aslkj", typeName)
         // initialize spinner
         val typeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
-                state.types.map { it.name })
+                types.value?.value?.map { it.name })
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         typeSpinner.adapter = typeAdapter
 
-        appdb.beginTransaction()
-        return try {
-            val type = appdb.typeDao().get(typeName)
-            state.curType.postValue(type)
-            appdb.setTransactionSuccessful()
+        val type = types.getByName(typeName)
+        if (type == null) fail(ctx, "Type does not exist.")
 
-            typeSpinner.setSelection(typeAdapter.getPosition(type.name))
-            true
-        } catch (e: Exception) {
-            typeSpinner.setSelection(0)
-            false
-        } finally {
-            appdb.endTransaction()
-            typeSpinner.onItemSelectedListener = TypeSelectedListener()
-        }
+        state.curType.postValue(type)
+        typeSpinner.setSelection(typeAdapter.getPosition(type?.name))
+        typeSpinner.onItemSelectedListener = TypeSelectedListener()
     }
 
-    override fun getEvent(eid: Int): UserEvent? {
-        appdb.beginTransaction()
-        return try {
-            val event = appdb.eventDao().get(eid)
-            appdb.setTransactionSuccessful()
-            event
-        } catch (e: Exception) {
-            null
-        } finally {
-            appdb.endTransaction()
+    override fun saveEvent(ctx: Context, eid: Int?) {
+        if (state.curType.value == null) fail(ctx, "Event Type Not Set")
+        val event = UserEvent(state.curType.value!!)
+        // delete existing event if we're editing it (update isn't working)
+        if (eid != null) {
+            event.eid = eid
+            events.delete(event.eid)
         }
-    }
 
-    override fun saveEvent(ctx: Context, eid: Int?): Boolean {
-        appdb.beginTransaction()
-        return try {
-            // initialize event with the state
-            if (state.curType.value == null) fail(ctx, "Event Type Not Set")
-            val event = UserEvent(state.curType.value!!)
-            if (eid != null) {
-                event.eid = eid
-                appdb.eventDao().deleteById(event.eid)
-            }
+        // set event parameters
+        event.setParam(ParameterTypes.TITLE, state.name.value as Any)
+        event.setParam(ParameterTypes.DESCRIPTION, state.desc.value as Any)
+        event.setParam(ParameterTypes.DATETIME, state.datetime.value as Any)
+        event.setParam(ParameterTypes.NOTIS, state.notis.value as Any)
+        event.setParam(ParameterTypes.LOCATION, state.location.value as Any)
+        event.setParam(ParameterTypes.ENTITIES, state.entities.value as Any)
+        event.setParam(ParameterTypes.REPEAT, state.repetitions.value as Any)
+        event.setParam(ParameterTypes.PROGRESS, state.progress.value as Any)
+        event.setParam(ParameterTypes.PRIORITY, state.priority.value as Any)
 
-            // set event parameters
-            event.setParam(ParameterTypes.TITLE, state.name.value as Any)
-            event.setParam(ParameterTypes.DESCRIPTION, state.desc.value as Any)
-            event.setParam(ParameterTypes.DATETIME, state.datetime.value as Any)
-            event.setParam(ParameterTypes.NOTIS, state.notis.value as Any)
-            event.setParam(ParameterTypes.LOCATION, state.location.value as Any)
-            event.setParam(ParameterTypes.ENTITIES, state.entities.value as Any)
-            event.setParam(ParameterTypes.REPEAT, state.repetitions.value as Any)
-            event.setParam(ParameterTypes.PROGRESS, state.progress.value as Any)
-            event.setParam(ParameterTypes.PRIORITY, state.priority.value as Any)
-
-            Log.i("TO SAVE EVENT", event.params.toString())
-            // save event to database
-            appdb.eventDao().insert(event)
-            appdb.setTransactionSuccessful()
-
-            true
-        } catch (e: Exception) {
-            false
-        } finally {
-            appdb.endTransaction()
-        }
-    }
-
-    override fun deleteEvent(eid: Int): Boolean {
-        appdb.beginTransaction()
-        return try {
-            appdb.eventDao().deleteById(eid)
-            appdb.setTransactionSuccessful()
-            true
-        } catch (e: Exception) {
-            false
-        } finally {
-            appdb.endTransaction()
-        }
+        // save event to database
+        events.add(event)
     }
 
     override fun timeChooser(view: View) {
@@ -268,13 +212,14 @@ class EditActivity : AppCompatActivity (), EditView {
         locationContainer.eventLocationEdit.setOnClickListener { mapDialog(it) }
 
         // initialize observers
-        val loadingObserver: Observer<Boolean> = Observer {
-            if (it == true) {
-                if (intent.hasExtra("eid"))
-                    state.isEdit.postValue(true)
-                else if (intent.hasExtra("typename"))
-                    state.isEdit.postValue(false)
-                else fail(ctx, "No Type or Event Specified")
+        val typeObserver: Observer<EventType> = Observer { type ->
+            Log.i("name", type?.name)
+            ParameterTypes.values().forEach {
+                if (type?.parameters!!.contains(it)) {
+                    paramtoView[it]?.visibility = LinearLayout.VISIBLE
+                } else {
+                    paramtoView[it]?.visibility = LinearLayout.GONE
+                }
             }
         }
         val isEditObserver: Observer<Boolean> = Observer {
@@ -282,10 +227,9 @@ class EditActivity : AppCompatActivity (), EditView {
                 // set cancel button text and functionality
                 cancelButton.text = getString(R.string.deleteText)
 
-                val event: UserEvent? = getEvent(intent.extras.getInt("eid"))
+                val event = events.getById(intent.extras.getInt("eid"))
                 if (event == null) fail(ctx, "Invalid Event ID")
-                else if (!setType(event.typeName)) fail(ctx, "Invalid Type Name")
-                Log.i("EVENT PARAMS", event!!.params.toString())
+                else setType(ctx, event.typeName)
 
                 // set defaults according to event
                 event!!.params.keys.forEach {
@@ -307,24 +251,16 @@ class EditActivity : AppCompatActivity (), EditView {
                 }
             } else {
                 cancelButton.text = getString(R.string.cancelText)
-                if (!setType(intent.extras.getString("typename")))
-                    fail(ctx, "Invalid Type Name")
-            }
-        }
-        val typeObserver: Observer<EventType> = Observer { type ->
-            Log.i("TYPE", type?.parameters.toString())
-            ParameterTypes.values().forEach {
-                if (type?.parameters!!.contains(it)) {
-                    paramtoView[it]?.visibility = LinearLayout.VISIBLE
-                } else {
-                    paramtoView[it]?.visibility = LinearLayout.GONE
-                }
+                setType(ctx, intent.extras.getString("typename"))
             }
         }
 
-        state.loaded.observe(this, loadingObserver)
-        state.isEdit.observe(this, isEditObserver)
-        state.curType.observe(this, typeObserver)
+        types.value?.observe(this, Observer {
+            if (it != null) {
+                state.curType.observe(this, typeObserver)
+                state.isEdit.observe(this, isEditObserver)
+            }
+        })
 
         // param observers
         val locationObserver: Observer<Location> = Observer {
@@ -349,20 +285,12 @@ class EditActivity : AppCompatActivity (), EditView {
         eventPriorityContainer.eventPrioritySeek.setOnSeekBarChangeListener(SeekbarListener(state.priority))
         eventProgressContainer.eventProgressSeek.setOnSeekBarChangeListener(SeekbarListener(state.progress))
 
-        // initialize data
-        if (loadDatabase(ctx))
-            state.loaded.postValue(loadTypes())
-        else {
-            fail(ctx, "Failed to Load the Database")
-        }
-
         // ender clickers
         cancelButton.setOnClickListener {
             val code = Intent()
             if (state.isEdit.value == true) {
-                if (deleteEvent(intent.extras.getInt("eid")))
-                    setResult(ResultCodes.EVENTDELETED.code, code)
-                else setResult(ResultCodes.EVENTFAILED.code, code)
+                events.delete(intent.extras.getInt("eid"))
+                setResult(ResultCodes.EVENTDELETED.code, code)
             }
             else
                 setResult(ResultCodes.EVENTCANCELED.code, code)
@@ -371,18 +299,18 @@ class EditActivity : AppCompatActivity (), EditView {
         saveButton.setOnClickListener {
             val code = Intent()
             if (state.isEdit.value == true) {
-                if (saveEvent(ctx, intent.extras.getInt("eid")))
-                    setResult(ResultCodes.EVENTCHANGED.code, code)
-                else
-                    setResult(ResultCodes.EVENTFAILED.code, code)
+                saveEvent(ctx, intent.extras.getInt("eid"))
+                setResult(ResultCodes.EVENTCHANGED.code, code)
             } else {
-                if (saveEvent(ctx, null))
-                    setResult(ResultCodes.EVENTSAVED.code, code)
-                else
-                    setResult(ResultCodes.EVENTFAILED.code, code)
+                saveEvent(ctx, null)
+                setResult(ResultCodes.EVENTSAVED.code, code)
             }
             finish()
         }
+
+        if (intent.hasExtra("eid"))
+            state.isEdit.postValue(true)
+        else state.isEdit.postValue(false)
 
     }
 

@@ -2,6 +2,7 @@ package com.example.fa11en.watoplan.views.dialog
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.widget.*
 import com.example.fa11en.watoplan.*
+import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
 import com.example.fa11en.watoplan.viewmodels.EditTypeViewState
 import com.example.fa11en.watoplan.views.EditTypeView
 import kotlinx.android.synthetic.main.edittype_layout.*
@@ -19,6 +21,12 @@ import yuku.ambilwarna.AmbilWarnaDialog
 
 
 class EditTypeActivity: AppCompatActivity (), EditTypeView {
+
+    // viewmodels
+
+    lateinit override var state: EditTypeViewState
+    lateinit override var types: TypesViewModel
+
 
     // use kotterknife to bind views to vals
 
@@ -29,23 +37,30 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
     val cancelButton: Button by bindView(R.id.typeCancelButton)
     val saveButton: Button by bindView(R.id.typeSaveButton)
 
-    override lateinit var appdb: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edittype_layout)
 
-        if (EditTypeViewState.Edit.isInstantiated())
-            render(EditTypeViewState.Edit.getInstance(null), this)
-        else
-            render(EditTypeViewState.New(), this)
+        state = ViewModelProviders.of(this).get(EditTypeViewState::class.java)
+        types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
+
+        render(this)
     }
 
 
     ////**** INTENTS ****////
 
-    override fun saveType(state: EditTypeViewState): Boolean {
-        return if (state.typeName.value != null
+    override fun fail(ctx: Context, msg: String) {
+        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+    }
+
+    override fun showDbError(ctx: Context, msg: String) {
+        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+    }
+
+    override fun saveType(ctx: Context) {
+        if (state.typeName.value != null
                 && state.typeColorNormal.value != null
                 && state.typeColorPressed.value != null) {
             // assuming state.typeParams is initialized along with other state vals
@@ -53,58 +68,19 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
                     ArrayList(state.typeParams.keys.filter {
                         state.typeParams[it]?.value!!
                     }), state.typeColorNormal.value!!, state.typeColorPressed.value!!)
-            appdb.beginTransaction()
-            try {
-                appdb.typeDao().insert(eventType)
-                appdb.setTransactionSuccessful()
-                true
-            } catch (e: Exception) {
-                false
-            } finally {
-                appdb.endTransaction()
-            }
-        } else false
+
+            if (state.isEdit.value == true) types.update(eventType)
+            else types.add(eventType)
+        } else fail(ctx, "Invalid parameters")
     }
 
-    override fun updateType(state: EditTypeViewState.Edit): Boolean {
-        return if (state.typeName.value != null && state.typeColorNormal.value != null && state.typeColorPressed.value != null) {
-            val eventType = EventType(state.typeName.value!!,
-                    ArrayList(state.typeParams.keys.filter {
-                        state.typeParams[it]?.value!!
-                    }), state.typeColorNormal.value!!, state.typeColorPressed.value!!)
-            appdb.beginTransaction()
-            try {
-                appdb.typeDao().update(eventType)
-                appdb.setTransactionSuccessful()
-                true
-            } catch (e: Exception) {
-                false
-            } finally {
-                appdb.endTransaction()
-            }
-        } else false
-    }
-
-    override fun deleteType(state: EditTypeViewState.Edit): Boolean {
-        appdb.beginTransaction()
-        return try {
-            if (state.typeName.value == null) throw NullPointerException("Typename is empty.")
-            if (state.typeName.value!! in appdb.typeDao().getAll().map { it.name })
-                appdb.eventDao().deleteByTypeName(state.typeName.value!!)
-            else
-                showDbError(applicationContext, "Invalid Type Name")
-            appdb.typeDao().delete(appdb.typeDao().get(state.typeName.value!!))
-            appdb.setTransactionSuccessful()
-            true
-        } catch (e: Exception) {
-            false
-        } finally {
-            appdb.endTransaction()
-        }
-    }
-
-    override fun showDbError(ctx: Context, msg: String) {
-        Toast.makeText(ctx, msg, Toast.LENGTH_LONG).show()
+    override fun deleteType(ctx: Context) {
+        if (state.typeName.value == null) throw NullPointerException("Typename is empty.")
+        if (types.value == null || types.value!!.value == null) throw NullPointerException("Types not loaded.")
+        if (state.typeName.value!! in types.value!!.value!!.map { it.name })
+            types.delete(types.getByName(state.typeName.value!!)!!)
+        else
+            showDbError(applicationContext, "Invalid Type Name")
     }
 
     override fun showColorChooser(ctx: Context, colorData: MutableLiveData<Int>) {
@@ -123,10 +99,7 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
                 listener()).dialog.show()
     }
 
-    override fun render(state: EditTypeViewState, ctx: Context) {
-
-        // get database
-        appdb = EventsDB.getInstance(ctx)
+    override fun render(ctx: Context) {
 
         //  initialize observables/listeners  //
 
@@ -176,35 +149,38 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
             showColorChooser(ctx, state.typeColorPressed)
         }
 
-        // after everything is initialized then check if specific defaults set
-        when (state) {
-            is EditTypeViewState.Edit -> {
-                nameEditText.setText(state.typeName.value)
-                colorNormalButton.setBackgroundColor(state.typeColorNormal.value!!)
-                colorPressedButton.setBackgroundColor(state.typeColorPressed.value!!)
-                cancelButton.text = getText(R.string.deleteText)
+        // isEdit observer
+        val isEditObserver: Observer<Boolean> = Observer {
+            if (it == true) {
+                val type = types.getByName(intent.getStringExtra("typename"))
+
+                nameEditText.setText(type!!.name)
+                state.typeColorNormal.postValue(type.colorNormal)
+                state.typeColorPressed.postValue(type.colorPressed)
+                ParameterTypes.values().forEach {
+                    if (it in type.parameters && state.typeParams[it]?.value != true)
+                        state.typeParams[it]?.postValue(true)
+                    else if (it !in type.parameters && state.typeParams[it]?.value != false)
+                        state.typeParams[it]?.postValue(false)
+                }
 
                 // delete button
+                cancelButton.text = getText(R.string.deleteText)
                 cancelButton.setOnClickListener{
                     val code = Intent()
-                    if (deleteType(state))
-                        setResult(ResultCodes.TYPEDELETED.code, code)
-                    else
-                        setResult(ResultCodes.TYPEFAILED.code, code)
+                    types.delete(types.getByName(type.name)!!)
+                    setResult(ResultCodes.TYPEDELETED.code, code)
                     finish()
                 }
 
                 // update button
                 saveButton.setOnClickListener {
                     val code = Intent()
-                    if (updateType(state))
-                        setResult(ResultCodes.TYPECHANGED.code, code)
-                    else
-                        setResult(ResultCodes.TYPEFAILED.code, code)
+                    saveType(ctx)
+                    setResult(ResultCodes.TYPECHANGED.code, code)
                     finish()
                 }
-            }
-            is EditTypeViewState.New -> {
+            } else {
                 // cancel button
                 cancelButton.setOnClickListener{
                     val code = Intent()
@@ -215,14 +191,20 @@ class EditTypeActivity: AppCompatActivity (), EditTypeView {
                 // save button
                 saveButton.setOnClickListener {
                     val code = Intent()
-                    if (saveType(state))
-                        setResult(ResultCodes.TYPESAVED.code, code)
-                    else
-                        setResult(ResultCodes.TYPEFAILED.code, code)
+                    saveType(ctx)
+                    setResult(ResultCodes.TYPESAVED.code, code)
                     finish()
                 }
             }
         }
+        types.value?.observe(this, Observer {
+            if (it != null) state.isEdit.observe(this, isEditObserver)
+        })
+
+        // after everything is initialized then check if specific defaults set
+        if (intent.hasExtra("typename"))
+            state.isEdit.postValue(true)
+        else state.isEdit.postValue(false)
 
     }
 

@@ -3,23 +3,22 @@ package com.example.fa11en.watoplan.views
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import com.example.fa11en.watoplan.AppDatabase
+import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
 import com.example.fa11en.watoplan.viewmodels.EditTypeViewState
 
 
 interface EditTypeView {
 
-    val appdb: AppDatabase
+    var state: EditTypeViewState
+    var types: TypesViewModel
 
     ////    required intents    ////
 
-    // save the event type to database
-    fun saveType (state: EditTypeViewState): Boolean
+    fun fail (ctx: Context, msg: String)
 
-    // update the event type being edited
-    fun updateType (state: EditTypeViewState.Edit): Boolean
+    fun saveType (ctx: Context)
 
-    // delete event type
-    fun deleteType (state: EditTypeViewState.Edit): Boolean
+    fun deleteType (ctx: Context)
 
     // show errors from the database
     fun showDbError (ctx: Context, msg: String)
@@ -32,6 +31,6 @@ interface EditTypeView {
         @param state: the viewState to be displayed
         @param ctx: the context to be rendered in
     */
-    fun render (state: EditTypeViewState, ctx: Context)
+    fun render (ctx: Context)
 
 }
