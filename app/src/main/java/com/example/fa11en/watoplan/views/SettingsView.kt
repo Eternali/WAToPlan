@@ -25,7 +25,7 @@ interface SettingsView {
     fun editDialog (ctx: Context, eventType: EventType?)
 
     // set the type
-    fun setTheme (ctx: Context, theme: Themes)
+    fun setThemePref (ctx: Context, theme: Themes?)
 
     /*
         Render the view

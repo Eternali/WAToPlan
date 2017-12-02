@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.*
 import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
@@ -103,11 +104,17 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
     }
 
-    override fun setTheme(ctx: Context, theme: Themes?) {
+    override fun setThemePref(ctx: Context, theme: Themes?) {
         if (state.sharedPref == null || theme == null) showDbError(ctx, "Failed to change theme")
         val spEditor: SharedPreferences.Editor = state.sharedPref!!.edit()
 
-        spEditor.putInt("theme", theme.ordinal)
+        if (theme != null) spEditor.putInt("theme", theme.ordinal)
+
+        val curTheme = TypedValue()
+        ctx.theme.resolveAttribute(R.attr.themeName, curTheme, true)
+        val theme = state.sharedPref?.getInt("theme", Themes.LIGHT.ordinal)
+
+        if (curTheme.string != )
 
         spEditor.apply()
         recreate()
@@ -121,7 +128,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 typeList.adapter = TypeAdapter(this, 0, it.toMutableList())
         }
         val themeObserver: Observer<Themes> = Observer {
-            setTheme(ctx, it)
+            setThemePref(ctx, it)
         }
 
         types.value?.observe(this, typesObserver)
