@@ -30,7 +30,6 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     lateinit override var state: SettingsViewState
     lateinit override var types: TypesViewModel
 
-
     // use kotterknife to bind views to vals
 
     // theme switch
@@ -50,6 +49,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
 
         state = ViewModelProviders.of(this).get(SettingsViewState::class.java)
         types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
+        state.sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE)
 
         render(this)
     }
@@ -103,6 +103,16 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
     }
 
+    override fun setTheme(ctx: Context, theme: Themes?) {
+        if (state.sharedPref == null || theme == null) showDbError(ctx, "Failed to change theme")
+        val spEditor: SharedPreferences.Editor = state.sharedPref!!.edit()
+
+        spEditor.putInt("theme", theme.ordinal)
+
+        spEditor.apply()
+        recreate()
+    }
+
     override fun render(ctx: Context) {
 
         // initialize observers
@@ -111,11 +121,16 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
                 typeList.adapter = TypeAdapter(this, 0, it.toMutableList())
         }
         val themeObserver: Observer<Themes> = Observer {
-
+            setTheme(ctx, it)
         }
 
         types.value?.observe(this, typesObserver)
         state.theme.observe(this, themeObserver)
+
+        themeSwitch.setOnClickListener {
+            if (it.isActivated) state.theme.postValue(Themes.DARK)
+            else state.theme.postValue(Themes.LIGHT)
+        }
 
         addTypeButton.setOnClickListener { editDialog(ctx, null) }
     }

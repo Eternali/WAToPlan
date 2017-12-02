@@ -2,6 +2,7 @@ package com.example.fa11en.watoplan.views
 
 import android.content.Context
 import com.example.fa11en.watoplan.EventType
+import com.example.fa11en.watoplan.Themes
 import com.example.fa11en.watoplan.data.dataviewmodel.TypesViewModel
 import com.example.fa11en.watoplan.viewmodels.SettingsViewState
 
@@ -22,6 +23,9 @@ interface SettingsView {
 
     // make dialog popup to edit event types
     fun editDialog (ctx: Context, eventType: EventType?)
+
+    // set the type
+    fun setTheme (ctx: Context, theme: Themes)
 
     /*
         Render the view
