@@ -108,13 +108,18 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         if (state.sharedPref == null || theme == null) showDbError(ctx, "Failed to change theme")
         val spEditor: SharedPreferences.Editor = state.sharedPref!!.edit()
 
-        if (theme != null) spEditor.putInt("theme", theme.ordinal)
+        if (theme != null) spEditor.putString("theme", theme.name)
 
         val curTheme = TypedValue()
-        ctx.theme.resolveAttribute(R.attr.themeName, curTheme, true)
-        val theme = state.sharedPref?.getInt("theme", Themes.LIGHT.ordinal)
+        ctx.theme.resolveAttribute(R.attr.theme_name, curTheme, true)
+        val theme = state.sharedPref?.getString("theme", Themes.LIGHT.name)
 
-        if (curTheme.string != )
+        if (curTheme.string != null) {
+            when (theme) {
+                Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
+                Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
+            }
+        }
 
         spEditor.apply()
         recreate()

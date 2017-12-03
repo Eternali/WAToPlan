@@ -8,9 +8,9 @@ import java.util.*
 
 
 // global enum of themes
-enum class Themes {
-    DARK,
-    LIGHT
+enum class Themes(name: String) {
+    DARK("DARK"),
+    LIGHT("LIGHT")
 }
 
 // global enum for request codes
