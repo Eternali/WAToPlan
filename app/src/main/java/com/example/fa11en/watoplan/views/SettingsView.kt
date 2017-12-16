@@ -24,8 +24,11 @@ interface SettingsView {
     // make dialog popup to edit event types
     fun editDialog (ctx: Context, eventType: EventType?)
 
-    // set the type
-    fun setThemePref (ctx: Context, theme: Themes?)
+    // save theme to shared preferences
+    fun setThemePref (ctx: Context, theme: Themes)
+
+    // recreate activity and apply theme
+    fun setTheme (ctx: Context)
 
     /*
         Render the view

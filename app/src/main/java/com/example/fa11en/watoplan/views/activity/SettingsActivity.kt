@@ -41,17 +41,33 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     private val typeList: ListView by bindView(R.id.typesEditList)
     private val addTypeButton: Button by bindView(R.id.addTypeButton)
 
+    // onCreate intents
+    override fun setTheme(ctx: Context) {
+        val activeTheme = TypedValue()
+        ctx.theme.resolveAttribute(R.attr.theme_name, activeTheme, true)
+
+        val curTheme: String? = state.sharedPref?.getString("theme", Themes.LIGHT.name)
+        if (activeTheme.string != curTheme) {
+            when (curTheme) {
+                Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
+                Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
+            }
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // must set theme before super is called
+        state = ViewModelProviders.of(this).get(SettingsViewState::class.java)
+        state.sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        setTheme(this)
 
         // set content view to layout
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        state = ViewModelProviders.of(this).get(SettingsViewState::class.java)
         types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
-        state.sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE)
-
         render(this)
     }
 
@@ -104,44 +120,48 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
             startActivityForResult(Intent(ctx, EditTypeActivity::class.java), RequestCodes.NEWEVENTTYPE.code)
     }
 
-    override fun setThemePref(ctx: Context, theme: Themes?) {
-        if (state.sharedPref == null || theme == null) showDbError(ctx, "Failed to change theme")
-        val spEditor: SharedPreferences.Editor = state.sharedPref!!.edit()
-
-        if (theme != null) spEditor.putString("theme", theme.name)
-
-        val curTheme = TypedValue()
-        ctx.theme.resolveAttribute(R.attr.theme_name, curTheme, true)
-        val theme = state.sharedPref?.getString("theme", Themes.LIGHT.name)
-
-        if (curTheme.string != null) {
-            when (theme) {
-                Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
-                Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
-            }
+    override fun setThemePref(ctx: Context, theme: Themes) {
+        if (state.sharedPref == null) {
+            showDbError(ctx, "Failed to load preferences.")
+            finish()
         }
 
-        spEditor.apply()
-        recreate()
+        val curTheme = state.sharedPref?.getString("theme", Themes.LIGHT.name)
+        Log.i("THEME CURRENTLY APPLIED", curTheme)
+
+        // only open editor if we need to change it to avoid pref change listeners being called
+        if (curTheme != theme.name) {
+            val spEditor: SharedPreferences.Editor = state.sharedPref!!.edit()
+            spEditor.putString("theme", theme.name)
+            spEditor.apply()
+        }
     }
 
     override fun render(ctx: Context) {
 
         // initialize observers
+        state.prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPref, key -> run {
+            when (key) {
+                "theme" -> setTheme(this)
+            }
+            recreate()
+        } }
         val typesObserver: Observer<List<EventType>> = Observer {
             if (it != null)
                 typeList.adapter = TypeAdapter(this, 0, it.toMutableList())
         }
-        val themeObserver: Observer<Themes> = Observer {
-            setThemePref(ctx, it)
-        }
 
+        state.sharedPref?.registerOnSharedPreferenceChangeListener(state.prefListener)
         types.value?.observe(this, typesObserver)
-        state.theme.observe(this, themeObserver)
 
         themeSwitch.setOnClickListener {
-            if (it.isActivated) state.theme.postValue(Themes.DARK)
-            else state.theme.postValue(Themes.LIGHT)
+            if ((it as Switch).isChecked) {
+                Log.i("THEME REQUESTED", Themes.DARK.name)
+                setThemePref(this, Themes.DARK)
+            } else {
+                Log.i("THEME REQUESTED", Themes.LIGHT.name)
+                setThemePref(this, Themes.LIGHT)
+            }
         }
 
         addTypeButton.setOnClickListener { editDialog(ctx, null) }
