@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.fa11en.watoplan">
+    package="com.chipthink.eternali.watoplan">
 
     <application
         android:allowBackup="true"
@@ -9,16 +9,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.chipthink.eternali.watoplan.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".views.dialog.EditTypeActivity"
+        <activity android:name="com.chipthink.eternali.watoplan.EditActivity" />
+        <activity android:name="com.chipthink.eternali.watoplan.SettingsActivity" />
+        <activity android:name="com.chipthink.eternali.watoplan.views.dialog.EditTypeActivity"
             android:theme="@style/edit_type_dialog_style"
             android:excludeFromRecents="true" />
     </application>
