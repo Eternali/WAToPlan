@@ -2,6 +2,7 @@ package com.chipthink.eternali.watoplan.viewmodels
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.content.SharedPreferences
 import android.location.Location
 import com.chipthink.eternali.watoplan.EventType
 import com.chipthink.eternali.watoplan.Person
@@ -9,6 +10,9 @@ import java.util.*
 
 
 class EditViewState : ViewModel () {
+
+    // shared preferences for theme, etc.
+    var sharedPref: SharedPreferences? = null
 
     val curType: MutableLiveData<EventType> = MutableLiveData()
 

@@ -11,6 +11,7 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.view.Window
 import android.widget.*
@@ -54,11 +55,31 @@ class EditActivity : AppCompatActivity (), EditView {
 
     private val repeatContainer: LinearLayout by bindView(R.id.eventRepeatContainer)
 
+    // onCreate intents
+    override fun setTheme(ctx: Context) {
+        val activeTheme = TypedValue()
+        ctx.theme.resolveAttribute(R.attr.theme_name, activeTheme, true)
+
+        val curTheme: String? = state.sharedPref?.getString("theme", Themes.LIGHT.name)
+        if (activeTheme.string != curTheme) {
+            when (curTheme) {
+                Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
+                Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
+            }
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // must set theme and init state before super called
+        state = ViewModelProviders.of(this).get(EditViewState::class.java)
+        state.sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        setTheme(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
 
-        state = ViewModelProviders.of(this).get(EditViewState::class.java)
         events = ViewModelProviders.of(this).get(UserEventsViewModel::class.java)
         types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
 

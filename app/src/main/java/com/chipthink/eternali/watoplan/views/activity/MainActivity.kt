@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -44,15 +45,33 @@ class MainActivity: AppCompatActivity (), SummaryView {
     // dot menu
     lateinit private var dotMenu: Menu
 
+    // onCreate intents
+    override fun setTheme(ctx: Context) {
+        val activeTheme = TypedValue()
+        ctx.theme.resolveAttribute(R.attr.theme_name, activeTheme, true)
+
+        val curTheme: String? = state.sharedPref?.getString("theme", Themes.LIGHT.name)
+        if (activeTheme.string != curTheme) {
+            when (curTheme) {
+                Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
+                Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
+            }
+        }
+    }
+
 
     override fun onCreate (savedInstanceState: Bundle?) {
+
+        // must set theme and init state before super called
+        state = ViewModelProviders.of(this).get(SummaryViewState::class.java)
+        state.sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE)
+        setTheme(this)
 
         // set content view to layout
         // DEFAULT had parameter persistentState: PersistableBundle? in constructor and passed to super onCreate //
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        state = ViewModelProviders.of(this).get(SummaryViewState::class.java)
         events = ViewModelProviders.of(this).get(UserEventsViewModel::class.java)
         types = ViewModelProviders.of(this).get(TypesViewModel::class.java)
 
