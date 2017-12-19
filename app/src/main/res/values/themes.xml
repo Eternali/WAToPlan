@@ -4,7 +4,12 @@
         <item name="android:textViewStyle">@style/theme_textview_style</item>
     </style>
 
-    <style name="theme_textview_style" parent="@android:style/Widget.Holo.Light.TextView">
+    <!-- light dialog theme -->
+    <style name="light_textview_style" parent="@android:style/Widget.Holo.Light.TextView">
         <item name="android:textColor">@color/colorAccent</item>
     </style>
-</resources>
+    <!-- dark dialog theme -->
+    <style name="dark_textview_style" parent="@android:style/Widget.Holo.TextView">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+</resources>f

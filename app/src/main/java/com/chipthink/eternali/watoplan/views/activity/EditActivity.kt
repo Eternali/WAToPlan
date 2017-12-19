@@ -115,7 +115,6 @@ class EditActivity : AppCompatActivity (), EditView {
     }
 
     override fun setType(ctx: Context, typeName: String) {
-        Log.i("aslkj", typeName)
         // initialize spinner
         val typeAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                 types.value?.value?.map { it.name })
