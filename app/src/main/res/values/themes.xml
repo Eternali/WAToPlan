@@ -12,4 +12,4 @@
     <style name="dark_textview_style" parent="@android:style/Widget.Holo.TextView">
         <item name="android:textColor">@color/colorAccent</item>
     </style>
-</resources>f
+</resources>
