@@ -27,9 +27,6 @@ interface SettingsView {
     // save theme to shared preferences
     fun setThemePref (ctx: Context, theme: Themes)
 
-    // recreate activity and apply theme
-    fun setTheme (ctx: Context)
-
     /*
         Render the view
         @param state: the viewState to be displayed

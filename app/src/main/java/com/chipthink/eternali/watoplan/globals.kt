@@ -1,6 +1,7 @@
 package com.chipthink.eternali.watoplan
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.TypedValue
 import java.util.*
 
@@ -160,14 +161,18 @@ fun paramToParamType (param: String): ParameterTypes {
 }
 
 // set theme on activity onCreate
-fun setTheme (ctx: Context, prefTheme: Themes) {
+fun setTheme (ctx: Context, prefTheme: Themes? = null, sharedPref: SharedPreferences? = null) {
+    // get current theme
     val activeTheme = TypedValue()
     ctx.theme.resolveAttribute(R.attr.theme_name, activeTheme, true)
 
-    if (activeTheme.string != prefTheme.name) {
-        when (prefTheme) {
-            Themes.LIGHT -> ctx.setTheme(R.style.AppThemeLight)
-            Themes.DARK -> ctx.setTheme(R.style.AppThemeDark)
+    // determine desired theme
+    val desiredTheme = prefTheme?.name ?: sharedPref?.getString("theme", Themes.LIGHT.name)
+
+    if (activeTheme.string != desiredTheme) {
+        when (desiredTheme) {
+            Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
+            Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
         }
     }
 }
