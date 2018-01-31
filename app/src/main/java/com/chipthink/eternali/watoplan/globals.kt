@@ -161,7 +161,7 @@ fun paramToParamType (param: String): ParameterTypes {
 }
 
 // set theme on activity onCreate
-fun setTheme (ctx: Context, prefTheme: Themes? = null, sharedPref: SharedPreferences? = null) {
+fun setTheme (ctx: Context, prefTheme: Themes? = null, sharedPref: SharedPreferences? = null): Boolean {
     // get current theme
     val activeTheme = TypedValue()
     ctx.theme.resolveAttribute(R.attr.theme_name, activeTheme, true)
@@ -169,11 +169,20 @@ fun setTheme (ctx: Context, prefTheme: Themes? = null, sharedPref: SharedPrefere
     // determine desired theme
     val desiredTheme = prefTheme?.name ?: sharedPref?.getString("theme", Themes.LIGHT.name)
 
+    // return a boolean so the calling context knows whether or not it has to reload the view
     if (activeTheme.string != desiredTheme) {
         when (desiredTheme) {
-            Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
-            Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
+            Themes.LIGHT.name -> {
+                ctx.setTheme(R.style.AppThemeLight)
+                return true
+            }
+            Themes.DARK.name -> {
+                ctx.setTheme(R.style.AppThemeDark)
+                return true
+            }
         }
     }
+
+    return false
 }
 
