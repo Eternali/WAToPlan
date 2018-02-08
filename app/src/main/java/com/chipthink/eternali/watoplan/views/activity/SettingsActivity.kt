@@ -36,27 +36,13 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
     private val typeList: ListView by bindView(R.id.typesEditList)
     private val addTypeButton: Button by bindView(R.id.addTypeButton)
 
-    // onCreate intents
-    override fun setTheme(ctx: Context) {
-        val activeTheme = TypedValue()
-        ctx.theme.resolveAttribute(R.attr.theme_name, activeTheme, true)
-
-        val curTheme: String? = state.sharedPref?.getString("theme", Themes.LIGHT.name)
-        if (activeTheme.string != curTheme) {
-            when (curTheme) {
-                Themes.LIGHT.name -> ctx.setTheme(R.style.AppThemeLight)
-                Themes.DARK.name -> ctx.setTheme(R.style.AppThemeDark)
-            }
-        }
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // must set theme before super is called
         state = ViewModelProviders.of(this).get(SettingsViewState::class.java)
         state.sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE)
-        setTheme(this)
+        setTheme(this, sharedPref = state.sharedPref)
 
         // set content view to layout
         super.onCreate(savedInstanceState)
@@ -137,7 +123,7 @@ class SettingsActivity : AppCompatActivity (), SettingsView {
         // initialize observers
         state.prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPref, key -> run {
             when (key) {
-                "theme" -> setTheme(this)
+                "theme" -> setTheme(this, sharedPref = sharedPref)
             }
             recreate()
         } }

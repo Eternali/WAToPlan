@@ -19,9 +19,6 @@ interface EditView {
     // map each parameter type to a view
     val paramtoView: LinkedHashMap<ParameterTypes, LinearLayout>
 
-    // set theme and recreate activity
-    fun setTheme (ctx: Context)
-
     // switch event type
     fun setType(ctx: Context, typeName: String)
 

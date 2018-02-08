@@ -1,5 +1,8 @@
 package com.chipthink.eternali.watoplan
 
+import android.content.Context
+import android.content.SharedPreferences
+import android.util.TypedValue
 import java.util.*
 
 
@@ -75,50 +78,9 @@ fun Calendar.datestr (): String {
     return this.get(Calendar.DAY_OF_MONTH).toString() + " " + this.get(Calendar.MONTH) + " " + this.get(Calendar.YEAR)
 }
 
-
 // add extension to Int to change its range
 fun Int.toRange (instart: Int, inend: Int, outstart: Int, outend: Int): Int {
     return outstart + ((outend - outstart) / (inend - instart)) * (this - instart)
-}
-
-
-// event list extensions for sorting
-
-fun pivot (toSort: MutableList<Pair<Int, Long>>, lo: Int, hi: Int): Int {
-    val p = toSort[hi]
-    var i = lo - 1
-
-    for (j in lo until hi) {
-        if (toSort[j].second < p.second) {
-            i += 1
-            val tmp = toSort[i]
-            toSort[i] = toSort[j]
-            toSort[j] = tmp
-        }
-    }
-    if (toSort[hi].second < toSort[i+1].second) {
-        val tmp = toSort[i+1]
-        toSort[i+1] = toSort[hi]
-        toSort[hi] = tmp
-    }
-
-    return i + 1
-}
-
-fun quickSort (toSort: MutableList<Pair<Int, Long>>, lo: Int, hi: Int) {
-    if (lo < hi) {
-        val p = pivot(toSort, lo, hi)
-        quickSort(toSort, lo, p - 1)
-        quickSort(toSort, p + 1, hi)
-    }
-}
-
-fun Pair<Int, Long>.getEvent (events: List<UserEvent>): UserEvent? {
-    for (event in events)
-        if (event.eid == this.first)
-            return event
-
-    return null
 }
 
 fun List<UserEvent>.orderByDate (): List<UserEvent?>? {
@@ -149,11 +111,78 @@ fun List<UserEvent>.orderByProgress (): List<UserEvent?>? {
 }
 
 
+////**** HELPER FUNCTIONS ****////
+
+
+// quick sort custom implementation
+
+fun pivot (toSort: MutableList<Pair<Int, Long>>, lo: Int, hi: Int): Int {
+    val p = toSort[hi]
+    var i = lo - 1
+
+    for (j in lo until hi) {
+        if (toSort[j].second < p.second) {
+            i += 1
+            val tmp = toSort[i]
+            toSort[i] = toSort[j]
+            toSort[j] = tmp
+        }
+    }
+    if (toSort[hi].second < toSort[i+1].second) {
+        val tmp = toSort[i+1]
+        toSort[i+1] = toSort[hi]
+        toSort[hi] = tmp
+    }
+
+    return i + 1
+}
+fun quickSort (toSort: MutableList<Pair<Int, Long>>, lo: Int, hi: Int) {
+    if (lo < hi) {
+        val p = pivot(toSort, lo, hi)
+        quickSort(toSort, lo, p - 1)
+        quickSort(toSort, p + 1, hi)
+    }
+}
+
+fun Pair<Int, Long>.getEvent (events: List<UserEvent>): UserEvent? {
+    for (event in events)
+        if (event.eid == this.first)
+            return event
+
+    return null
+}
+
 // This must be defined to get ParameterTypes object based on its param
 fun paramToParamType (param: String): ParameterTypes {
     ParameterTypes.values()
             .filter { it.param == param }
             .forEach { return it }
     throw TypeNotPresentException(param, Throwable())
+}
+
+// set theme on activity onCreate
+fun setTheme (ctx: Context, prefTheme: Themes? = null, sharedPref: SharedPreferences? = null): Boolean {
+    // get current theme
+    val activeTheme = TypedValue()
+    ctx.theme.resolveAttribute(R.attr.theme_name, activeTheme, true)
+
+    // determine desired theme
+    val desiredTheme = prefTheme?.name ?: sharedPref?.getString("theme", Themes.LIGHT.name)
+
+    // return a boolean so the calling context knows whether or not it has to reload the view
+    if (activeTheme.string != desiredTheme) {
+        when (desiredTheme) {
+            Themes.LIGHT.name -> {
+                ctx.setTheme(R.style.AppThemeLight)
+                return true
+            }
+            Themes.DARK.name -> {
+                ctx.setTheme(R.style.AppThemeDark)
+                return true
+            }
+        }
+    }
+
+    return false
 }
 

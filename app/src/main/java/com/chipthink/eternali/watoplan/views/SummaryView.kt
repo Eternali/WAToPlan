@@ -13,9 +13,6 @@ interface SummaryView {
     var events: UserEventsViewModel
     var types: TypesViewModel
 
-    // set theme and recreate activity
-    fun setTheme (ctx: Context)
-
     // show database errors
     fun showDbError (ctx: Context, msg: String)
 
