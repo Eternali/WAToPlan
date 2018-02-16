@@ -1,35 +1,16 @@
 <resources>
 
-    <!-- Base application light theme. -->
-    <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="theme_name">LIGHT</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-    <!-- Base application dark theme. -->
-    <style name="AppThemeDark" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="theme_name">DARK</item>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="add_labels_style">
+    <style name="addLabelsStyle">
         <item name="android:background">@drawable/fab_label_background</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
-
-    <style name="edit_type_dialog_style" parent="Theme.AppCompat.Light.Dialog">
-        <item name="windowNoTitle">true</item>
-        <item name="android:screenSize">normal</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="theme_textview_style" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/fabLabel</item>
     </style>
 
 </resources>

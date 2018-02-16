@@ -5,75 +5,26 @@
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.chipthink.eternali.watoplan.MainActivity">
-
-    <RelativeLayout
-        android:id="@+id/overviewLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <RadioGroup
-            android:id="@+id/overviewLayoutSwitcher"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <ToggleButton
-                android:id="@+id/dateToggle"
-                android:layout_weight="0.3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/date_label"
-                android:textOff="@string/date_label"
-                android:textOn="@string/date_label"
-                android:checked="false" />
-
-            <ToggleButton
-                android:id="@+id/priorityToggle"
-                android:layout_weight="0.3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/priority_label"
-                android:textOff="@string/priority_label"
-                android:textOn="@string/priority_label"
-                android:checked="false" />
-
-            <ToggleButton
-                android:id="@+id/progressToggle"
-                android:layout_weight="0.3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/progress_label"
-                android:textOff="@string/progress_label"
-                android:textOn="@string/progress_label"
-                android:checked="false" />
-            </RadioGroup>
-
-    </RelativeLayout>
+    tools:context="com.chipthink.eternali.watoplan.views.activities.MainActivity">
 
     <LinearLayout
-        android:id="@+id/displayFragContainer"
+        android:id="@+id/activitiesContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/overviewLayout">
+        android:orientation="vertical">
     </LinearLayout>
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/addMenu"
+        android:id="@+id/activityAddMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginEnd="16dp"
-        fab:fab_addButtonPlusIconColor="@color/white"
-        fab:fab_addButtonColorNormal="@color/colorAccent"
-        fab:fab_addButtonColorPressed="@color/colorAccent_pressed"
-        fab:fab_labelStyle="@style/add_labels_style"
         android:hapticFeedbackEnabled="true"
+        fab:fab_addButtonPlusIconColor="@color/colorAccentLight"
+        fab:fab_addButtonColorNormal="@color/colorPrimaryLight"
+        fab:fab_addButtonColorPressed="@color/colorPrimary"
+        fab:fab_labelStyle="@style/addLabelsStyle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

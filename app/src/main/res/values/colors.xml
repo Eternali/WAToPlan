@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FF3F51B5</color>
-    <color name="colorPrimaryDark">#FF303F9F</color>
-    <color name="colorAccent">#FFFF4081</color>
-    <color name="colorSubTitle">#FF454545</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="colorAccent_pressed">#FFCF1051</color>
-    <color name="black_semi_transparent">#B2000000</color>
-    <color name="cancel_button">#FF757575</color>
+    <color name="lightText">#FFFFFF</color>
+    <color name="fabLabel">#EDEDED</color>
+    <color name="blackSemiTransparent">#B2000000</color>
+
+    <color name="colorPrimaryLight">#BE33DA</color>
+    <color name="colorPrimary">#8100B4</color>
+    <color name="colorPrimaryDark">#57058B</color>
+    <color name="colorAccentLight">#FFEA3D</color>
+    <color name="colorAccent">#FFD54F</color>
+    <color name="colorAccentDark">#E4B429</color>
 </resources>

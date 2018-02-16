@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("com.chipthink.fa11en.watoplan", appContext.packageName)
+        assertEquals("com.chipthink.eternali.watoplan", appContext.packageName)
     }
 }
