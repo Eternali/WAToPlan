@@ -109,8 +109,8 @@ final Map<String, HomeLayout> validLayouts = {
       );
     }
   ),
-  'month': HomeLayout(
-    name: 'month',
+  'calendar': HomeLayout(
+    name: 'calendar',
     defaultOptions: {  },
   )..withMenuBuilder((HomeLayout self) =>
     (BuildContext context, ValueChanged onChanged) {

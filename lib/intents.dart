@@ -64,6 +64,7 @@ class Intents {
 
   static Future initSettings(AppStateObservable appState, SharedPreferences prefs) async {
     if (LoadDefaults.defaultData.keys.length < 1) await LoadDefaults.loadDefaultData();
+    // await prefs.clear();
     return Future.value({
       'focused': LoadDefaults.defaultData['focused'] ?? 0,
       'focusedDate': Converters.dateTimeFromString(prefs.getString('focusedDate')) ?? DateTime.now(),
